@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Ofuscador Lua</title>
 <style>
 :root{
@@ -26,6 +26,11 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
+html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{touch-action:pan-x pan-y;}
+.actions{margin:14px 0 0;}
+.actions.second{margin:10px 0 14px;}
+#panelsRow{margin:10px 0 0;}
 body{
   margin:0; background:var(--bg); color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -204,7 +209,11 @@ footer{color:var(--muted); font-size:.72rem; text-align:center; padding:20px; ma
   <div class="actions">
     <button type="button" class="primary" id="runBtn">Ofuscar →</button>
     <button type="button" class="ghost" id="exampleBtn">Subir archivo</button>
-    <div class="panels-wrap">
+    <button type="button" class="owner" id="histBtn" style="display:none;">OBFUSCATIONS</button>
+    <input type="file" id="fileInput" style="display:none;">
+  </div>
+  <div class="actions" id="panelsRow">
+    <div class="panels-wrap" id="panelsWrap">
       <button type="button" class="ghost" id="panelsBtn">Panels ▾</button>
       <div class="panels-dropdown" id="panelsDropdown">
         <button type="button" id="ddSource">📄 Panel</button>
@@ -212,9 +221,9 @@ footer{color:var(--muted); font-size:.72rem; text-align:center; padding:20px; ma
         <button type="button" id="ddName">🏷️ Name</button>
       </div>
     </div>
+  </div>
+  <div class="actions second">
     <span id="panelStatusBadge"></span>
-    <button type="button" class="owner" id="histBtn" style="display:none;">OBFUSCATIONS</button>
-    <input type="file" id="fileInput" style="display:none;">
     <button type="button" class="ghost" id="copyBtn" style="display:none;">Copiar</button>
     <button type="button" class="ghost" id="dlNowBtn" style="display:none;">Descargar .txt</button>
     <button type="button" class="ghost" id="loadstringBtn" style="display:none;">Loadstring</button>
@@ -342,6 +351,13 @@ footer{color:var(--muted); font-size:.72rem; text-align:center; padding:20px; ma
 
 <script>
 const $ = id => document.getElementById(id);
+// Bloquear zoom (pellizco, doble toque, gestos)
+['gesturestart','gesturechange','gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
+document.addEventListener('touchmove', e => { if(e.touches && e.touches.length > 1) e.preventDefault(); }, {passive:false});
+let _lastTouchEnd = 0;
+document.addEventListener('touchend', e => { const n = Date.now(); if(n - _lastTouchEnd <= 300) e.preventDefault(); _lastTouchEnd = n; }, {passive:false});
+document.addEventListener('wheel', e => { if(e.ctrlKey) e.preventDefault(); }, {passive:false});
+document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey) && ['+','-','=','0'].includes(e.key)) e.preventDefault(); });
 let currentRole = null;
 let discordUser = null;
 const DISCORD_CLIENT_ID = '1562056929524719738';
@@ -530,6 +546,12 @@ function tryLogin(){
   $('loginScreen').style.display = 'none';
   $('appRoot').style.display = 'block';
   $('histBtn').style.display = currentRole === 'owner' ? 'inline-block' : 'none';
+  if(currentRole === 'owner'){
+    $('histBtn').insertAdjacentElement('afterend', $('panelsWrap'));
+    $('panelsRow').style.display = 'none';
+  } else {
+    $('panelsRow').style.display = 'flex';
+  }
   // Pedir al navegador que NO borre los datos al cerrar (iOS/Safari)
   try{
     if(navigator.storage && navigator.storage.persist){
