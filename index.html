@@ -40,7 +40,23 @@ body{
 #userCard span{font-size:.76rem; font-weight:600; color:var(--text); max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 #logoutBtn{position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); right:12px; z-index:20; background:transparent; color:var(--muted); border:1px solid var(--border); padding:7px 14px; font-size:.78rem; border-radius:8px; cursor:pointer;}
 #appRoot{display:none;}
-main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh; display:flex; align-items:center; justify-content:center;}
+main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh;}
+.toolbar{display:flex; flex-direction:column; gap:10px; padding-top:env(safe-area-inset-top,0px); margin-top:48px;}
+#searchInput{
+  width:100%; padding:11px 14px; border-radius:8px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text); font-size:.9rem; outline:none;
+}
+#searchInput:focus{border-color:var(--accent);}
+.toolbar-btns{display:flex; gap:10px;}
+.toolbar-btns button{
+  flex:1; font-size:.85rem; font-weight:600; padding:10px 16px;
+  border-radius:8px; border:1px solid var(--border); cursor:pointer;
+  background:var(--panel2); color:var(--text);
+}
+#publishBtn{background:var(--accent); color:#06231c; border-color:var(--accent);}
+#publishBtn:hover{opacity:.9;}
+#requestsBtn:hover{border-color:var(--accent);}
+.content{display:flex; align-items:center; justify-content:center; min-height:50vh;}
 .empty{color:var(--muted); font-size:.9rem; text-align:center;}
 </style>
 </head>
@@ -61,7 +77,16 @@ main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh; display:fl
   <div id="userCard"><img id="userAvatar" src="" alt=""><span id="userUsername"></span></div>
   <button type="button" id="logoutBtn">Cerrar sesión</button>
   <main>
-    <div class="empty">Vacío.</div>
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Buscar...">
+      <div class="toolbar-btns">
+        <button type="button" id="publishBtn">Publicar</button>
+        <button type="button" id="requestsBtn">Solicitudes</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="empty">Vacío.</div>
+    </div>
   </main>
 </div>
 
