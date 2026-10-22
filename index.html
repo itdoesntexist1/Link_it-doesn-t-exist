@@ -56,6 +56,7 @@ main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh;}
 #publishBtn{background:var(--accent); color:#06231c; border-color:var(--accent);}
 #publishBtn:hover{opacity:.9;}
 #requestsBtn:hover{border-color:var(--accent);}
+#messagesBtn:hover{border-color:var(--accent);}
 .content{display:flex; align-items:center; justify-content:center; min-height:50vh;}
 .empty{color:var(--muted); font-size:.9rem; text-align:center;}
 
@@ -125,6 +126,52 @@ main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh;}
 .req-reject{background:#ff6b6b; color:#fff;}
 .req-reject:hover{opacity:.9;}
 .req-empty{color:var(--muted); font-size:.85rem; text-align:center; padding:20px 10px;}
+
+#messagesModal{display:none; position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#messagesModal.open{display:flex;}
+#messagesModal .pmodal{max-width:480px;}
+.msg-item{
+  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+  padding:12px; margin-bottom:10px; cursor:pointer; display:flex; flex-direction:column; gap:4px;
+}
+.msg-item:hover{border-color:var(--accent);}
+.msg-item .meta{font-size:.75rem; color:var(--muted);}
+.msg-item .preview{font-size:.86rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.msg-empty{color:var(--muted); font-size:.85rem; text-align:center; padding:20px 10px;}
+
+#chatModal{display:none; position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#chatModal.open{display:flex;}
+#chatModal .pmodal{max-width:480px; height:min(80vh, 560px);}
+.chat-messages{
+  flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;
+  padding:12px 0; min-height:180px;
+}
+.chat-bubble{
+  max-width:80%; padding:8px 12px; border-radius:12px; font-size:.85rem; line-height:1.35;
+  word-break:break-word;
+}
+.chat-bubble.me{align-self:flex-end; background:var(--accent); color:#06231c; border-bottom-right-radius:4px;}
+.chat-bubble.them{align-self:flex-start; background:var(--panel2); border:1px solid var(--border); border-bottom-left-radius:4px;}
+.chat-bubble .who{font-size:.7rem; opacity:.75; margin-bottom:2px;}
+.chat-bubble .time{font-size:.65rem; opacity:.6; margin-top:4px; text-align:right;}
+.chat-input-row{display:flex; gap:8px; margin-top:8px;}
+.chat-input-row textarea{
+  flex:1; min-height:44px; max-height:90px; resize:none; padding:10px 12px;
+  border-radius:8px; border:1px solid var(--border); background:var(--panel2);
+  color:var(--text); font-size:.85rem; outline:none; font-family:inherit;
+}
+.chat-input-row textarea:focus{border-color:var(--accent);}
+.chat-send{
+  align-self:flex-end; padding:10px 14px; border-radius:8px; border:none;
+  background:var(--accent); color:#06231c; font-weight:600; font-size:.85rem; cursor:pointer;
+}
+.chat-send:hover{opacity:.9;}
+.pmodal-head .close-red{
+  background:#ff6b6b; color:#fff; border:none; border-radius:6px;
+  width:28px; height:28px; font-size:.9rem; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.pmodal-head .close-red:hover{opacity:.9;}
 </style>
 </head>
 <body>
@@ -149,6 +196,7 @@ main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh;}
       <div class="toolbar-btns">
         <button type="button" id="publishBtn">Publicar</button>
         <button type="button" id="requestsBtn">Solicitudes</button>
+        <button type="button" id="messagesBtn">Mensajes</button>
       </div>
     </div>
     <div class="content" id="content">
@@ -218,6 +266,30 @@ main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh;}
   </div>
 </div>
 
+<div id="messagesModal">
+  <div class="pmodal">
+    <div class="pmodal-head"><h2>Mensajes</h2><button type="button" class="close-red" id="messagesClose">✕</button></div>
+    <div class="pmodal-body" id="messagesList"></div>
+  </div>
+</div>
+
+<div id="chatModal">
+  <div class="pmodal">
+    <div class="pmodal-head">
+      <h2 id="chatTitle">Chat</h2>
+      <button type="button" class="close-red" id="chatClose">✕</button>
+    </div>
+    <div class="pmodal-body" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="Escribe un mensaje..." rows="1"></textarea>
+        <button type="button" class="chat-send" id="chatSend">Enviar</button>
+      </div>
+      <div id="chatError" style="color:#ff6b6b; font-size:.78rem; min-height:14px;"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 const $ = id => document.getElementById(id);
 
@@ -257,7 +329,7 @@ function startDiscordLogin(){
 }
 
 const SESSION_KEY = 'discordSession';
-const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 horas
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 
 function saveSession(user){
   localStorage.setItem(SESSION_KEY, JSON.stringify({ user, loginAt: Date.now() }));
@@ -289,7 +361,6 @@ function logout(){
 $('discordLoginBtn').addEventListener('click', startDiscordLogin);
 $('logoutBtn').addEventListener('click', logout);
 
-// ── Publicaciones ────────────────────────────────────────────────────────
 const LISTINGS_KEY = 'listings';
 
 function loadListings(){
@@ -410,7 +481,6 @@ $('publishSubmit').addEventListener('click', () => {
 
 $('searchInput').addEventListener('input', renderListings);
 
-// ── Mensajes / Solicitudes ───────────────────────────────────────────────
 const REQUESTS_KEY = 'requests';
 
 function loadRequests(){
@@ -454,10 +524,9 @@ $('messageSend').addEventListener('click', () => {
   const from = currentUsername();
   const requests = loadRequests();
 
-  // Busca si ya existe una solicitud de este usuario para esta publicación
   let req = requests.find(r => r.listingId === messageTargetListing.id && r.from === from);
   if(req){
-    req.messages.push({ text, ts: new Date().toISOString() });
+    req.messages.push({ text, ts: new Date().toISOString(), from });
   } else {
     req = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
@@ -465,8 +534,8 @@ $('messageSend').addEventListener('click', () => {
       listingTitle: messageTargetListing.title,
       to: messageTargetListing.author,
       from,
-      status: 'pending', // pending | accepted | rejected
-      messages: [{ text, ts: new Date().toISOString() }]
+      status: 'pending',
+      messages: [{ text, ts: new Date().toISOString(), from }]
     };
     requests.push(req);
   }
@@ -520,6 +589,120 @@ $('requestsList').addEventListener('click', (e) => {
   req.status = act === 'accept' ? 'accepted' : 'rejected';
   saveRequests(all);
   renderRequests();
+});
+
+// ── Mensajes / Chat ──────────────────────────────────────────────────────
+let currentChatId = null;
+
+function openMessagesModal(){
+  renderMessages();
+  $('messagesModal').classList.add('open');
+}
+function closeMessagesModal(){
+  $('messagesModal').classList.remove('open');
+}
+$('messagesBtn').addEventListener('click', openMessagesModal);
+$('messagesClose').addEventListener('click', closeMessagesModal);
+$('messagesModal').addEventListener('click', (e) => { if(e.target === $('messagesModal')) closeMessagesModal(); });
+
+function renderMessages(){
+  const me = currentUsername();
+  const all = loadRequests();
+  const convos = all.filter(r => r.status === 'accepted' && (r.from === me || r.to === me));
+  const list = $('messagesList');
+
+  if(convos.length === 0){
+    list.innerHTML = '<div class="msg-empty">No tienes conversaciones.</div>';
+    return;
+  }
+
+  convos.sort((a, b) => {
+    const ta = (a.messages && a.messages.length) ? a.messages[a.messages.length - 1].ts : '';
+    const tb = (b.messages && b.messages.length) ? b.messages[b.messages.length - 1].ts : '';
+    return tb.localeCompare(ta);
+  });
+
+  list.innerHTML = convos.map(r => {
+    const other = r.from === me ? r.to : r.from;
+    const last = r.messages && r.messages.length ? r.messages[r.messages.length - 1] : null;
+    const preview = last ? last.text : '';
+    return `<div class="msg-item" data-id="${r.id}">
+      <div class="meta"><strong>${escapeHtml(other)}</strong> · ${escapeHtml(r.listingTitle || '')}</div>
+      <div class="preview">${escapeHtml(preview)}</div>
+    </div>`;
+  }).join('');
+}
+
+$('messagesList').addEventListener('click', (e) => {
+  const item = e.target.closest('.msg-item');
+  if(!item) return;
+  openChat(item.dataset.id);
+});
+
+function openChat(id){
+  const all = loadRequests();
+  const req = all.find(r => r.id === id);
+  if(!req) return;
+  currentChatId = id;
+  const me = currentUsername();
+  const other = req.from === me ? req.to : req.from;
+  $('chatTitle').textContent = other + ' · ' + (req.listingTitle || '');
+  $('chatInput').value = '';
+  $('chatError').textContent = '';
+  renderChatMessages(req);
+  $('chatModal').classList.add('open');
+}
+
+function closeChat(){
+  $('chatModal').classList.remove('open');
+  currentChatId = null;
+}
+$('chatClose').addEventListener('click', closeChat);
+$('chatModal').addEventListener('click', (e) => { if(e.target === $('chatModal')) closeChat(); });
+
+function renderChatMessages(req){
+  const me = currentUsername();
+  const box = $('chatMessages');
+  const msgs = req.messages || [];
+  if(msgs.length === 0){
+    box.innerHTML = '<div class="msg-empty" style="padding:10px;">Sin mensajes aún.</div>';
+    return;
+  }
+  box.innerHTML = msgs.map(m => {
+    const isMe = (m.from || '') === me;
+    const who = isMe ? 'Tú' : (m.from || 'Usuario');
+    const time = m.ts ? new Date(m.ts).toLocaleString('es', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' }) : '';
+    return `<div class="chat-bubble ${isMe ? 'me' : 'them'}">
+      <div class="who">${escapeHtml(who)}</div>
+      ${escapeHtml(m.text)}
+      <div class="time">${escapeHtml(time)}</div>
+    </div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+$('chatSend').addEventListener('click', () => {
+  const text = $('chatInput').value.trim();
+  if(!text){ $('chatError').textContent = 'Escribe un mensaje.'; return; }
+  if(!currentChatId) return;
+
+  const from = currentUsername();
+  const all = loadRequests();
+  const req = all.find(r => r.id === currentChatId);
+  if(!req) return;
+
+  req.messages.push({ text, ts: new Date().toISOString(), from });
+  saveRequests(all);
+  $('chatInput').value = '';
+  $('chatError').textContent = '';
+  renderChatMessages(req);
+});
+
+$('chatInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    $('chatSend').click();
+  }
 });
 
 window.addEventListener('load', async () => {
