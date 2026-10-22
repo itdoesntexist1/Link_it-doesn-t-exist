@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Panel</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#161a21; --panel2:#1d222b; --border:#2a3140;
+  --text:#e8ecf4; --muted:#8b93a7; --accent:#5ee6c9;
+  color-scheme: dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f4f7; --panel:#ffffff; --panel2:#eef0f4; --border:#dde1e8;
+    --text:#1a1d24; --muted:#656d7e; --accent:#0f9d7f;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f3f4f7; --panel:#ffffff; --panel2:#eef0f4; --border:#dde1e8;
+  --text:#1a1d24; --muted:#656d7e; --accent:#0f9d7f;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+#discordScreen{position:fixed; inset:0; z-index:50; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:20px;}
+#discordScreen .box{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:32px 24px; width:100%; max-width:340px; text-align:center;}
+#discordScreen h2{margin:0 0 6px; font-size:1.05rem;}
+#discordScreen p{color:var(--muted); font-size:.8rem; margin:0 0 20px;}
+.discord-btn{display:inline-flex; align-items:center; gap:10px; background:#5865F2; color:#fff; border:2px solid #5865F2; border-radius:8px; padding:12px 20px; font-size:.9rem; font-weight:600; cursor:pointer; width:100%; justify-content:center;}
+.discord-btn:hover{background:#4752C4; border-color:#4752C4;}
+#userCard{position:fixed; top:calc(env(safe-area-inset-top,0px) + 8px); left:12px; z-index:20; display:none; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--border); border-radius:24px; padding:3px 10px 3px 3px;}
+#userCard img{width:26px; height:26px; border-radius:50%; object-fit:cover;}
+#userCard span{font-size:.76rem; font-weight:600; color:var(--text); max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+#logoutBtn{position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); right:12px; z-index:20; background:transparent; color:var(--muted); border:1px solid var(--border); padding:7px 14px; font-size:.78rem; border-radius:8px; cursor:pointer;}
+#appRoot{display:none;}
+main{padding:16px; max-width:1100px; margin:0 auto; min-height:100vh;}
+.toolbar{display:flex; flex-direction:column; gap:10px; padding-top:env(safe-area-inset-top,0px); margin-top:48px;}
+#searchInput{
+  width:100%; padding:11px 14px; border-radius:8px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text); font-size:.9rem; outline:none;
+}
+#searchInput:focus{border-color:var(--accent);}
+.toolbar-btns{display:flex; gap:10px;}
+.toolbar-btns button{
+  flex:1; font-size:.85rem; font-weight:600; padding:10px 16px;
+  border-radius:8px; border:1px solid var(--border); cursor:pointer;
+  background:var(--panel2); color:var(--text);
+}
+#publishBtn{background:var(--accent); color:#06231c; border-color:var(--accent);}
+#publishBtn:hover{opacity:.9;}
+#requestsBtn:hover{border-color:var(--accent);}
+#messagesBtn:hover{border-color:var(--accent);}
+.content{display:flex; align-items:center; justify-content:center; min-height:50vh;}
+.empty{color:var(--muted); font-size:.9rem; text-align:center;}
+
+#publishModal{display:none; position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#publishModal.open{display:flex;}
+.pmodal{background:var(--panel); border:1px solid var(--border); border-radius:12px; width:100%; max-width:420px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden;}
+.pmodal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border);}
+.pmodal-head h2{margin:0; font-size:.95rem;}
+.pmodal-head button{background:transparent; border:none; color:var(--muted); font-size:1rem; cursor:pointer;}
+.pmodal-body{padding:16px; display:flex; flex-direction:column; gap:14px; overflow-y:auto;}
+.pmodal-body label{display:block; font-size:.78rem; color:var(--muted); margin-bottom:6px;}
+.pmodal-body input[type="text"], .pmodal-body input[type="number"], .pmodal-body textarea{
+  width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border);
+  background:var(--panel2); color:var(--text); font-size:.85rem; outline:none; font-family:inherit;
+}
+.pmodal-body input:focus, .pmodal-body textarea:focus{border-color:var(--accent);}
+.pmodal-body textarea{min-height:90px; resize:vertical;}
+.photo-picker{
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;
+  border:1px dashed var(--border); border-radius:8px; padding:18px; cursor:pointer; text-align:center;
+}
+.photo-picker:hover{border-color:var(--accent);}
+.photo-picker img{max-width:100%; max-height:160px; border-radius:6px; object-fit:cover; display:none;}
+.photo-picker .hint{font-size:.78rem; color:var(--muted);}
+.pmodal-foot{padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end;}
+.pmodal-foot button{
+  font-size:.85rem; font-weight:600; padding:9px 16px; border-radius:8px;
+  border:1px solid var(--border); cursor:pointer; background:var(--panel2); color:var(--text);
+}
+.pmodal-foot button.primary{background:var(--accent); color:#06231c; border-color:var(--accent);}
+#formError{color:#ff6b6b; font-size:.78rem; min-height:14px;}
+
+.listing-card{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.listing-card img{width:100%; height:150px; object-fit:cover; background:var(--panel2);}
+.listing-card .body{padding:12px; display:flex; flex-direction:column; gap:4px;}
+.listing-card h3{margin:0; font-size:.92rem;}
+.listing-card .price{color:var(--accent); font-weight:700; font-size:.9rem;}
+.listing-card .category{color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em;}
+.listing-card .desc{color:var(--muted); font-size:.8rem; line-height:1.4; margin-top:4px;}
+.listings-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:14px; width:100%;
+}
+.listing-card{cursor:pointer;}
+.listing-card:hover{border-color:var(--accent);}
+
+#messageModal{display:none; position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#messageModal.open{display:flex;}
+
+#requestsModal{display:none; position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#requestsModal.open{display:flex;}
+#requestsModal .pmodal{max-width:480px;}
+.req-item{
+  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+  padding:12px; margin-bottom:10px; display:flex; flex-direction:column; gap:6px;
+}
+.req-item .meta{font-size:.75rem; color:var(--muted);}
+.req-item .msg{font-size:.86rem;}
+.req-item .req-btns{display:flex; gap:8px; margin-top:4px;}
+.req-item .req-btns button{
+  flex:1; padding:8px; border-radius:7px; border:none; font-size:1rem; cursor:pointer;
+}
+.req-accept{background:#2fb76b; color:#fff;}
+.req-accept:hover{opacity:.9;}
+.req-reject{background:#ff6b6b; color:#fff;}
+.req-reject:hover{opacity:.9;}
+.req-empty{color:var(--muted); font-size:.85rem; text-align:center; padding:20px 10px;}
+
+#messagesModal{display:none; position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#messagesModal.open{display:flex;}
+#messagesModal .pmodal{max-width:480px;}
+.msg-item{
+  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+  padding:12px; margin-bottom:10px; cursor:pointer; display:flex; flex-direction:column; gap:4px;
+}
+.msg-item:hover{border-color:var(--accent);}
+.msg-item .meta{font-size:.75rem; color:var(--muted);}
+.msg-item .preview{font-size:.86rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.msg-empty{color:var(--muted); font-size:.85rem; text-align:center; padding:20px 10px;}
+
+#chatModal{display:none; position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px;}
+#chatModal.open{display:flex;}
+#chatModal .pmodal{max-width:480px; height:min(80vh, 560px);}
+.chat-messages{
+  flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;
+  padding:12px 0; min-height:180px;
+}
+.chat-bubble{
+  max-width:80%; padding:8px 12px; border-radius:12px; font-size:.85rem; line-height:1.35;
+  word-break:break-word;
+}
+.chat-bubble.me{align-self:flex-end; background:var(--accent); color:#06231c; border-bottom-right-radius:4px;}
+.chat-bubble.them{align-self:flex-start; background:var(--panel2); border:1px solid var(--border); border-bottom-left-radius:4px;}
+.chat-bubble .who{font-size:.7rem; opacity:.75; margin-bottom:2px;}
+.chat-bubble .time{font-size:.65rem; opacity:.6; margin-top:4px; text-align:right;}
+.chat-input-row{display:flex; gap:8px; margin-top:8px;}
+.chat-input-row textarea{
+  flex:1; min-height:44px; max-height:90px; resize:none; padding:10px 12px;
+  border-radius:8px; border:1px solid var(--border); background:var(--panel2);
+  color:var(--text); font-size:.85rem; outline:none; font-family:inherit;
+}
+.chat-input-row textarea:focus{border-color:var(--accent);}
+.chat-send{
+  align-self:flex-end; padding:10px 14px; border-radius:8px; border:none;
+  background:var(--accent); color:#06231c; font-weight:600; font-size:.85rem; cursor:pointer;
+}
+.chat-send:hover{opacity:.9;}
+.pmodal-head .close-red{
+  background:#ff6b6b; color:#fff; border:none; border-radius:6px;
+  width:28px; height:28px; font-size:.9rem; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.pmodal-head .close-red:hover{opacity:.9;}
+</style>
+</head>
+<body>
+
+<div id="discordScreen">
+  <div class="box">
+    <h2>👾 Bienvenido</h2>
+    <p>Inicia sesión con tu cuenta de Discord para continuar.</p>
+    <button type="button" class="discord-btn" id="discordLoginBtn">
+      <svg width="20" height="20" viewBox="0 0 71 55" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.44077 45.4204 0.52529C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.52529C25.5141 0.44359 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309-0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/></svg>
+      Iniciar sesión con Discord
+    </button>
+  </div>
+</div>
+
+<div id="appRoot">
+  <div id="userCard"><img id="userAvatar" src="" alt=""><span id="userUsername"></span></div>
+  <button type="button" id="logoutBtn">Cerrar sesión</button>
+  <main>
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Buscar...">
+      <div class="toolbar-btns">
+        <button type="button" id="publishBtn">Publicar</button>
+        <button type="button" id="requestsBtn">Solicitudes</button>
+        <button type="button" id="messagesBtn">Mensajes</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div class="empty">Vacío.</div>
+    </div>
+  </main>
+</div>
+
+<div id="publishModal">
+  <div class="pmodal">
+    <div class="pmodal-head"><h2>Publicar</h2><button type="button" id="publishClose">✕</button></div>
+    <div class="pmodal-body">
+      <div>
+        <label>Foto (opcional)</label>
+        <div class="photo-picker" id="photoPicker">
+          <img id="photoPreview" alt="">
+          <span class="hint" id="photoHint">Toca para elegir una foto</span>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none;">
+      </div>
+      <div>
+        <label>Precio</label>
+        <input type="number" id="priceInput" placeholder="Ej: 150" min="0" step="0.01">
+      </div>
+      <div>
+        <label>¿Qué es lo que vendes?</label>
+        <input type="text" id="categoryInput" placeholder="Ej: Celular, ropa, servicio...">
+      </div>
+      <div>
+        <label>Título</label>
+        <input type="text" id="titleInput" placeholder="Título de la publicación" maxlength="80">
+      </div>
+      <div>
+        <label>Descripción</label>
+        <textarea id="descInput" placeholder="Describe lo que ofreces..."></textarea>
+      </div>
+      <div id="formError"></div>
+    </div>
+    <div class="pmodal-foot">
+      <button type="button" id="publishCancel">Cancelar</button>
+      <button type="button" class="primary" id="publishSubmit">Publicar</button>
+    </div>
+  </div>
+</div>
+
+<div id="messageModal">
+  <div class="pmodal">
+    <div class="pmodal-head"><h2 id="messageTitle">Enviar mensaje</h2><button type="button" id="messageClose">✕</button></div>
+    <div class="pmodal-body">
+      <div>
+        <label>Mensaje</label>
+        <textarea id="messageInput" placeholder="Escribe tu mensaje..."></textarea>
+      </div>
+      <div id="messageError"></div>
+    </div>
+    <div class="pmodal-foot">
+      <button type="button" id="messageCancel">Cancelar</button>
+      <button type="button" class="primary" id="messageSend">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<div id="requestsModal">
+  <div class="pmodal">
+    <div class="pmodal-head"><h2>Solicitudes</h2><button type="button" id="requestsClose">✕</button></div>
+    <div class="pmodal-body" id="requestsList"></div>
+  </div>
+</div>
+
+<div id="messagesModal">
+  <div class="pmodal">
+    <div class="pmodal-head"><h2>Mensajes</h2><button type="button" class="close-red" id="messagesClose">✕</button></div>
+    <div class="pmodal-body" id="messagesList"></div>
+  </div>
+</div>
+
+<div id="chatModal">
+  <div class="pmodal">
+    <div class="pmodal-head">
+      <h2 id="chatTitle">Chat</h2>
+      <button type="button" class="close-red" id="chatClose">✕</button>
+    </div>
+    <div class="pmodal-body" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="Escribe un mensaje..." rows="1"></textarea>
+        <button type="button" class="chat-send" id="chatSend">Enviar</button>
+      </div>
+      <div id="chatError" style="color:#ff6b6b; font-size:.78rem; min-height:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const DISCORD_CLIENT_ID = '1562056929524719738';
+const DISCORD_REDIRECT_URI = 'https://itdoesntexist1.github.io/Ofuscador-Lua/';
+
+function parseDiscordToken(){
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  return params.get('access_token');
+}
+
+async function fetchDiscordUser(token){
+  const res = await fetch('https://discord.com/api/users/@me', { headers: { Authorization: 'Bearer ' + token } });
+  if(!res.ok) throw new Error('fail');
+  return await res.json();
+}
+
+let discordUser = null;
+
+function showApp(user){
+  discordUser = user;
+  const av = user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+    : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id) >> 22n) % 6}.png`;
+  $('userAvatar').src = av;
+  $('userUsername').textContent = user.global_name || user.username;
+  $('userCard').style.display = 'flex';
+  $('discordScreen').style.display = 'none';
+  $('appRoot').style.display = 'block';
+  renderListings();
+}
+
+function startDiscordLogin(){
+  const p = new URLSearchParams({ client_id: DISCORD_CLIENT_ID, redirect_uri: DISCORD_REDIRECT_URI, response_type: 'token', scope: 'identify' });
+  window.location.href = 'https://discord.com/api/oauth2/authorize?' + p.toString();
+}
+
+const SESSION_KEY = 'discordSession';
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+
+function saveSession(user){
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ user, loginAt: Date.now() }));
+}
+
+function loadSession(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    if(!data || !data.user || !data.loginAt) return null;
+    if(Date.now() - data.loginAt > SESSION_TTL_MS){
+      localStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return data.user;
+  }catch(e){
+    return null;
+  }
+}
+
+function logout(){
+  localStorage.removeItem(SESSION_KEY);
+  $('appRoot').style.display = 'none';
+  $('userCard').style.display = 'none';
+  $('discordScreen').style.display = 'flex';
+}
+
+$('discordLoginBtn').addEventListener('click', startDiscordLogin);
+$('logoutBtn').addEventListener('click', logout);
+
+const LISTINGS_KEY = 'listings';
+
+function loadListings(){
+  try{
+    const raw = localStorage.getItem(LISTINGS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveListings(arr){
+  try{ localStorage.setItem(LISTINGS_KEY, JSON.stringify(arr)); }catch(e){}
+}
+
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderListings(){
+  const q = ($('searchInput').value || '').trim().toLowerCase();
+  const all = loadListings().slice().reverse();
+  const filtered = q
+    ? all.filter(l => [l.title, l.description, l.category].some(f => (f || '').toLowerCase().includes(q)))
+    : all;
+
+  const content = $('content');
+  if(filtered.length === 0){
+    content.innerHTML = '<div class="empty">' + (all.length === 0 ? 'Vacío.' : 'Sin resultados.') + '</div>';
+    return;
+  }
+  content.innerHTML = '<div class="listings-grid">' + filtered.map(l => `
+    <div class="listing-card" data-id="${l.id}">
+      ${l.photo ? `<img src="${l.photo}" alt="">` : ''}
+      <div class="body">
+        <span class="category">${escapeHtml(l.category || '')}</span>
+        <h3>${escapeHtml(l.title || '')}</h3>
+        <span class="price">${l.price !== null && l.price !== '' ? '$' + escapeHtml(l.price) : ''}</span>
+        <span class="desc">${escapeHtml(l.description || '')}</span>
+      </div>
+    </div>
+  `).join('') + '</div>';
+
+  content.querySelectorAll('.listing-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const listing = loadListings().find(l => l.id === card.dataset.id);
+      if(listing) openMessageModal(listing);
+    });
+  });
+}
+
+let photoDataUrl = null;
+
+function resetPublishForm(){
+  $('priceInput').value = '';
+  $('categoryInput').value = '';
+  $('titleInput').value = '';
+  $('descInput').value = '';
+  $('formError').textContent = '';
+  $('photoInput').value = '';
+  photoDataUrl = null;
+  $('photoPreview').style.display = 'none';
+  $('photoHint').style.display = 'block';
+}
+
+function openPublishModal(){
+  resetPublishForm();
+  $('publishModal').classList.add('open');
+}
+function closePublishModal(){
+  $('publishModal').classList.remove('open');
+}
+
+$('publishBtn').addEventListener('click', openPublishModal);
+$('publishClose').addEventListener('click', closePublishModal);
+$('publishCancel').addEventListener('click', closePublishModal);
+$('publishModal').addEventListener('click', (e) => { if(e.target === $('publishModal')) closePublishModal(); });
+
+$('photoPicker').addEventListener('click', () => $('photoInput').click());
+$('photoInput').addEventListener('change', () => {
+  const file = $('photoInput').files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    photoDataUrl = reader.result;
+    $('photoPreview').src = photoDataUrl;
+    $('photoPreview').style.display = 'block';
+    $('photoHint').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+$('publishSubmit').addEventListener('click', () => {
+  const price = $('priceInput').value.trim();
+  const category = $('categoryInput').value.trim();
+  const title = $('titleInput').value.trim();
+  const description = $('descInput').value.trim();
+
+  if(!title){ $('formError').textContent = 'Pon un título.'; return; }
+  if(!category){ $('formError').textContent = 'Di qué es lo que vendes.'; return; }
+
+  const listing = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+    photo: photoDataUrl,
+    price,
+    category,
+    title,
+    description,
+    author: (discordUser && (discordUser.global_name || discordUser.username)) || '',
+    ts: new Date().toISOString()
+  };
+
+  const all = loadListings();
+  all.push(listing);
+  saveListings(all);
+
+  closePublishModal();
+  renderListings();
+});
+
+$('searchInput').addEventListener('input', renderListings);
+
+const REQUESTS_KEY = 'requests';
+
+function loadRequests(){
+  try{
+    const raw = localStorage.getItem(REQUESTS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveRequests(arr){
+  try{ localStorage.setItem(REQUESTS_KEY, JSON.stringify(arr)); }catch(e){}
+}
+
+function currentUsername(){
+  return (discordUser && (discordUser.global_name || discordUser.username)) || '';
+}
+
+let messageTargetListing = null;
+
+function openMessageModal(listing){
+  messageTargetListing = listing;
+  $('messageTitle').textContent = 'Mensaje a ' + (listing.author || 'el vendedor') + ' · ' + listing.title;
+  $('messageInput').value = '';
+  $('messageError').textContent = '';
+  $('messageModal').classList.add('open');
+}
+function closeMessageModal(){
+  $('messageModal').classList.remove('open');
+  messageTargetListing = null;
+}
+
+$('messageClose').addEventListener('click', closeMessageModal);
+$('messageCancel').addEventListener('click', closeMessageModal);
+$('messageModal').addEventListener('click', (e) => { if(e.target === $('messageModal')) closeMessageModal(); });
+
+$('messageSend').addEventListener('click', () => {
+  const text = $('messageInput').value.trim();
+  if(!text){ $('messageError').textContent = 'Escribe un mensaje.'; return; }
+  if(!messageTargetListing) return;
+
+  const from = currentUsername();
+  const requests = loadRequests();
+
+  let req = requests.find(r => r.listingId === messageTargetListing.id && r.from === from);
+  if(req){
+    req.messages.push({ text, ts: new Date().toISOString(), from });
+  } else {
+    req = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      listingId: messageTargetListing.id,
+      listingTitle: messageTargetListing.title,
+      to: messageTargetListing.author,
+      from,
+      status: 'pending',
+      messages: [{ text, ts: new Date().toISOString(), from }]
+    };
+    requests.push(req);
+  }
+  saveRequests(requests);
+  closeMessageModal();
+});
+
+function openRequestsModal(){
+  renderRequests();
+  $('requestsModal').classList.add('open');
+}
+function closeRequestsModal(){
+  $('requestsModal').classList.remove('open');
+}
+$('requestsBtn').addEventListener('click', openRequestsModal);
+$('requestsClose').addEventListener('click', closeRequestsModal);
+$('requestsModal').addEventListener('click', (e) => { if(e.target === $('requestsModal')) closeRequestsModal(); });
+
+function renderRequests(){
+  const me = currentUsername();
+  const all = loadRequests();
+  const mine = all.filter(r => r.to === me && r.status === 'pending');
+  const list = $('requestsList');
+
+  if(mine.length === 0){
+    list.innerHTML = '<div class="req-empty">No tienes solicitudes.</div>';
+    return;
+  }
+
+  list.innerHTML = mine.map(r => {
+    const firstMsg = r.messages[0] ? r.messages[0].text : '';
+    return `<div class="req-item" data-id="${r.id}">
+      <div class="meta"><strong>${escapeHtml(r.from)}</strong> sobre «${escapeHtml(r.listingTitle)}»</div>
+      <div class="msg">${escapeHtml(firstMsg)}</div>
+      <div class="req-btns">
+        <button type="button" class="req-accept" data-act="accept" data-id="${r.id}">✅</button>
+        <button type="button" class="req-reject" data-act="reject" data-id="${r.id}">❌</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+$('requestsList').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  const act = btn.dataset.act;
+  const all = loadRequests();
+  const req = all.find(r => r.id === id);
+  if(!req) return;
+  req.status = act === 'accept' ? 'accepted' : 'rejected';
+  saveRequests(all);
+  renderRequests();
+});
+
+// ── Mensajes / Chat ──────────────────────────────────────────────────────
+let currentChatId = null;
+
+function openMessagesModal(){
+  renderMessages();
+  $('messagesModal').classList.add('open');
+}
+function closeMessagesModal(){
+  $('messagesModal').classList.remove('open');
+}
+$('messagesBtn').addEventListener('click', openMessagesModal);
+$('messagesClose').addEventListener('click', closeMessagesModal);
+$('messagesModal').addEventListener('click', (e) => { if(e.target === $('messagesModal')) closeMessagesModal(); });
+
+function renderMessages(){
+  const me = currentUsername();
+  const all = loadRequests();
+  const convos = all.filter(r => r.status === 'accepted' && (r.from === me || r.to === me));
+  const list = $('messagesList');
+
+  if(convos.length === 0){
+    list.innerHTML = '<div class="msg-empty">No tienes conversaciones.</div>';
+    return;
+  }
+
+  convos.sort((a, b) => {
+    const ta = (a.messages && a.messages.length) ? a.messages[a.messages.length - 1].ts : '';
+    const tb = (b.messages && b.messages.length) ? b.messages[b.messages.length - 1].ts : '';
+    return tb.localeCompare(ta);
+  });
+
+  list.innerHTML = convos.map(r => {
+    const other = r.from === me ? r.to : r.from;
+    const last = r.messages && r.messages.length ? r.messages[r.messages.length - 1] : null;
+    const preview = last ? last.text : '';
+    return `<div class="msg-item" data-id="${r.id}">
+      <div class="meta"><strong>${escapeHtml(other)}</strong> · ${escapeHtml(r.listingTitle || '')}</div>
+      <div class="preview">${escapeHtml(preview)}</div>
+    </div>`;
+  }).join('');
+}
+
+$('messagesList').addEventListener('click', (e) => {
+  const item = e.target.closest('.msg-item');
+  if(!item) return;
+  openChat(item.dataset.id);
+});
+
+function openChat(id){
+  const all = loadRequests();
+  const req = all.find(r => r.id === id);
+  if(!req) return;
+  currentChatId = id;
+  const me = currentUsername();
+  const other = req.from === me ? req.to : req.from;
+  $('chatTitle').textContent = other + ' · ' + (req.listingTitle || '');
+  $('chatInput').value = '';
+  $('chatError').textContent = '';
+  renderChatMessages(req);
+  $('chatModal').classList.add('open');
+}
+
+function closeChat(){
+  $('chatModal').classList.remove('open');
+  currentChatId = null;
+}
+$('chatClose').addEventListener('click', closeChat);
+$('chatModal').addEventListener('click', (e) => { if(e.target === $('chatModal')) closeChat(); });
+
+function renderChatMessages(req){
+  const me = currentUsername();
+  const box = $('chatMessages');
+  const msgs = req.messages || [];
+  if(msgs.length === 0){
+    box.innerHTML = '<div class="msg-empty" style="padding:10px;">Sin mensajes aún.</div>';
+    return;
+  }
+  box.innerHTML = msgs.map(m => {
+    const isMe = (m.from || '') === me;
+    const who = isMe ? 'Tú' : (m.from || 'Usuario');
+    const time = m.ts ? new Date(m.ts).toLocaleString('es', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' }) : '';
+    return `<div class="chat-bubble ${isMe ? 'me' : 'them'}">
+      <div class="who">${escapeHtml(who)}</div>
+      ${escapeHtml(m.text)}
+      <div class="time">${escapeHtml(time)}</div>
+    </div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+$('chatSend').addEventListener('click', () => {
+  const text = $('chatInput').value.trim();
+  if(!text){ $('chatError').textContent = 'Escribe un mensaje.'; return; }
+  if(!currentChatId) return;
+
+  const from = currentUsername();
+  const all = loadRequests();
+  const req = all.find(r => r.id === currentChatId);
+  if(!req) return;
+
+  req.messages.push({ text, ts: new Date().toISOString(), from });
+  saveRequests(all);
+  $('chatInput').value = '';
+  $('chatError').textContent = '';
+  renderChatMessages(req);
+});
+
+$('chatInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    $('chatSend').click();
+  }
+});
+
+window.addEventListener('load', async () => {
+  const token = parseDiscordToken();
+  if(token){
+    history.replaceState(null, '', window.location.pathname);
+    try{
+      const user = await fetchDiscordUser(token);
+      saveSession(user);
+      showApp(user);
+    }catch(e){
+      $('discordScreen').style.display = 'flex';
+    }
+  } else {
+    const user = loadSession();
+    if(user){
+      showApp(user);
+    } else {
+      $('discordScreen').style.display = 'flex';
+    }
+  }
+});
+</script>
+</body>
+</html>
