@@ -99,8 +99,31 @@ function startDiscordLogin(){
   window.location.href = 'https://discord.com/api/oauth2/authorize?' + p.toString();
 }
 
+const SESSION_KEY = 'discordSession';
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 horas
+
+function saveSession(user){
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ user, loginAt: Date.now() }));
+}
+
+function loadSession(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    if(!data || !data.user || !data.loginAt) return null;
+    if(Date.now() - data.loginAt > SESSION_TTL_MS){
+      localStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return data.user;
+  }catch(e){
+    return null;
+  }
+}
+
 function logout(){
-  sessionStorage.removeItem('discordUser');
+  localStorage.removeItem(SESSION_KEY);
   $('appRoot').style.display = 'none';
   $('userCard').style.display = 'none';
   $('discordScreen').style.display = 'flex';
@@ -115,16 +138,15 @@ window.addEventListener('load', async () => {
     history.replaceState(null, '', window.location.pathname);
     try{
       const user = await fetchDiscordUser(token);
-      sessionStorage.setItem('discordUser', JSON.stringify(user));
+      saveSession(user);
       showApp(user);
     }catch(e){
       $('discordScreen').style.display = 'flex';
     }
   } else {
-    const saved = sessionStorage.getItem('discordUser');
-    if(saved){
-      try{ showApp(JSON.parse(saved)); }
-      catch(e){ $('discordScreen').style.display = 'flex'; }
+    const user = loadSession();
+    if(user){
+      showApp(user);
     } else {
       $('discordScreen').style.display = 'flex';
     }
