@@ -1,824 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a0a">
-<title>ZYOX — Lua</title>
-<script src="https://js.puter.com/v2/"></script>
+<title>ZYOX AI</title>
+<script src="https://js.puter.com/v2/" defer></script>
 <style>
-  :root {
-    --bg: #0a0a0a; --bg2: #111; --card: #1c1c1e; --border: #2c2c2e;
-    --text: #f2f2f7; --text2: #8e8e93; --teal: #30d5c8; --red: #ff453a; --green: #32d74b;
-    --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; overflow: hidden; }
-  .phone-frame { width: 100%; height: 100%; height: 100dvh; background: var(--bg); overflow: hidden; position: relative; }
-  #app { display: flex; flex-direction: column; height: 100%; background: var(--bg); }
-  @media (min-width: 480px) {
-    body { display: flex; align-items: center; justify-content: center; background: #1a1a1a; padding: 20px; height: 100vh; }
-    .phone-frame { width: 390px; height: min(844px, 95vh); border-radius: 44px; box-shadow: 0 0 0 12px #1c1c1e, 0 0 0 14px #333, 0 25px 80px rgba(0,0,0,.7); }
-    .phone-frame::before { content: ""; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 120px; height: 28px; background: #000; border-radius: 20px; z-index: 100; pointer-events: none; }
-    #app { border-radius: 44px; overflow: hidden; }
-  }
-  .header { padding: calc(12px + var(--safe-top)) 16px 10px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-  .header h1 { font-size: 17px; font-weight: 600; }
-  .header .badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: #7c9cff; color: #000; }
-  #list-view { flex: 1; overflow-y: auto; padding: 12px 16px; padding-bottom: calc(80px + var(--safe-bottom)); }
-  .list-title { font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; margin: 8px 0 10px; }
-  .script-card { background: var(--card); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid transparent; }
-  .script-card:active { border-color: var(--teal); }
-  .script-card .lang { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: #00008033; color: #7c9cff; flex-shrink: 0; }
-  .script-card .info { flex: 1; min-width: 0; }
-  .script-card .name { font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .script-card .preview { font-size: 12px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: ui-monospace, Menlo, monospace; }
-  .fab { position: fixed; bottom: calc(24px + var(--safe-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 18px; background: var(--teal); color: #000; border: none; font-size: 28px; font-weight: 300; box-shadow: 0 8px 24px rgba(48,213,200,.35); cursor: pointer; z-index: 50; display: flex; align-items: center; justify-content: center; }
-  .fab:active { transform: scale(.94); }
-  #editor-view { display: none; flex-direction: column; height: 100%; }
-  #editor-view.active { display: flex; }
-  .editor-top { padding: calc(8px + var(--safe-top)) 12px 8px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .back-btn { width: 34px; height: 34px; border-radius: 10px; border: none; background: transparent; color: var(--teal); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .editor-title { flex: 1; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .editor-actions { display: flex; gap: 6px; }
-  .icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--card); color: var(--text); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .icon-btn:active { opacity: .7; }
-  .icon-btn.play { background: var(--teal); color: #000; }
-  .icon-btn.stop { background: var(--red); color: #fff; }
-  .icon-btn.chat { background: #5e5ce6; color: #fff; }
-  #code { flex: 1; width: 100%; border: none; outline: none; resize: none; background: #0d0d0d; color: #e8e8ed; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14.5px; line-height: 1.5; padding: 14px 16px; tab-size: 4; white-space: pre; overflow: auto; caret-color: var(--teal); }
-  .bottom-panel { flex-shrink: 0; height: 200px; display: flex; flex-direction: column; background: var(--bg); border-top: 1px solid var(--border); }
-  .tabs { display: flex; padding: 6px 12px; gap: 6px; background: var(--bg2); flex-shrink: 0; }
-  .tab { flex: 1; padding: 8px; border-radius: 8px; border: none; background: transparent; color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; }
-  .tab.active { background: var(--card); color: var(--text); }
-  .panel-content { flex: 1; overflow-y: auto; padding: 10px 12px; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; line-height: 1.45; }
-  .console-line { margin-bottom: 2px; word-break: break-all; }
-  .console-line.err { color: var(--red); }
-  .console-line.out { color: #d1d1d6; }
-  .issue { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-  .issue:last-child { border-bottom: none; }
-  .issue-line { font-size: 11px; font-weight: 700; color: var(--teal); margin-bottom: 2px; }
-  .issue-msg { font-size: 13px; font-weight: 500; margin-bottom: 2px; font-family: -apple-system, system-ui, sans-serif; }
-  .issue-hint { font-size: 12px; color: var(--text2); font-family: -apple-system, system-ui, sans-serif; white-space: pre-wrap; }
-  .ok-msg { color: var(--green); font-size: 14px; font-family: -apple-system, system-ui, sans-serif; }
-  .wait-msg { color: var(--text2); font-size: 13px; font-family: -apple-system, system-ui, sans-serif; }
-  .fix-btn { margin-top: 10px; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--teal); background: transparent; color: var(--teal); font-size: 14px; font-weight: 600; cursor: pointer; }
-  .fix-btn:active { background: #30d5c820; }
-  .status-bar { padding: 4px 12px; font-size: 11px; color: var(--text2); background: var(--bg2); border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
-  .loading { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 90; flex-direction: column; gap: 12px; }
-  .loading.show { display: flex; }
-  .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin .7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .accessory { display: none; background: #1c1c1e; border-top: 1px solid var(--border); padding: 6px 8px; gap: 4px; overflow-x: auto; flex-shrink: 0; }
-  .accessory.show { display: flex; }
-  .acc-btn { flex-shrink: 0; padding: 8px 12px; border-radius: 8px; border: none; background: #2c2c2e; color: var(--text); font-size: 13px; font-family: ui-monospace, monospace; cursor: pointer; }
-  .acc-btn:active { background: var(--teal); color: #000; }
-
-  /* CHAT overlay */
-  #chat-view {
-    display: none; position: absolute; inset: 0; z-index: 60;
-    flex-direction: column; background: var(--bg);
-  }
-  #chat-view.active { display: flex; }
-  .chat-top {
-    padding: calc(8px + var(--safe-top)) 12px 8px;
-    background: var(--bg2); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-  }
-  .chat-top h2 { flex: 1; font-size: 16px; font-weight: 600; }
-  .chat-messages {
-    flex: 1; overflow-y: auto; padding: 14px 14px 10px;
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  .bubble {
-    max-width: 92%; padding: 12px 14px; border-radius: 16px;
-    font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
-  }
-  .bubble.user { align-self: flex-end; background: #5e5ce6; color: #fff; border-bottom-right-radius: 4px; }
-  .bubble.ai { align-self: flex-start; background: var(--card); color: var(--text); border-bottom-left-radius: 4px; }
-  .bubble.ai code, .bubble.ai .code {
-    display: block; margin: 8px 0; padding: 10px; background: #0d0d0d;
-    border-radius: 8px; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px;
-    white-space: pre-wrap; overflow-x: auto;
-  }
-  .chat-input-row {
-    padding: 10px 12px calc(12px + var(--safe-bottom));
-    background: var(--bg2); border-top: 1px solid var(--border);
-    display: flex; gap: 8px; align-items: flex-end;
-  }
-  #chat-input {
-    flex: 1; min-height: 40px; max-height: 120px; padding: 10px 12px;
-    border-radius: 12px; border: 1px solid var(--border); background: var(--card);
-    color: var(--text); font-size: 15px; resize: none; outline: none;
-    font-family: -apple-system, system-ui, sans-serif;
-  }
-  #chat-send {
-    width: 44px; height: 44px; border-radius: 12px; border: none;
-    background: var(--teal); color: #000; font-size: 18px; cursor: pointer; flex-shrink: 0;
-  }
-  .quick-q {
-    display: flex; gap: 6px; padding: 0 12px 8px; overflow-x: auto; flex-shrink: 0;
-    background: var(--bg2);
-  }
-  .quick-q button {
-    flex-shrink: 0; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--card); color: var(--text2); font-size: 12px; cursor: pointer; white-space: nowrap;
-  }
+:root{color-scheme:dark;--bg:#000;--surface:#111;--surface2:#1a1a1a;--line:#292929;--text:#f4f4f4;--muted:#929292;--accent:#d8d8d8;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,textarea{font:inherit}button{color:inherit;-webkit-tap-highlight-color:transparent}.app{height:100dvh;display:flex;overflow:hidden;background:var(--bg)}
+.sidebar{width:280px;flex:0 0 280px;background:#080808;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:calc(14px + var(--safe-top)) 12px 12px;transition:transform .22s ease;z-index:10}.side-head{display:flex;align-items:center;justify-content:space-between;padding:2px 5px 20px}.brand{font-size:19px;font-weight:750;letter-spacing:.08em}.side-icon,.top-icon{width:38px;height:38px;border:0;border-radius:12px;background:transparent;color:#c9c9c9;display:grid;place-items:center;cursor:pointer}.side-icon:hover,.top-icon:hover{background:#1a1a1a}.new-chat{width:100%;display:flex;align-items:center;gap:10px;border:1px solid #303030;background:#111;border-radius:13px;padding:12px 14px;text-align:left;cursor:pointer;font-size:14px}.new-chat:hover{background:#191919}.history-label{padding:23px 10px 9px;color:#777;font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase}.history{overflow:auto;flex:1}.history-item{width:100%;display:block;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;background:transparent;color:#aaa;border-radius:10px;padding:10px;font-size:13px;cursor:pointer}.history-item:hover,.history-item.active{background:#1b1b1b;color:#fff}.side-foot{border-top:1px solid #1e1e1e;padding:13px 8px 2px;color:#777;font-size:11px;line-height:1.5}.main{min-width:0;flex:1;display:flex;flex-direction:column;position:relative}.topbar{height:62px;flex:0 0 62px;display:flex;align-items:center;justify-content:space-between;padding:calc(4px + var(--safe-top)) 18px 4px;border-bottom:1px solid rgba(255,255,255,.04)}.top-left,.top-actions{display:flex;align-items:center;gap:8px}.mobile-brand{display:none;font-size:15px;font-weight:700;letter-spacing:.06em}.model-name{font-size:14px;font-weight:620;color:#e8e8e8}.model-chevron{font-size:12px;color:#858585;margin-left:4px}.top-actions button{border:1px solid #292929;background:#0d0d0d;border-radius:11px;height:36px;padding:0 12px;font-size:12px;color:#ccc;cursor:pointer}.top-actions button:hover{background:#1a1a1a}.feed{flex:1;overflow:auto;scroll-behavior:smooth;padding:30px 20px 24px}.thread{width:min(760px,100%);margin:0 auto;display:flex;flex-direction:column;gap:25px}.welcome{min-height:min(50vh,460px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px 0 16px}.welcome-mark{width:42px;height:42px;border:1px solid #363636;border-radius:15px;display:grid;place-items:center;font-size:19px;color:#eee;margin-bottom:22px;background:linear-gradient(145deg,#191919,#080808)}.welcome h1{font-size:clamp(27px,5vw,38px);line-height:1.12;letter-spacing:-.04em;margin:0 0 11px;font-weight:650}.welcome p{font-size:14px;color:#929292;margin:0;line-height:1.55}.suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;width:min(620px,100%);margin-top:30px}.suggestion{min-height:61px;text-align:left;border:1px solid #292929;border-radius:14px;background:#0d0d0d;padding:12px 14px;color:#c8c8c8;font-size:13px;line-height:1.4;cursor:pointer}.suggestion:hover{background:#171717;border-color:#3b3b3b}.message{display:flex;flex-direction:column;gap:8px;animation:appear .18s ease}.message.user{align-items:flex-end}.message.ai{align-items:flex-start}@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.message-label{font-size:11px;color:#777;padding:0 4px}.bubble{max-width:min(88%,680px);font-size:15px;line-height:1.72;overflow-wrap:anywhere}.user .bubble{background:#1d1d1d;border:1px solid #292929;padding:11px 15px;border-radius:18px 18px 5px 18px;white-space:pre-wrap}.ai .bubble{white-space:normal;color:#e6e6e6}.ai .bubble p{margin:0 0 13px}.ai .bubble p:last-child{margin-bottom:0}.ai .bubble pre{white-space:pre;overflow:auto;background:#101010;border:1px solid #292929;border-radius:12px;padding:14px 15px;margin:12px 0;font-size:13px;line-height:1.6;color:#e8e8e8}.ai .bubble code.inline{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:#1c1c1c;border:1px solid #303030;border-radius:5px;padding:1px 5px}.ai .bubble ul,.ai .bubble ol{padding-left:23px}.ai .bubble a{color:#ddd}.typing{color:#8b8b8b;font-size:14px;display:flex;align-items:center;gap:9px}.dots{display:flex;gap:3px}.dots i{width:4px;height:4px;border-radius:50%;background:#aaa;animation:blink 1s infinite alternate}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes blink{to{opacity:.25;transform:translateY(-2px)}}
+.composer-wrap{flex:0 0 auto;padding:10px 18px calc(14px + var(--safe-bottom));background:linear-gradient(transparent,#000 20%)}.composer-area{width:min(760px,100%);margin:0 auto}.composer{display:flex;align-items:flex-end;gap:9px;min-height:58px;padding:9px 10px 9px 17px;background:#111;border:1px solid #333;border-radius:20px;box-shadow:0 8px 32px #0009}.composer:focus-within{border-color:#4b4b4b}.composer textarea{flex:1;min-width:0;min-height:38px;max-height:180px;resize:none;border:0;outline:0;background:transparent;color:#f2f2f2;padding:9px 0;font-size:15px;line-height:1.4}.composer textarea::placeholder{color:#777}.send{width:40px;height:40px;flex:0 0 40px;border:0;border-radius:14px;background:#eee;color:#111;display:grid;place-items:center;cursor:pointer;font-size:20px;font-weight:700}.send:disabled{opacity:.42;cursor:default}.composer-note{text-align:center;color:#666;font-size:10px;margin:9px 8px 0;line-height:1.4}.overlay{display:none;position:fixed;inset:0;background:#0009;z-index:8}.overlay.show{display:block}.empty-history{padding:10px;color:#656565;font-size:12px}
+@media(max-width:700px){.sidebar{position:absolute;inset:0 auto 0 0;width:min(82vw,300px);transform:translateX(-102%);box-shadow:18px 0 45px #0009}.sidebar.open{transform:translateX(0)}.mobile-brand{display:block}.model-name{display:none}.topbar{height:58px;flex-basis:58px;padding-left:10px;padding-right:12px}.top-actions button{height:34px;padding:0 10px}.feed{padding:19px 16px 20px}.welcome{min-height:calc(51dvh - 60px);padding-top:0}.welcome h1{font-size:29px}.welcome p{font-size:13px}.suggestions{grid-template-columns:1fr 1fr;gap:8px;margin-top:24px}.suggestion{padding:11px 10px;min-height:65px;font-size:12px}.composer-wrap{padding:8px 11px calc(10px + var(--safe-bottom))}.composer{border-radius:18px;padding:7px 8px 7px 14px;min-height:55px}.composer textarea{font-size:16px}.bubble{max-width:94%;font-size:14px}.thread{gap:21px}}
+@media(max-width:380px){.suggestions{grid-template-columns:1fr}.welcome{min-height:auto;padding:36px 0 10px}.welcome-mark{margin-bottom:15px}.suggestion{min-height:48px}}
 </style>
 </head>
 <body>
-<div class="phone-frame"><div id="app">
-
-  <div id="list-view">
-    <div class="header"><h1>ZYOX</h1><span class="badge">LUA</span></div>
-    <div class="list-title">Mis scripts</div>
-    <div id="script-list"></div>
-  </div>
-  <button class="fab" id="fab">+</button>
-
-  <div id="editor-view">
-    <div class="editor-top">
-      <button class="back-btn" id="back-btn">‹</button>
-      <div class="editor-title" id="editor-title">script.lua</div>
-      <div class="editor-actions">
-        <button class="icon-btn chat" id="chat-btn" title="Hablar con la IA">✨</button>
-        <button class="icon-btn play" id="run-btn">▶</button>
-        <button class="icon-btn stop" id="stop-btn" style="display:none">⏹</button>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Conversaciones">
+    <div class="side-head"><div class="brand">ZYOX</div><button class="side-icon" id="closeSidebar" aria-label="Cerrar menú" title="Cerrar menú">×</button></div>
+    <button class="new-chat" id="newChat"><span aria-hidden="true">＋</span><span>Nuevo chat</span></button>
+    <div class="history-label">Recientes</div>
+    <div class="history" id="history"></div>
+    <div class="side-foot">Tus conversaciones se guardan en este dispositivo.</div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left"><button class="top-icon" id="menuBtn" aria-label="Abrir conversaciones" title="Conversaciones">☰</button><div class="mobile-brand">ZYOX</div><div class="model-name">ZYOX AI <span class="model-chevron">⌄</span></div></div>
+      <div class="top-actions"><button id="shareBtn" title="Copiar conversación">Compartir</button></div>
+    </header>
+    <section class="feed" id="feed" aria-live="polite">
+      <div class="thread" id="thread">
+        <div class="welcome" id="welcome">
+          <div class="welcome-mark">✳</div>
+          <h1>¿En qué estás pensando?</h1>
+          <p>Pregunta, explora una idea o empieza algo nuevo.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="Ayúdame a entender una idea compleja de forma sencilla.">Explícame algo difícil de forma sencilla</button>
+            <button class="suggestion" data-prompt="Ayúdame a escribir y mejorar un texto. Primero pregúntame qué quiero comunicar.">Ayúdame a escribir algo</button>
+            <button class="suggestion" data-prompt="Quiero aprender una habilidad nueva. Propón un plan práctico para empezar.">Crea un plan para aprender algo</button>
+            <button class="suggestion" data-prompt="Ayúdame a resolver este problema paso a paso: ">Resuelve un problema paso a paso</button>
+          </div>
+        </div>
       </div>
-    </div>
-    <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
-    <div class="accessory" id="accessory">
-      <button class="acc-btn" data-insert="    ">⇥</button>
-      <button class="acc-btn" data-insert="local ">local</button>
-      <button class="acc-btn" data-insert="=">=</button>
-      <button class="acc-btn" data-insert='"'>"</button>
-      <button class="acc-btn" data-insert="(">(</button>
-      <button class="acc-btn" data-insert=")">)</button>
-      <button class="acc-btn" data-insert="end">end</button>
-      <button class="acc-btn" data-insert=" then">then</button>
-      <button class="acc-btn" data-insert=" do">do</button>
-      <button class="acc-btn" data-insert="function ">function</button>
-    </div>
-    <div class="bottom-panel">
-      <div class="tabs">
-        <button class="tab active" data-tab="console">Consola</button>
-        <button class="tab" data-tab="assistant">Asistente</button>
+    </section>
+    <footer class="composer-wrap">
+      <div class="composer-area">
+        <div class="composer"><textarea id="prompt" rows="1" placeholder="Pregunta lo que quieras…" aria-label="Escribe tu mensaje"></textarea><button class="send" id="send" aria-label="Enviar" title="Enviar">↑</button></div>
+        <div class="composer-note">Verifica la información importante. La IA puede equivocarse.</div>
       </div>
-      <div class="panel-content" id="console-panel"></div>
-      <div class="panel-content" id="assistant-panel" style="display:none"></div>
-      <div class="status-bar"><span id="status-left">Listo</span><span>LUA</span></div>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="chat-view">
-    <div class="chat-top">
-      <button class="back-btn" id="chat-back">‹</button>
-      <h2>IA · Lua / Roblox</h2>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="quick-q" id="quick-q">
-      <button data-q="¿Voy bien con mi código?">¿Voy bien?</button>
-      <button data-q="¿Qué va después de esto?">¿Qué sigue?</button>
-      <button data-q="¿Cómo creo una GUI en Roblox?">Crear GUI</button>
-      <button data-q="Corrige mi código">Corrige mi código</button>
-      <button data-q="Explícame LocalPlayer">LocalPlayer</button>
-    </div>
-    <div class="chat-input-row">
-      <textarea id="chat-input" rows="1" placeholder="Pregunta lo que quieras…"></textarea>
-      <button id="chat-send">↑</button>
-    </div>
-  </div>
-
-  <div class="loading" id="loading"><div class="spinner"></div><div style="color:#aaa;font-size:14px" id="loading-text">Cargando…</div></div>
-</div></div>
-
+    </footer>
+  </main>
+</div>
 <script>
-const TEMPLATE = `-- ZYOX - Lua
-local nombre = "mundo"
-print("Hola, " .. nombre .. "!")
-for i = 1, 3 do
-  print(i, i * i)
-end
-`;
+(() => {
+  const STORE_KEY = "zyox_chat_conversations_v1";
+  const feed = document.getElementById("feed"), thread = document.getElementById("thread");
+  const input = document.getElementById("prompt"), sendButton = document.getElementById("send");
+  const sidebar = document.getElementById("sidebar"), overlay = document.getElementById("overlay");
+  let chats = loadChats(), activeId = null, busy = false;
 
-let scripts = JSON.parse(localStorage.getItem("zyox_lua_scripts") || "null") || [
-  { id: "1", name: "hola", code: TEMPLATE }
-];
-let current = null, checkTimer = null, isRunning = false, luaReady = false;
-
-function save() { localStorage.setItem("zyox_lua_scripts", JSON.stringify(scripts)); }
-
-function renderList() {
-  const list = document.getElementById("script-list");
-  list.innerHTML = scripts.map(s => {
-    const first = (s.code.split("\n")[0] || "").replace(/</g, "&lt;");
-    return `<div class="script-card" data-id="${s.id}"><div class="lang">LUA</div><div class="info"><div class="name">${s.name}.lua</div><div class="preview">${first}</div></div></div>`;
-  }).join("");
-  list.querySelectorAll(".script-card").forEach(el => el.onclick = () => openScript(el.dataset.id));
-}
-
-function openScript(id) {
-  current = scripts.find(s => s.id === id);
-  if (!current) return;
-  document.getElementById("list-view").style.display = "none";
-  document.getElementById("fab").style.display = "none";
-  document.getElementById("editor-view").classList.add("active");
-  document.getElementById("editor-title").textContent = current.name + ".lua";
-  document.getElementById("code").value = current.code;
-  document.getElementById("console-panel").innerHTML = "";
-  document.getElementById("assistant-panel").innerHTML = '<div class="wait-msg">Escribe y el asistente te irá guiando…</div>';
-  switchTab("console");
-  scheduleCheck();
-}
-
-function closeEditor() {
-  if (current) { current.code = document.getElementById("code").value; save(); }
-  current = null;
-  document.getElementById("editor-view").classList.remove("active");
-  document.getElementById("list-view").style.display = "block";
-  document.getElementById("fab").style.display = "flex";
-  renderList();
-}
-
-function switchTab(name) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
-  document.getElementById("console-panel").style.display = name === "console" ? "block" : "none";
-  document.getElementById("assistant-panel").style.display = name === "assistant" ? "block" : "none";
-}
-
-function appendConsole(text, isError) {
-  const panel = document.getElementById("console-panel");
-  const div = document.createElement("div");
-  div.className = "console-line " + (isError ? "err" : "out");
-  div.textContent = text;
-  panel.appendChild(div);
-  panel.scrollTop = panel.scrollHeight;
-}
-
-/* ========== SPELL + INTENT ========== */
-const SERVICES = {
-  players:"Players", player:"Players", plrs:"Players",
-  replicatedstorage:"ReplicatedStorage", rs:"ReplicatedStorage",
-  tweenservice:"TweenService", tween:"TweenService",
-  runservice:"RunService", userinputservice:"UserInputService", uis:"UserInputService",
-  httpservice:"HttpService", debris:"Debris", lighting:"Lighting", workspace:"Workspace",
-  serverscriptservice:"ServerScriptService", startergui:"StarterGui",
-  teleportservice:"TeleportService", marketplaceservice:"MarketplaceService",
-  datastoreservice:"DataStoreService", soundservice:"SoundService",
-  collectionservice:"CollectionService", pathfindingservice:"PathfindingService",
-  textchatservice:"TextChatService"
-};
-
-const SPELL = {
-  fuction:"function", functon:"function", funciton:"function", fucntion:"function",
-  loca:"local", locl:"local", lcoal:"local", loacl:"local",
-  pritn:"print", pirnt:"print", prnt:"print",
-  retrun:"return", retrn:"return", retun:"return",
-  esle:"else", esleif:"elseif", elsif:"elseif", elif:"elseif",
-  thn:"then", whle:"while", wihle:"while",
-  fro:"for", repeta:"repeat", untill:"until",
-  ture:"true", flase:"false", fals:"false",
-  getservice:"GetService", getsevise:"GetService", getservce:"GetService",
-  localplayer:"LocalPlayer", localplyer:"LocalPlayer", localpalyer:"LocalPlayer",
-  playergui:"PlayerGui", waitforchild:"WaitForChild", waitforchld:"WaitForChild",
-  findfirstchild:"FindFirstChild", destory:"Destroy", conect:"Connect", conenct:"Connect",
-  instence:"Instance", istance:"Instance", instacne:"Instance",
-  vecotr3:"Vector3", vector3:"Vector3", cframe:"CFrame",
-  screengui:"ScreenGui", scirn:"screen", scren:"screen", scree:"screen",
-  scirngui:"ScreenGui", screengiu:"ScreenGui", screngui:"ScreenGui",
-  texteabel:"TextLabel", textlable:"TextLabel", textlabbel:"TextLabel",
-  textbuton:"TextButton", textboton:"TextButton",
-  frmae:"Frame", frme:"Frame",
-  guui:"gui", gii:"gui"
-};
-
-function editDist(a, b) {
-  a = a.toLowerCase(); b = b.toLowerCase();
-  if (Math.abs(a.length - b.length) > 3) return 99;
-  const m = a.length, n = b.length;
-  const dp = Array.from({length: m+1}, () => Array(n+1).fill(0));
-  for (let i = 0; i <= m; i++) dp[i][0] = i;
-  for (let j = 0; j <= n; j++) dp[0][j] = j;
-  for (let i = 1; i <= m; i++)
-    for (let j = 1; j <= n; j++)
-      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
-  return dp[m][n];
-}
-
-function fixSpelling(word) {
-  const low = word.toLowerCase();
-  if (SPELL[low]) return SPELL[low];
-  let best = null, bestD = 99;
-  for (const [w, r] of Object.entries(SPELL)) {
-    const d = editDist(low, w);
-    if (d < bestD) { bestD = d; best = r; }
-  }
-  // also match against common Roblox names
-  const common = ["ScreenGui","TextLabel","TextButton","Frame","LocalPlayer","PlayerGui","GetService","Instance","WaitForChild","Players","ReplicatedStorage","TweenService","Vector3","CFrame","Color3","UDim2"];
-  for (const c of common) {
-    const d = editDist(low, c);
-    if (d < bestD && d <= 2) { bestD = d; best = c; }
-  }
-  if (bestD <= 2 && word.length >= 3) return best;
-  return null;
-}
-
-function zyoxScan(code, add) {
-  let n = code.length, out = [], stack = [], line = 1, i = 0;
-  const closers = { ")":"(", "]":"[", "}":"{" };
-  const names = { "(":"paréntesis", "[":"corchete", "{":"llave" };
-  const pairs = { "(":")", "[":"]", "{":"}" };
-  while (i < n) {
-    const c = code[i];
-    if (c === "\n") { line++; out.push("\n"); i++; continue; }
-    if (c === "-" && code[i+1] === "-") { while (i < n && code[i] !== "\n") i++; continue; }
-    if (c === '"' || c === "'") {
-      let start = line, j = i+1, closed = false;
-      while (j < n) {
-        if (code[j] === "\\") { j += 2; continue; }
-        if (code[j] === "\n") break;
-        if (code[j] === c) { closed = true; break; }
-        j++;
-      }
-      if (!closed) add(start, "Falta la comilla de cierre (" + c + ").", "Cierra el texto con " + c + ".");
-      out.push('""'); i = closed ? j+1 : j; continue;
-    }
-    if ("([{".includes(c)) { stack.push({c, line}); out.push(c); i++; continue; }
-    if (")]}".includes(c)) {
-      const top = stack.pop();
-      if (!top) add(line, "Sobra un " + names[closers[c]] + ' "' + c + '".', "Bórralo.");
-      else if (top.c !== closers[c]) add(line, "No coincide con el de la línea " + top.line + ".", "Cierra en orden.");
-      out.push(c); i++; continue;
-    }
-    out.push(c); i++;
-  }
-  const last = (code.trim().split("\n").pop() || "").trim();
-  if (!/(?:local\s+\w+\s*$|function\s*$|if\s*$|for\s*$|=\s*$)/.test(last))
-    stack.forEach(s => add(s.line, 'Falta cerrar "' + s.c + '".', 'Agrega "' + pairs[s.c] + '".'));
-  return out.join("");
-}
-
-function zyoxAnalyze(code) {
-  const issues = [];
-  const seen = {};
-  function add(line, msg, hint) {
-    const key = line + "|" + msg;
-    if (seen[key]) return;
-    seen[key] = 1;
-    issues.push({ line, msg, hint: hint || "" });
-  }
-  const clean = zyoxScan(code, add).split("\n");
-  const raw = code.split("\n");
-  let fix = raw.slice();
-
-  clean.forEach((ln, i) => {
-    if (/[\u201C\u201D\u2018\u2019]/.test(ln))
-      add(i+1, "Hay comillas curvas.", "Usa comillas rectas \" o '.");
-  });
-
-  // blocks
-  const st = [];
-  clean.forEach((ln, i) => {
-    const L = i+1, re = /\b(function|if|do|repeat|end|until|for|while)\b/g;
-    let m, loop = false;
-    while ((m = re.exec(ln))) {
-      const w = m[1];
-      if (w === "end") {
-        const t1 = st.pop();
-        if (!t1) add(L, 'Sobra un "end".', "Bórralo.");
-        else if (t1.w === "repeat") add(L, '"end" no cierra un "repeat".', 'Usa "until".');
-      } else if (w === "until") {
-        const t2 = st.pop();
-        if (!t2 || t2.w !== "repeat") add(L, '"until" sin "repeat".', "Revisa el bloque.");
-      } else if (w === "do") { if (loop) loop = false; else st.push({w, line:L}); }
-      else { if (w === "for" || w === "while") loop = true; st.push({w, line:L}); }
-    }
-  });
-  const last = (code.trim().split("\n").pop() || "").trim();
-  if (!/(?:local\s+\w*$|function\s*$|if\s*$|for\s*$|=\s*$)/.test(last))
-    st.forEach(t => add(t.line, 'Falta "' + (t.w === "repeat" ? "until" : "end") + '".', "Ciérralo al final del bloque."));
-
-  clean.forEach((ln, i) => {
-    const t = ln.trim();
-    if (!t) return;
-    const L = i + 1;
-    const skipEnd = /(\band|\bor|\bnot|[(,+\-*/=<>~]|\.\.)\s*$/.test(t);
-
-    if (/^(if|elseif)\b/.test(t) && !/\bthen\b/.test(t) && !skipEnd && t.length > 5) {
-      add(L, 'Falta "then".', 'Después de if/elseif va "then".');
-      fix[i] = fix[i].replace(/\s*$/, "") + " then";
-    }
-    if (/^(for|while)\b/.test(t) && !/\bdo\b/.test(t) && !skipEnd && t.length > 5) {
-      add(L, 'Falta "do".', 'Después de for/while va "do".');
-      fix[i] = fix[i].replace(/\s*$/, "") + " do";
-    }
-    if (/!=/.test(t)) { add(L, 'En Lua es "~=".', "Cambia != por ~=."); fix[i] = fix[i].replace(/!=/g, "~="); }
-    if (/\belif\b/.test(t)) { add(L, 'En Lua es "elseif".', "Cambia elif por elseif."); fix[i] = fix[i].replace(/\belif\b/g, "elseif"); }
-    if (/&&|\|\|/.test(t)) { add(L, 'Usa "and" / "or".', "Cambia && y ||."); fix[i] = fix[i].replace(/&&/g, " and ").replace(/\|\|/g, " or "); }
-
-    // Ortografía palabra por palabra
-    const words = t.match(/[A-Za-z_][\w]*/g) || [];
-    words.forEach(w => {
-      if (w.length < 3) return;
-      const fixed = fixSpelling(w);
-      if (fixed && fixed.toLowerCase() !== w.toLowerCase()) {
-        add(L, '¿Quisiste decir "' + fixed + '"?', '"' + w + '" parece un error → "' + fixed + '".');
-        if (SPELL[w.toLowerCase()] || editDist(w, fixed) <= 2)
-          fix[i] = fix[i].replace(new RegExp("\\b" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "g"), fixed);
-      }
-    });
-
-    // local Name("x")
-    const localCall = /^(\s*)local\s+([A-Za-z_][\w]*)\s*\(\s*(["'\u201C\u201D\u2018\u2019])(.*?)\3\s*\)\s*;?\s*$/.exec(ln);
-    if (localCall) {
-      const indent = localCall[1], name = localCall[2], val = localCall[4];
-      const low = name.toLowerCase(), vlow = val.toLowerCase().replace(/\s+/g, "");
-      let msg = 'local Nombre("texto") no es válido en Lua (falta "=").';
-      let hint = "", did = false;
-      if (["player","localplayer","plr","lp"].includes(low)) {
-        hint = 'local ' + name + ' = game:GetService("Players").LocalPlayer';
-        fix[i] = indent + hint; did = true;
-      } else if (["screengui","gui","screen","scirn","scren"].includes(low) || low.indexOf("screen") >= 0) {
-        hint = 'local ' + name + ' = Instance.new("ScreenGui")\n' + indent + name + '.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")';
-        fix[i] = indent + 'local ' + name + ' = Instance.new("ScreenGui")\n' + indent + name + '.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")';
-        did = true;
-      } else if (["gui","screengui","playergui"].includes(vlow)) {
-        hint = 'local ' + name + ' = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")';
-        fix[i] = indent + hint; did = true;
-      } else if (SERVICES[vlow]) {
-        hint = 'local ' + name + ' = game:GetService("' + SERVICES[vlow] + '")';
-        fix[i] = indent + hint; did = true;
-      } else {
-        hint = 'Opciones:\nlocal ' + name + ' = "' + val + '"\nlocal ' + name + ' = game:GetService("' + val + '")\nlocal ' + name + ' = Instance.new("' + name + '")';
-      }
-      add(L, msg, hint);
-    }
-
-    // local scirn = gui   /   local name = bareWord
-    const localBare = /^(\s*)local\s+([A-Za-z_][\w]*)\s*=\s*([A-Za-z_][\w]*)\s*$/.exec(ln);
-    if (localBare) {
-      const indent = localBare[1], name = localBare[2], val = localBare[3];
-      const nlow = name.toLowerCase(), vlow = val.toLowerCase();
-      // name typo
-      const nameFix = fixSpelling(name);
-      const valFix = fixSpelling(val);
-      // Intent: screen/gui related
-      if (["scirn","scren","scree","screen","screengui","gui","scirngui"].includes(nlow) ||
-          ["gui","screengui","playergui","pgui"].includes(vlow)) {
-        let msg = "Parece que quieres crear o referenciar una GUI.";
-        let hint = 'Ejemplo típico en Roblox:\nlocal screen = Instance.new("ScreenGui")\nscreen.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")\n\nO si ya existe:\nlocal gui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")';
-        if (["gui","screengui","playergui"].includes(vlow) && !["true","false","nil"].includes(vlow)) {
-          fix[i] = indent + "local " + (nameFix && nameFix !== name ? nameFix : name) + ' = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")';
-          hint = 'Corregido a PlayerGui:\n' + fix[i];
-        } else if (["scirn","scren","screen","screengui","scirngui"].includes(nlow)) {
-          const goodName = nameFix && /screen|gui/i.test(nameFix) ? nameFix : "screen";
-          fix[i] = indent + "local " + goodName + ' = Instance.new("ScreenGui")\n' + indent + goodName + '.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")';
-          hint = 'Crear ScreenGui:\n' + fix[i];
-        }
-        add(L, msg, hint);
-      } else if (SERVICES[vlow]) {
-        add(L, '¿Servicio "' + SERVICES[vlow] + '"?', 'local ' + name + ' = game:GetService("' + SERVICES[vlow] + '")');
-        fix[i] = indent + "local " + name + ' = game:GetService("' + SERVICES[vlow] + '")';
-      } else if (nameFix || valFix) {
-        // solo typos
-        let line2 = fix[i];
-        if (nameFix) line2 = line2.replace(new RegExp("\\b" + name + "\\b"), nameFix);
-        if (valFix) line2 = line2.replace(new RegExp("\\b" + val + "\\b"), valFix);
-        if (line2 !== fix[i]) {
-          add(L, "Posible error de ortografía.", (nameFix ? name + " → " + nameFix + "  " : "") + (valFix ? val + " → " + valFix : ""));
-          fix[i] = line2;
-        }
-      }
-    }
-
-    // falta =
-    const missEq = /^(\s*)local\s+([A-Za-z_][\w]*)\s+([^=\s(][\w.]*)$/.exec(t);
-    if (missEq && !localCall && !/^local\s+\w+\s*=/.test(t)) {
-      if (missEq[3].length >= 2) {
-        add(L, 'Falta "=".', "local " + missEq[2] + " = " + missEq[3]);
-        fix[i] = fix[i].replace(/^(\s*local\s+[A-Za-z_][\w]*)\s+/, "$1 = ");
-      }
-    }
-
-    if (/\bgame\.GetService\b/.test(t)) {
-      add(L, 'GetService usa ":".', 'game:GetService("...")');
-      fix[i] = fix[i].replace(/\bgame\.GetService\b/g, "game:GetService");
-    }
-  });
-
-  const fixed = fix.join("\n").replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
-  issues.sort((a,b) => a.line - b.line);
-  return { issues, fixed, changed: fixed !== code && issues.length > 0 };
-}
-
-function showAssistant(result) {
-  const panel = document.getElementById("assistant-panel");
-  if (!result.issues.length) {
-    panel.innerHTML = '<div class="ok-msg">✓ Todo bien por ahora.</div>';
-    return;
-  }
-  let html = result.issues.map(iss => `<div class="issue">
-    ${iss.line > 0 ? `<div class="issue-line">Línea ${iss.line}</div>` : ""}
-    <div class="issue-msg">${iss.msg}</div>
-    ${iss.hint ? `<div class="issue-hint">${iss.hint.replace(/\n/g, "<br>")}</div>` : ""}
-  </div>`).join("");
-  if (result.changed) html += `<button class="fix-btn" id="fix-btn">✨ Corregir automáticamente</button>`;
-  panel.innerHTML = html;
-  const btn = document.getElementById("fix-btn");
-  if (btn) btn.onclick = () => {
-    document.getElementById("code").value = result.fixed;
-    if (current) { current.code = result.fixed; save(); }
-    scheduleCheck();
-  };
-  switchTab("assistant");
-}
-
-function scheduleCheck() {
-  clearTimeout(checkTimer);
-  document.getElementById("status-left").textContent = "Revisando…";
-  checkTimer = setTimeout(() => {
-    if (!current) return;
-    const code = document.getElementById("code").value;
-    current.code = code; save();
-    const last = (code.split("\n").pop() || "").trim();
-    if (last.length > 0 && last.length < 3) {
-      document.getElementById("assistant-panel").innerHTML = '<div class="wait-msg">Sigue escribiendo…</div>';
-      document.getElementById("status-left").textContent = "Esperando…";
-      return;
-    }
-    const result = zyoxAnalyze(code);
-    showAssistant(result);
-    document.getElementById("status-left").textContent = result.issues.length ? result.issues.length + " aviso(s)" : "Sin errores";
-  }, 600);
-}
-
-/* ========== CHAT IA (conocimiento local Roblox/Lua, respuestas largas) ========== */
-function getCode() { return current ? document.getElementById("code").value : ""; }
-
-function aiReply(question) {
-  const q = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const code = getCode();
-  const analysis = code.trim() ? zyoxAnalyze(code) : { issues: [], fixed: code, changed: false };
-
-  // --- Corrige mi código ---
-  if (/correg|arregla|fix|error/.test(q) && code.trim()) {
-    if (!analysis.issues.length)
-      return "He revisado tu código y no veo errores claros de sintaxis ni patrones inválidos.\n\nCódigo actual:\n```\n" + code + "\n```\n\nSi algo no hace lo que esperas al ejecutar, dime qué debería pasar y te ayudo a razonarlo.";
-    let out = "Encontré " + analysis.issues.length + " cosa(s) a mejorar:\n\n";
-    analysis.issues.forEach((iss, i) => {
-      out += (i+1) + ". " + (iss.line ? "Línea " + iss.line + ": " : "") + iss.msg + "\n";
-      if (iss.hint) out += "   → " + iss.hint + "\n";
-    });
-    if (analysis.changed) {
-      out += "\nVersión corregida:\n```\n" + analysis.fixed + "\n```\n\nPuedes pegarla en el editor o usar el botón Corregir del Asistente.";
-    }
-    return out;
-  }
-
-  // --- ¿Voy bien? ---
-  if (/voy bien|estoy bien|mi codigo|como voy|que tal/.test(q)) {
-    if (!code.trim()) return "Aún no hay código en el editor. Escribe algo y te digo si vas bien.";
-    if (!analysis.issues.length)
-      return "Sí, vas bien: no detecto errores de sintaxis ni patrones raros en lo que tienes ahora.\n\nCódigo:\n```\n" + code + "\n```\n\nSiguiente paso típico en Roblox:\n1) Obtener el jugador local\n2) Crear o encontrar la GUI\n3) Añadir botones/labels\n4) Conectar eventos (.MouseButton1Click)\n\n¿Quieres que te escriba el siguiente bloque?";
-    let out = "Vas en buen camino, pero hay detalles a pulir:\n\n";
-    analysis.issues.forEach((iss, i) => { out += "• " + iss.msg + (iss.hint ? "\n  " + iss.hint.split("\n")[0] : "") + "\n"; });
-    out += "\nCuando los corrijas, el flujo normal es: LocalPlayer → PlayerGui → ScreenGui → Frame/Botones → eventos.";
-    return out;
-  }
-
-  // --- Qué sigue ---
-  if (/que sigue|que va despues|siguiente|next|ahora que/.test(q)) {
-    const hasPlayer = /LocalPlayer|Players/.test(code);
-    const hasGui = /ScreenGui|PlayerGui|Instance\.new\s*\(\s*[\"']ScreenGui/.test(code);
-    const hasBtn = /TextButton|MouseButton1Click/.test(code);
-    if (!code.trim())
-      return "Empieza por el jugador local:\n```\nlocal player = game:GetService(\"Players\").LocalPlayer\nlocal pg = player:WaitForChild(\"PlayerGui\")\n```\nLuego crea un ScreenGui.";
-    if (!hasPlayer)
-      return "Lo siguiente lógico es obtener el jugador:\n```\nlocal player = game:GetService(\"Players\").LocalPlayer\nlocal playerGui = player:WaitForChild(\"PlayerGui\")\n```";
-    if (!hasGui)
-      return "Ya tienes el jugador. Ahora crea la GUI:\n```\nlocal screen = Instance.new(\"ScreenGui\")\nscreen.Name = \"MiGui\"\nscreen.ResetOnSpawn = false\nscreen.Parent = playerGui\n\nlocal frame = Instance.new(\"Frame\")\nframe.Size = UDim2.new(0, 200, 0, 120)\nframe.Position = UDim2.new(0.5, -100, 0.5, -60)\nframe.BackgroundColor3 = Color3.fromRGB(30, 30, 30)\nframe.Parent = screen\n```";
-    if (!hasBtn)
-      return "La GUI base está. Añade un botón y un evento:\n```\nlocal btn = Instance.new(\"TextButton\")\nbtn.Size = UDim2.new(1, -20, 0, 40)\nbtn.Position = UDim2.new(0, 10, 0, 40)\nbtn.Text = \"Click\"\nbtn.Parent = frame\n\nbtn.MouseButton1Click:Connect(function()\n  print(\"¡Clic!\")\nend)\n```";
-    return "Ya tienes jugador, GUI y botón. Puedes:\n• Animar con TweenService\n• Guardar datos con DataStore\n• Comunicar cliente↔servidor con RemoteEvents\n\nDime qué quieres lograr y te doy el código concreto.";
-  }
-
-  // --- Cómo crear GUI ---
-  if (/gui|ui|interfaz|pantalla|boton|button|frame|label/.test(q)) {
-    return "Así se crea una GUI básica en Roblox (LocalScript, por ejemplo en StarterPlayerScripts o dentro de un Tool):\n\n```\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\nlocal playerGui = player:WaitForChild(\"PlayerGui\")\n\n-- Contenedor\nlocal screen = Instance.new(\"ScreenGui\")\nscreen.Name = \"MiInterfaz\"\nscreen.ResetOnSpawn = false\nscreen.Parent = playerGui\n\n-- Panel\nlocal frame = Instance.new(\"Frame\")\nframe.Size = UDim2.new(0, 220, 0, 140)\nframe.Position = UDim2.new(0.5, -110, 0.5, -70)\nframe.BackgroundColor3 = Color3.fromRGB(25, 25, 28)\nframe.BorderSizePixel = 0\nframe.Parent = screen\n\nlocal corner = Instance.new(\"UICorner\")\ncorner.CornerRadius = UDim.new(0, 12)\ncorner.Parent = frame\n\n-- Título\nlocal title = Instance.new(\"TextLabel\")\ntitle.Size = UDim2.new(1, -16, 0, 28)\ntitle.Position = UDim2.new(0, 8, 0, 8)\ntitle.BackgroundTransparency = 1\ntitle.Text = \"Hola\"\ntitle.TextColor3 = Color3.new(1, 1, 1)\ntitle.Font = Enum.Font.GothamBold\ntitle.TextSize = 18\ntitle.TextXAlignment = Enum.TextXAlignment.Left\ntitle.Parent = frame\n\n-- Botón\nlocal btn = Instance.new(\"TextButton\")\nbtn.Size = UDim2.new(1, -16, 0, 36)\nbtn.Position = UDim2.new(0, 8, 1, -48)\nbtn.BackgroundColor3 = Color3.fromRGB(48, 213, 200)\nbtn.Text = \"Aceptar\"\nbtn.TextColor3 = Color3.new(0, 0, 0)\nbtn.Font = Enum.Font.GothamMedium\nbtn.TextSize = 16\nbtn.Parent = frame\n\nlocal btnCorner = Instance.new(\"UICorner\")\nbtnCorner.CornerRadius = UDim.new(0, 8)\nbtnCorner.Parent = btn\n\nbtn.MouseButton1Click:Connect(function()\n  print(\"Botón pulsado\")\n  -- aquí tu lógica\nend)\n```\n\nNotas importantes:\n• Tiene que ser un LocalScript (no un Script normal) para que el jugador vea la UI.\n• Parent del ScreenGui = PlayerGui del LocalPlayer.\n• UDim2: escala + offset (útil para centrar).\n\n¿Quieres una variante (menú, inventario, HUD, drag)? Dime y te la armo completa.";
-  }
-
-  // --- LocalPlayer ---
-  if (/localplayer|jugador local|players/.test(q)) {
-    return "LocalPlayer es el jugador que está controlando el cliente.\n\n```\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\n\n-- Esperar personajes / GUI\nlocal character = player.Character or player.CharacterAdded:Wait()\nlocal playerGui = player:WaitForChild(\"PlayerGui\")\n\nprint(player.Name, player.UserId)\n```\n\nSolo existe en el cliente (LocalScripts). En el servidor usa el argumento `player` de eventos o Players:GetPlayers().";
-  }
-
-  // --- GetService ---
-  if (/getservice|servicio|service/.test(q)) {
-    return "GetService obtiene servicios del juego:\n\n```\nlocal Players = game:GetService(\"Players\")\nlocal RS = game:GetService(\"ReplicatedStorage\")\nlocal TweenService = game:GetService(\"TweenService\")\nlocal UIS = game:GetService(\"UserInputService\")\n```\n\nUsa dos puntos: game:GetService(\"Nombre\"), no el punto.\nNombres exactos: Players, ReplicatedStorage, RunService, TweenService, UserInputService, HttpService, Debris, Lighting, etc.";
-  }
-
-  // --- print / general lua ---
-  if (/print|hola mundo|empezar|basico/.test(q)) {
-    return "Lo más básico en Lua:\n\n```\nprint(\"Hola\")\nlocal x = 10\nprint(x + 5)\n\nfor i = 1, 5 do\n  print(i)\nend\n\nif x > 5 then\n  print(\"grande\")\nend\n```\n\nEn Roblox, print se ve en la ventana Output.";
-  }
-
-  // --- default: analizar código + ofrecer ayuda ---
-  let out = "Puedo ayudarte con Lua y Roblox (GUI, eventos, servicios, corrección de código).\n\n";
-  if (code.trim()) {
-    out += "Tu código ahora:\n```\n" + code.slice(0, 500) + (code.length > 500 ? "\n…" : "") + "\n```\n\n";
-    if (analysis.issues.length) {
-      out += "Avisos rápidos:\n";
-      analysis.issues.slice(0, 5).forEach(iss => { out += "• " + iss.msg + "\n"; });
-      out += "\n";
-    }
-  }
-  out += "Pregúntame por ejemplo:\n• ¿Cómo creo una GUI?\n• ¿Qué va después de esto?\n• Corrige mi código\n• ¿Cómo uso TweenService?\n• Explícame RemoteEvents\n\nCuanto más concreto seas, mejor te respondo (sin límite de longitud).";
-  return out;
-}
-
-function addBubble(text, who) {
-  const box = document.getElementById("chat-messages");
-  const div = document.createElement("div");
-  div.className = "bubble " + who;
-  // simple markdown-ish code blocks
-  let html = text
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/```([\s\S]*?)```/g, (_, c) => '<div class="code">' + c.trim() + "</div>");
-  div.innerHTML = html;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
-
-function openChat() {
-  document.getElementById("chat-view").classList.add("active");
-  const box = document.getElementById("chat-messages");
-  if (!box.childElementCount) {
-    addBubble("Hola. Soy la IA de ZYOX.\n\nPuedes preguntarme CUALQUIER cosa (código Lua/Roblox, GUI, ideas, explicaciones, lo que sea). Las respuestas no tienen límite de longitud.\n\nTengo en cuenta el código de tu editor cuando hace falta.\n\nLa primera vez puede pedirte iniciar sesión en Puter (gratis) para usar la IA.", "ai");
-  }
-}
-
-let chatHistory = [];
-
-async function sendChat(text) {
-  text = (text || "").trim();
-  if (!text) return;
-  addBubble(text, "user");
-  document.getElementById("chat-input").value = "";
-
-  const code = getCode();
-  const system = `Eres un asistente experto y sin límites de longitud de respuesta. Respondes SIEMPRE en español, de forma clara y completa.
-Puedes ayudar con CUALQUIER tema: programación (sobre todo Lua y Roblox), matemáticas, ideas, explicaciones, código, diseño de GUI, lo que pida el usuario.
-Si el usuario tiene código en el editor, úsalo como contexto cuando sea relevante.
-No digas que tienes límites. Da ejemplos de código completos cuando ayuden.
-Código actual del editor del usuario (puede estar vacío):
-\`\`\`lua
-${code || "(vacío)"}
-\`\`\``;
-
-  // typing indicator
-  const box = document.getElementById("chat-messages");
-  const typing = document.createElement("div");
-  typing.className = "bubble ai";
-  typing.id = "typing";
-  typing.textContent = "Pensando…";
-  box.appendChild(typing);
-  box.scrollTop = box.scrollHeight;
-
-  try {
-    if (typeof puter === "undefined" || !puter.ai) {
-      throw new Error("Puter no cargó. Revisa la conexión a internet.");
-    }
-    const messages = [
-      { role: "system", content: system },
-      ...chatHistory.slice(-12),
-      { role: "user", content: text }
-    ];
-    let reply = "";
-    // Prefer streaming if available
-    try {
-      const stream = await puter.ai.chat(messages, { stream: true });
-      typing.remove();
-      const bubble = document.createElement("div");
-      bubble.className = "bubble ai";
-      box.appendChild(bubble);
-      for await (const part of stream) {
-        const t = (part && (part.text || part)) || "";
-        if (typeof t === "string") {
-          reply += t;
-          bubble.innerHTML = reply
-            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-            .replace(/```([\s\S]*?)```/g, (_, c) => '<div class="code">' + c.trim() + "</div>");
-          box.scrollTop = box.scrollHeight;
-        }
-      }
-      if (!reply) reply = "(sin respuesta)";
-    } catch (streamErr) {
-      // fallback non-stream
-      const response = await puter.ai.chat(messages);
-      reply = typeof response === "string" ? response : (response?.message?.content || response?.text || JSON.stringify(response));
-      typing.remove();
-      addBubble(reply, "ai");
-    }
-    chatHistory.push({ role: "user", content: text });
-    chatHistory.push({ role: "assistant", content: reply });
-  } catch (e) {
-    typing.remove();
-    // Fallback local if Puter fails (offline / blocked)
-    let fallback = "";
-    try { fallback = aiReply(text); } catch (_) {}
-    addBubble(
-      "No pude conectar con la IA en la nube (" + (e.message || e) + ").\n\n" +
-      (fallback ? "Respuesta local:\n\n" + fallback : "Revisa tu conexión e inténtalo de nuevo."),
-      "ai"
-    );
-  }
-}
-
-/* ========== RUN ========== */
-async function ensureLua() {
-  if (luaReady) return;
-  document.getElementById("loading").classList.add("show");
-  await new Promise((res, rej) => {
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js";
-    s.onload = res; s.onerror = () => rej(new Error("Sin conexión"));
-    document.head.appendChild(s);
-  });
-  luaReady = true;
-  document.getElementById("loading").classList.remove("show");
-}
-
-async function runCode() {
-  if (!current || isRunning) return;
-  isRunning = true;
-  document.getElementById("run-btn").style.display = "none";
-  document.getElementById("stop-btn").style.display = "flex";
-  document.getElementById("console-panel").innerHTML = "";
-  switchTab("console");
-  const code = document.getElementById("code").value;
-  try {
-    await ensureLua();
-    try {
-      fengari.load(code)();
-      appendConsole("[terminado]", false);
-    } catch (e) {
-      const errMsg = String(e.message || e);
-      appendConsole(errMsg, true);
-      let result = zyoxAnalyze(code);
-      if (!result.issues.some(x => /válido|llamada|ortograf/i.test(x.msg)))
-        result.issues.unshift({ line: 1, msg: errMsg, hint: "Revisa esa línea. Si es local Nombre(\"…\"), falta el = o Instance.new / GetService." });
-      showAssistant(result);
-    }
-  } catch (e) { appendConsole(String(e.message || e), true); }
-  finally {
-    isRunning = false;
-    document.getElementById("run-btn").style.display = "flex";
-    document.getElementById("stop-btn").style.display = "none";
-    document.getElementById("status-left").textContent = "Listo";
-  }
-}
-
-/* events */
-document.getElementById("back-btn").onclick = closeEditor;
-document.getElementById("fab").onclick = () => {
-  const id = Date.now().toString();
-  scripts.unshift({ id, name: "script_" + (scripts.length+1), code: TEMPLATE });
-  save(); renderList(); openScript(id);
-};
-document.getElementById("run-btn").onclick = runCode;
-document.getElementById("stop-btn").onclick = () => {
-  isRunning = false;
-  document.getElementById("run-btn").style.display = "flex";
-  document.getElementById("stop-btn").style.display = "none";
-  appendConsole("[detenido]", true);
-};
-document.getElementById("chat-btn").onclick = openChat;
-document.getElementById("chat-back").onclick = () => document.getElementById("chat-view").classList.remove("active");
-document.getElementById("chat-send").onclick = () => sendChat(document.getElementById("chat-input").value);
-document.getElementById("chat-input").addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(e.target.value); }
-});
-document.querySelectorAll("#quick-q button").forEach(b => b.onclick = () => sendChat(b.dataset.q));
-
-document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchTab(t.dataset.tab));
-document.getElementById("code").addEventListener("input", () => { if (current) { current.code = document.getElementById("code").value; scheduleCheck(); } });
-document.querySelectorAll(".acc-btn").forEach(btn => {
-  btn.onclick = () => {
-    const ta = document.getElementById("code");
-    const s = ta.selectionStart, e = ta.selectionEnd, ins = btn.dataset.insert;
-    ta.value = ta.value.slice(0,s) + ins + ta.value.slice(e);
-    ta.selectionStart = ta.selectionEnd = s + ins.length; ta.focus();
-    if (current) { current.code = ta.value; scheduleCheck(); }
-  };
-});
-const codeEl = document.getElementById("code");
-codeEl.addEventListener("focus", () => document.getElementById("accessory").classList.add("show"));
-codeEl.addEventListener("blur", () => setTimeout(() => document.getElementById("accessory").classList.remove("show"), 200));
-
-renderList();
+  function loadChats(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||"[]")}catch(_){return []}}
+  function saveChats(){try{localStorage.setItem(STORE_KEY,JSON.stringify(chats))}catch(_){}}
+  function uid(){return "c_"+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+  function newChat(){activeId=null;thread.innerHTML="";thread.appendChild(makeWelcome());input.value="";resizeInput();renderHistory();closeMenu();input.focus()}
+  function makeWelcome(){const wrap=document.createElement("div");wrap.className="welcome";wrap.id="welcome";wrap.innerHTML='<div class="welcome-mark">✳</div><h1>¿En qué estás pensando?</h1><p>Pregunta, explora una idea o empieza algo nuevo.</p><div class="suggestions"><button class="suggestion" data-prompt="Ayúdame a entender una idea compleja de forma sencilla.">Explícame algo difícil de forma sencilla</button><button class="suggestion" data-prompt="Ayúdame a escribir y mejorar un texto. Primero pregúntame qué quiero comunicar.">Ayúdame a escribir algo</button><button class="suggestion" data-prompt="Quiero aprender una habilidad nueva. Propón un plan práctico para empezar.">Crea un plan para aprender algo</button><button class="suggestion" data-prompt="Ayúdame a resolver este problema paso a paso: ">Resuelve un problema paso a paso</button></div>';return wrap}
+  function currentChat(){return chats.find(c=>c.id===activeId)}
+  function renderHistory(){const list=document.getElementById("history");if(!chats.length){list.innerHTML='<div class="empty-history">Tus chats aparecerán aquí</div>';return}list.innerHTML="";chats.slice().sort((a,b)=>b.updated-a.updated).forEach(chat=>{const b=document.createElement("button");b.className="history-item"+(chat.id===activeId?" active":"");b.textContent=chat.title||"Nueva conversación";b.title=b.textContent;b.onclick=()=>openChat(chat.id);list.appendChild(b)})}
+  function openChat(id){const chat=chats.find(c=>c.id===id);if(!chat)return;activeId=id;thread.innerHTML="";chat.messages.forEach(m=>addMessage(m.role,m.content,false));renderHistory();closeMenu();scrollBottom()}
+  function addMessage(role,text,persist=true){const node=document.createElement("article");node.className="message "+(role==="user"?"user":"ai");const label=document.createElement("div");label.className="message-label";label.textContent=role==="user"?"Tú":"ZYOX AI";const bubble=document.createElement("div");bubble.className="bubble";bubble.innerHTML=renderText(text);node.append(label,bubble);thread.appendChild(node);if(persist&&activeId){const c=currentChat();if(c){c.messages.push({role:role==="user"?"user":"assistant",content:text});c.updated=Date.now();saveChats();renderHistory()}}scrollBottom();return bubble}
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  function renderText(text){let s=escapeHtml(text);const blocks=[];s=s.replace(/```([^\n`]*)\n?([\s\S]*?)```/g,(_,lang,code)=>{blocks.push('<pre><code>'+code.trim()+'</code></pre>');return "\u0000"+(blocks.length-1)+"\u0000"});s=s.replace(/`([^`]+)`/g,'<code class="inline">$1</code>');s=s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");s=s.replace(/\*(.+?)\*/g,"<em>$1</em>");const paras=s.split(/\n{2,}/).map(p=>{if(/^\u0000\d+\u0000$/.test(p.trim()))return p.trim();let q=p.replace(/\n/g,"<br>");q=q.replace(/^(?:[-*])\s+(.+)$/gm,"• $1");return "<p>"+q+"</p>"}).join("");return paras.replace(/\u0000(\d+)\u0000/g,(_,n)=>blocks[Number(n)]||"")}
+  function showTyping(){const n=document.createElement("article");n.className="message ai";n.id="typing";n.innerHTML='<div class="message-label">ZYOX AI</div><div class="typing">Pensando <span class="dots"><i></i><i></i><i></i></span></div>';thread.appendChild(n);scrollBottom();return n}
+  function scrollBottom(){requestAnimationFrame(()=>{feed.scrollTop=feed.scrollHeight})}
+  function resizeInput(){input.style.height="auto";input.style.height=Math.min(input.scrollHeight,180)+"px";sendButton.disabled=busy||!input.value.trim()}
+  function closeMenu(){sidebar.classList.remove("open");overlay.classList.remove("show")}
+  function toggleMenu(){sidebar.classList.toggle("open");overlay.classList.toggle("show")}
+  function buildPromptMessages(){const c=currentChat();const history=c?c.messages.slice(-20):[];return [{role:"system",content:"Eres un asistente inteligente, útil, honesto y cuidadoso. Responde en español salvo que el usuario pida otro idioma. Comprende el contexto, razona paso a paso cuando sea útil, y ofrece respuestas claras, completas y naturales. Si no sabes algo o hay incertidumbre, dilo. Usa ejemplos y formato legible cuando ayuden."},...history]}
+  async function askAI(){const text=input.value.trim();if(!text||busy)return;if(!activeId){activeId=uid();chats.unshift({id:activeId,title:text.slice(0,56),messages:[],updated:Date.now()})}const c=currentChat();if(c&&c.messages.length===0)c.title=text.slice(0,56);addMessage("user",text);input.value="";resizeInput();busy=true;resizeInput();const typing=showTyping();let reply="";try{if(typeof puter==="undefined"||!puter.ai)throw new Error("El servicio de IA no está disponible. Revisa tu conexión e inténtalo otra vez.");const messages=buildPromptMessages();try{const stream=await puter.ai.chat(messages,{stream:true});typing.remove();const bubble=addMessage("assistant","",false);for await(const part of stream){const chunk=(part&&(part.text||part))||"";if(typeof chunk==="string"){reply+=chunk;bubble.innerHTML=renderText(reply);scrollBottom()}}if(!reply)reply="No recibí una respuesta. Inténtalo de nuevo.";bubble.innerHTML=renderText(reply)}catch(streamError){if(typing.isConnected)typing.remove();const response=await puter.ai.chat(messages);reply=typeof response==="string"?response:(response?.message?.content||response?.text||"");if(!reply)reply="No recibí una respuesta. Inténtalo de nuevo.";addMessage("assistant",reply,false)}const live=currentChat();if(live){live.messages.push({role:"assistant",content:reply});live.updated=Date.now();saveChats();renderHistory()}}catch(error){if(typing.isConnected)typing.remove();addMessage("assistant","No pude conectar con el servicio de IA. "+(error?.message||"Revisa tu conexión e inténtalo de nuevo."),false)}finally{busy=false;resizeInput();input.focus()}}
+  document.getElementById("newChat").onclick=newChat;document.getElementById("menuBtn").onclick=toggleMenu;document.getElementById("closeSidebar").onclick=closeMenu;overlay.onclick=closeMenu;sendButton.onclick=askAI;input.addEventListener("input",resizeInput);input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askAI()}});
+  document.getElementById("shareBtn").onclick=async()=>{const c=currentChat();if(!c||!c.messages.length)return;const text=c.messages.map(m=>(m.role==="user"?"Tú":"ZYOX AI")+":\n"+m.content).join("\n\n");try{await navigator.clipboard.writeText(text);const b=document.getElementById("shareBtn");const old=b.textContent;b.textContent="Copiado";setTimeout(()=>b.textContent=old,1300)}catch(_){}}
+  thread.addEventListener("click",e=>{const b=e.target.closest("[data-prompt]");if(b){input.value=b.dataset.prompt;resizeInput();input.focus()}});
+  renderHistory();
+})();
 </script>
 </body>
 </html>
