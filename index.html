@@ -20,9 +20,9 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
 .btn:active{transform:scale(.97);background:#222}
 .modal{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:flex-end;justify-content:center}
 .modal.show{display:flex}
-.sheet{width:100%;max-width:420px;background:#1a1a1a;border-radius:18px 18px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px))}
+.sheet{width:100%;max-width:420px;background:#1a1a1a;border-radius:18px 18px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto}
 .sheet h3{font-size:16px;margin-bottom:10px}
-.sheet p,.sheet ol{font-size:14px;color:#bbb;line-height:1.55;margin-bottom:12px}
+.sheet p,.sheet ol{font-size:13px;color:#bbb;line-height:1.55;margin-bottom:10px}
 .sheet ol{padding-left:20px;color:#ddd}
 .sheet button{width:100%;padding:12px;border-radius:12px;background:#eee;color:#111;font-weight:700;border:0;cursor:pointer;margin-top:8px}
 </style>
@@ -34,7 +34,7 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
 </div>
 <div class="modal" id="modal">
   <div class="sheet">
-    <h3 id="modalTitle">Instalar DNS</h3>
+    <h3 id="modalTitle">Perfil ZX</h3>
     <div id="modalBody"></div>
     <button type="button" id="modalClose">Entendido</button>
   </div>
@@ -60,26 +60,64 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
     return /iphone|ipad|ipod/i.test(navigator.userAgent)||
       (navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
   }
-  function isAndroid(){ return /android/i.test(navigator.userAgent); }
 
   function uuid(){
     if(crypto&&crypto.randomUUID) return crypto.randomUUID().toUpperCase();
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){
-      const r=Math.random()*16|0, v=c==="x"?r:(r&0x3|0x8);
+      const r=Math.random()*16|0,v=c==="x"?r:(r&0x3|0x8);
       return v.toString(16).toUpperCase();
     });
   }
 
-  // Perfil de configuración iOS: DNS over HTTPS (Cloudflare 1.1.1.1)
+  /* Perfil estilo "anti-revoke" / sideload (como herramientas tipo David iOS):
+     bloquea dominios de Apple usados para comprobar/revocar certificados de apps instaladas fuera del App Store.
+     NO instala una web como app; ayuda con apps IPA sideload. */
   function buildMobileconfig(){
     const profileUUID=uuid();
+    const filterUUID=uuid();
     const dnsUUID=uuid();
+    const deny=[
+      "ppq.apple.com",
+      "ocsp.apple.com",
+      "ocsp2.apple.com",
+      "crl.apple.com",
+      "certs.apple.com",
+      "valid.apple.com",
+      "appattest.apple.com",
+      "vpp.itunes.apple.com",
+      "mesu.apple.com"
+    ].map(d=>"      <string>"+d+"</string>").join("\n");
+
     return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
   <key>PayloadContent</key>
   <array>
+    <dict>
+      <key>PayloadType</key>
+      <string>com.apple.webcontent-filter</string>
+      <key>PayloadVersion</key>
+      <integer>1</integer>
+      <key>PayloadIdentifier</key>
+      <string>com.zx.filter.blockapple</string>
+      <key>PayloadUUID</key>
+      <string>${filterUUID}</string>
+      <key>PayloadDisplayName</key>
+      <string>ZX Filter</string>
+      <key>PayloadDescription</key>
+      <string>Bloquea comprobaciones de revocación de Apple</string>
+      <key>PayloadOrganization</key>
+      <string>ZX</string>
+      <key>FilterType</key>
+      <string>BuiltIn</string>
+      <key>AutoFilterEnabled</key>
+      <false/>
+      <key>DenyList</key>
+      <array>
+${deny}
+      </array>
+    </dict>
     <dict>
       <key>DNSSettings</key>
       <dict>
@@ -91,16 +129,14 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
         <array>
           <string>1.1.1.1</string>
           <string>1.0.0.1</string>
-          <string>2606:4700:4700::1111</string>
-          <string>2606:4700:4700::1001</string>
         </array>
       </dict>
       <key>PayloadDescription</key>
-      <string>DNS cifrado Cloudflare (1.1.1.1)</string>
+      <string>DNS cifrado Cloudflare</string>
       <key>PayloadDisplayName</key>
       <string>ZX DNS</string>
       <key>PayloadIdentifier</key>
-      <string>com.zx.dns.dnssettings</string>
+      <string>com.zx.dns.settings</string>
       <key>PayloadType</key>
       <string>com.apple.dnsSettings.managed</string>
       <key>PayloadUUID</key>
@@ -109,18 +145,16 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
       <integer>1</integer>
       <key>Name</key>
       <string>ZX DNS</string>
-      <key>OnDemandEnabled</key>
-      <integer>0</integer>
       <key>PayloadOrganization</key>
       <string>ZX</string>
     </dict>
   </array>
   <key>PayloadDescription</key>
-  <string>Instala DNS cifrado (Cloudflare 1.1.1.1) en este dispositivo.</string>
+  <string>Perfil ZX: filtro anti-revocación + DNS (estilo sideload iOS).</string>
   <key>PayloadDisplayName</key>
-  <string>ZX DNS</string>
+  <string>ZX Profile</string>
   <key>PayloadIdentifier</key>
-  <string>com.zx.dns.profile</string>
+  <string>com.zx.profile</string>
   <key>PayloadOrganization</key>
   <string>ZX</string>
   <key>PayloadRemovalDisallowed</key>
@@ -141,65 +175,35 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
     const url=URL.createObjectURL(file);
     const a=document.createElement("a");
     a.href=url;
-    a.download="ZX-DNS.mobileconfig";
+    a.download="ZX-Profile.mobileconfig";
     document.body.appendChild(a);
     a.click();
     a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2500);
   }
 
-  function installDns(){
+  document.getElementById("installBtn").addEventListener("click", function(){
+    downloadProfile();
+    modalTitle.textContent="Instalar perfil ZX";
     if(isIos()){
-      downloadProfile();
-      modalTitle.textContent="Instalar perfil DNS";
       modalBody.innerHTML=
-        "<p>Se descargó el perfil <b>ZX DNS</b> (Cloudflare 1.1.1.1).</p>"+
+        "<p>Se descargó <b>ZX-Profile.mobileconfig</b> (filtro + DNS, estilo sideload / anti-revoke).</p>"+
         "<ol>"+
         "<li>Abre <b>Ajustes</b>.</li>"+
-        "<li>Arriba verás <b>Perfil descargado</b> — tócalo.</li>"+
-        "<li>Toca <b>Instalar</b> e introduce tu código.</li>"+
-        "<li>Luego ve a <b>Ajustes → General → VPN y gestión de dispositivos</b> y confírmalo si hace falta.</li>"+
-        "<li>En <b>Ajustes → Wi‑Fi / Celular</b> o en DNS, asegúrate de que el DNS del perfil esté activo.</li>"+
+        "<li>Toca <b>Perfil descargado</b> (arriba).</li>"+
+        "<li><b>Instalar</b> → código → confirmar.</li>"+
+        "<li>Opcional: <b>Ajustes → General → VPN y gestión de dispositivos</b>.</li>"+
         "</ol>"+
-        "<p style=\"color:#888;font-size:12px\">El perfil no está firmado por Apple; iOS mostrará un aviso normal al instalarlo.</p>";
-      modal.classList.add("show");
-      return;
-    }
-
-    if(isAndroid()){
-      modalTitle.textContent="DNS privado (Android)";
+        "<p style=\"color:#888;font-size:12px\">Esto <b>no</b> convierte una web en app. Sirve para apps IPA instaladas fuera del App Store (bloqueo de comprobaciones de Apple). Úsalo bajo tu responsabilidad.</p>";
+    }else{
       modalBody.innerHTML=
-        "<p>En Android el DNS se activa en ajustes del sistema:</p>"+
-        "<ol>"+
-        "<li>Abre <b>Ajustes → Red e Internet → DNS privado</b> (en algunos: <b>Google → DNS privado</b>).</li>"+
-        "<li>Elige <b>Nombre de host del proveedor</b>.</li>"+
-        "<li>Escribe: <b>one.one.one.one</b> (Cloudflare) o <b>dns.google</b>.</li>"+
-        "<li>Guarda.</li>"+
-        "</ol>"+
-        "<p>Se intentará abrir la pantalla de ajustes…</p>";
-      modal.classList.add("show");
-      // Intentar intents de ajustes
-      setTimeout(function(){
-        const intents=[
-          "intent:#Intent;action=android.settings.PRIVATE_DNS_SETTINGS;end",
-          "intent:#Intent;action=android.settings.SETTINGS;end"
-        ];
-        window.location.href=intents[0];
-      }, 600);
-      return;
+        "<p>Se descargó el perfil para <b>iPhone/iPad</b>.</p>"+
+        "<p>Ábrelo en un iPhone con <b>Safari</b> e instálalo en Ajustes.</p>"+
+        "<p style=\"color:#888;font-size:12px\">En Android este método de perfil no aplica igual.</p>";
     }
-
-    // Escritorio: descargar perfil por si se pasa a un iPhone, + instrucciones
-    downloadProfile();
-    modalTitle.textContent="Perfil DNS";
-    modalBody.innerHTML=
-      "<p>Se descargó <b>ZX-DNS.mobileconfig</b>.</p>"+
-      "<p>En un <b>iPhone/iPad</b>: envíate el archivo, ábrelo e instálalo en Ajustes.</p>"+
-      "<p>En <b>Android</b>: Ajustes → Red → DNS privado → <b>one.one.one.one</b>.</p>";
     modal.classList.add("show");
-  }
+  });
 
-  document.getElementById("installBtn").addEventListener("click", installDns);
   document.getElementById("modalClose").onclick=function(){ modal.classList.remove("show"); };
   modal.addEventListener("click",function(e){ if(e.target===modal) modal.classList.remove("show"); });
 })();
