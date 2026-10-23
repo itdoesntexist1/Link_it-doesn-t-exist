@@ -1,90 +1,544 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>ZYOX AI</title>
-<script src="https://js.puter.com/v2/" defer></script>
+<title>ZYOX Music</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAC5UlEQVR42u3dsXGEQBQFwe/gXA7KSskqOsmVfwe7MG2MiwGvMYAq5vV6/UrVxkkQABIAEgASABIAEgASABIAEgASABIAEgASABIAEgASABIAEgASAB/r6+dbNwsAg9fmIMbwVYYwhq8yhDF+lRGM4asMYYxfZQRj/CojGONXGcEYv8oIxvhVRjDGrzICAASA8auKYIxfZQQACADjVxUBAALA+FVFAIAAAEAAACAAjF8tBAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAukACQAJAAeEbHcbyV0QIAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4BoAMAGQAvDusYsoALg5gE+MvowBgJsCOHP4JQgA3AzAqgAAIA3gqRAAACCNAAAA0ggAACCNAAAA0ggAAAAAAACoIgAAAAAAAKCKAAAAAADA+AEAwPABAMDwAQDA+AEAwPgBAMD4AQDA+AEAAABvggEwfgAAAMDXoAAYPwAAuPsDAIDn/gAAYPwAAGD8AABg+AAAYPwAAGD4AHgRZvQAALBoyAYPQBaB3x8BkAVg2ABkERg1AFkEBg1AFoExA5BFYMgAJCEYMABJCIYLQBKDwQIgASABIAEgASA9EwAEusv4ARAAAAgAAAQABGqNHwABcBYACLT7+AEQAGcCgEA7j/8SABBo1/EDIACuAACBdhz/pQAg0G7jvxwABNpp/EsAQKBdxr8MAATaYfxLAUCg1eNfDgAErd7eFgAgMP48ABAMHwAQDB8AIAweAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAOlff2L3kgIyoyLTAAAAAElFTkSuQmCC">
+<meta name="apple-mobile-web-app-title" content="ZYOX Music">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAC5UlEQVR42u3dsXGEQBQFwe/gXA7KSskqOsmVfwe7MG2MiwGvMYAq5vV6/UrVxkkQABIAEgASABIAEgASABIAEgASABIAEgASABIAEgASABIAEgASAB/r6+dbNwsAg9fmIMbwVYYwhq8yhDF+lRGM4asMYYxfZQRj/CojGONXGcEYv8oIxvhVRjDGrzICAASA8auKYIxfZQQACADjVxUBAALA+FVFAIAAAEAAACAAjF8tBAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAukACQAJAAeEbHcbyV0QIAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4BoAMAGQAvDusYsoALg5gE+MvowBgJsCOHP4JQgA3AzAqgAAIA3gqRAAACCNAAAA0ggAACCNAAAA0ggAAAAAAACoIgAAAAAAAKCKAAAAAADA+AEAwPABAMDwAQDA+AEAwPgBAMD4AQDA+AEAAABvggEwfgAAAMDXoAAYPwAAuPsDAIDn/gAAYPwAAGD8AABg+AAAYPwAAGD4AHgRZvQAALBoyAYPQBaB3x8BkAVg2ABkERg1AFkEBg1AFoExA5BFYMgAJCEYMABJCIYLQBKDwQIgASABIAEgASA9EwAEusv4ARAAAAgAAAQABGqNHwABcBYACLT7+AEQAGcCgEA7j/8SABBo1/EDIACuAACBdhz/pQAg0G7jvxwABNpp/EsAQKBdxr8MAATaYfxLAUCg1eNfDgAErd7eFgAgMP48ABAMHwAQDB8AIAweAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAOlff2L3kgIyoyLTAAAAAElFTkSuQmCC">
 <style>
-:root{color-scheme:dark;--bg:#000;--surface:#111;--surface2:#1a1a1a;--line:#292929;--text:#f4f4f4;--muted:#929292;--accent:#d8d8d8;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,textarea{font:inherit}button{color:inherit;-webkit-tap-highlight-color:transparent}.app{height:100dvh;display:flex;overflow:hidden;background:var(--bg)}
-.sidebar{width:280px;flex:0 0 280px;background:#080808;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:calc(14px + var(--safe-top)) 12px 12px;transition:transform .22s ease;z-index:10}.side-head{display:flex;align-items:center;justify-content:space-between;padding:2px 5px 20px}.brand{font-size:19px;font-weight:750;letter-spacing:.08em}.side-icon,.top-icon{width:38px;height:38px;border:0;border-radius:12px;background:transparent;color:#c9c9c9;display:grid;place-items:center;cursor:pointer}.side-icon:hover,.top-icon:hover{background:#1a1a1a}.new-chat{width:100%;display:flex;align-items:center;gap:10px;border:1px solid #303030;background:#111;border-radius:13px;padding:12px 14px;text-align:left;cursor:pointer;font-size:14px}.new-chat:hover{background:#191919}.history-label{padding:23px 10px 9px;color:#777;font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase}.history{overflow:auto;flex:1}.history-item{width:100%;display:block;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;background:transparent;color:#aaa;border-radius:10px;padding:10px;font-size:13px;cursor:pointer}.history-item:hover,.history-item.active{background:#1b1b1b;color:#fff}.side-foot{border-top:1px solid #1e1e1e;padding:13px 8px 2px;color:#777;font-size:11px;line-height:1.5}.main{min-width:0;flex:1;display:flex;flex-direction:column;position:relative}.topbar{height:62px;flex:0 0 62px;display:flex;align-items:center;justify-content:space-between;padding:calc(4px + var(--safe-top)) 18px 4px;border-bottom:1px solid rgba(255,255,255,.04)}.top-left,.top-actions{display:flex;align-items:center;gap:8px}.mobile-brand{display:none;font-size:15px;font-weight:700;letter-spacing:.06em}.model-name{font-size:14px;font-weight:620;color:#e8e8e8}.model-chevron{font-size:12px;color:#858585;margin-left:4px}.top-actions button{border:1px solid #292929;background:#0d0d0d;border-radius:11px;height:36px;padding:0 12px;font-size:12px;color:#ccc;cursor:pointer}.top-actions button:hover{background:#1a1a1a}.feed{flex:1;overflow:auto;scroll-behavior:smooth;padding:30px 20px 24px}.thread{width:min(760px,100%);margin:0 auto;display:flex;flex-direction:column;gap:25px}.welcome{min-height:min(50vh,460px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px 0 16px}.welcome-mark{width:42px;height:42px;border:1px solid #363636;border-radius:15px;display:grid;place-items:center;font-size:19px;color:#eee;margin-bottom:22px;background:linear-gradient(145deg,#191919,#080808)}.welcome h1{font-size:clamp(27px,5vw,38px);line-height:1.12;letter-spacing:-.04em;margin:0 0 11px;font-weight:650}.welcome p{font-size:14px;color:#929292;margin:0;line-height:1.55}.suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;width:min(620px,100%);margin-top:30px}.suggestion{min-height:61px;text-align:left;border:1px solid #292929;border-radius:14px;background:#0d0d0d;padding:12px 14px;color:#c8c8c8;font-size:13px;line-height:1.4;cursor:pointer}.suggestion:hover{background:#171717;border-color:#3b3b3b}.message{display:flex;flex-direction:column;gap:8px;animation:appear .18s ease}.message.user{align-items:flex-end}.message.ai{align-items:flex-start}@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.message-label{font-size:11px;color:#777;padding:0 4px}.bubble{max-width:min(88%,680px);font-size:15px;line-height:1.72;overflow-wrap:anywhere}.user .bubble{background:#1d1d1d;border:1px solid #292929;padding:11px 15px;border-radius:18px 18px 5px 18px;white-space:pre-wrap}.ai .bubble{white-space:normal;color:#e6e6e6}.ai .bubble p{margin:0 0 13px}.ai .bubble p:last-child{margin-bottom:0}.ai .bubble pre{white-space:pre;overflow:auto;background:#101010;border:1px solid #292929;border-radius:12px;padding:14px 15px;margin:12px 0;font-size:13px;line-height:1.6;color:#e8e8e8}.ai .bubble code.inline{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:#1c1c1c;border:1px solid #303030;border-radius:5px;padding:1px 5px}.ai .bubble ul,.ai .bubble ol{padding-left:23px}.ai .bubble a{color:#ddd}.typing{color:#8b8b8b;font-size:14px;display:flex;align-items:center;gap:9px}.dots{display:flex;gap:3px}.dots i{width:4px;height:4px;border-radius:50%;background:#aaa;animation:blink 1s infinite alternate}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes blink{to{opacity:.25;transform:translateY(-2px)}}
-.composer-wrap{flex:0 0 auto;padding:10px 18px calc(14px + var(--safe-bottom));background:linear-gradient(transparent,#000 20%)}.composer-area{width:min(760px,100%);margin:0 auto}.composer{display:flex;align-items:flex-end;gap:9px;min-height:58px;padding:9px 10px 9px 17px;background:#111;border:1px solid #333;border-radius:20px;box-shadow:0 8px 32px #0009}.composer:focus-within{border-color:#4b4b4b}.composer textarea{flex:1;min-width:0;min-height:38px;max-height:180px;resize:none;border:0;outline:0;background:transparent;color:#f2f2f2;padding:9px 0;font-size:15px;line-height:1.4}.composer textarea::placeholder{color:#777}.send{width:40px;height:40px;flex:0 0 40px;border:0;border-radius:14px;background:#eee;color:#111;display:grid;place-items:center;cursor:pointer;font-size:20px;font-weight:700}.send:disabled{opacity:.42;cursor:default}.composer-note{text-align:center;color:#666;font-size:10px;margin:9px 8px 0;line-height:1.4}.overlay{display:none;position:fixed;inset:0;background:#0009;z-index:8}.overlay.show{display:block}.empty-history{padding:10px;color:#656565;font-size:12px}
-@media(max-width:700px){.sidebar{position:absolute;inset:0 auto 0 0;width:min(82vw,300px);transform:translateX(-102%);box-shadow:18px 0 45px #0009}.sidebar.open{transform:translateX(0)}.mobile-brand{display:block}.model-name{display:none}.topbar{height:58px;flex-basis:58px;padding-left:10px;padding-right:12px}.top-actions button{height:34px;padding:0 10px}.feed{padding:19px 16px 20px}.welcome{min-height:calc(51dvh - 60px);padding-top:0}.welcome h1{font-size:29px}.welcome p{font-size:13px}.suggestions{grid-template-columns:1fr 1fr;gap:8px;margin-top:24px}.suggestion{padding:11px 10px;min-height:65px;font-size:12px}.composer-wrap{padding:8px 11px calc(10px + var(--safe-bottom))}.composer{border-radius:18px;padding:7px 8px 7px 14px;min-height:55px}.composer textarea{font-size:16px}.bubble{max-width:94%;font-size:14px}.thread{gap:21px}}
-@media(max-width:380px){.suggestions{grid-template-columns:1fr}.welcome{min-height:auto;padding:36px 0 10px}.welcome-mark{margin-bottom:15px}.suggestion{min-height:48px}}
+:root{--bg:#050505;--card2:#1a1a1a;--line:#2a2a2a;--text:#f2f2f2;--muted:#8a8a8a;--accent:#1db954;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;overflow:hidden}
+button,input{font:inherit;color:inherit;border:none;background:none;outline:none}
+.app{height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;background:radial-gradient(ellipse at top,#141414 0%,#050505 55%)}
+.header{padding:calc(14px + var(--safe-top)) 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:20px;font-weight:800;letter-spacing:.04em}.brand span{color:var(--accent)}
+.install-btn{font-size:10px;font-weight:700;letter-spacing:.02em;padding:8px 10px;border-radius:10px;background:var(--accent);color:#000;cursor:pointer;max-width:48%;line-height:1.25;text-align:center}
+.install-btn:active{opacity:.85}
+.install-btn.hidden{display:none}
+.install-modal{display:none;position:fixed;inset:0;background:#000c;z-index:80;align-items:flex-end;justify-content:center}
+.install-modal.show{display:flex}
+.install-sheet{width:100%;max-width:480px;background:#1a1a1a;border-radius:18px 18px 0 0;padding:20px 18px calc(20px + var(--safe-bottom));}
+.install-sheet h3{font-size:17px;margin-bottom:10px}
+.install-sheet p{font-size:14px;color:#aaa;line-height:1.5;margin-bottom:14px}
+.install-sheet ol{padding-left:20px;color:#ddd;font-size:14px;line-height:1.7;margin-bottom:16px}
+.install-sheet button{width:100%;padding:12px;border-radius:12px;background:var(--accent);color:#000;font-weight:700;font-size:14px;cursor:pointer}
+.search-wrap{padding:0 16px 10px}
+.search-box{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:11px 12px}
+.search-box:focus-within{border-color:#3a3a3a}
+.search-box input{flex:1;min-width:0;font-size:15px}
+.search-box input::placeholder{color:#666}
+.search-btn{background:var(--accent);color:#000;font-weight:700;font-size:13px;padding:8px 12px;border-radius:10px;cursor:pointer}
+.tabs{display:flex;gap:6px;padding:0 16px 8px}
+.tab{flex:1;padding:9px;border-radius:10px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer}
+.tab.active{background:var(--card2);color:var(--text)}
+.content{flex:1;overflow-y:auto;padding:4px 12px 210px;-webkit-overflow-scrolling:touch}
+.count{font-size:12px;color:var(--muted);padding:6px 8px 10px}
+.track{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;cursor:pointer}
+.track:active,.track.playing{background:var(--card2)}
+.cover{width:52px;height:52px;border-radius:10px;background:#222;flex-shrink:0;overflow:hidden;display:grid;place-items:center;color:#555;font-size:18px}
+.cover img{width:100%;height:100%;object-fit:cover}
+.meta{flex:1;min-width:0}
+.title{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artist{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-size:10px;color:#000;background:var(--accent);padding:2px 6px;border-radius:6px;font-weight:700;margin-left:4px}
+.badge.yt{background:#f00;color:#fff}
+.actions{display:flex;gap:2px}
+.icon-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:16px}
+.icon-btn:active{background:#222;color:#fff}
+.empty,.loading,.error{text-align:center;padding:36px 18px;color:var(--muted);font-size:14px;line-height:1.5}
+.spinner{width:28px;height:28px;border:3px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.player{position:absolute;left:10px;right:10px;bottom:calc(10px + var(--safe-bottom));background:linear-gradient(160deg,#1e1e1e,#111);border:1px solid #2e2e2e;border-radius:18px;padding:12px;box-shadow:0 12px 40px #000a;z-index:30;display:none}
+.player.show{display:block}
+.yt-wrap{display:none;border-radius:12px;overflow:hidden;margin-bottom:10px;background:#000;aspect-ratio:16/9}
+.yt-wrap.show{display:block}
+.yt-wrap iframe{width:100%;height:100%;border:0}
+.player-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.player-cover{width:48px;height:48px;border-radius:10px;background:#222;overflow:hidden;flex-shrink:0;display:grid;place-items:center;color:#555}
+.player-cover img{width:100%;height:100%;object-fit:cover}
+.player-meta{flex:1;min-width:0}
+.player-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-artist{font-size:12px;color:var(--muted);margin-top:2px}
+.player-controls{display:flex;align-items:center;justify-content:center;gap:18px;margin:4px 0 8px}
+.ctrl{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:18px}
+.ctrl.play{width:52px;height:52px;background:var(--accent);color:#000;font-size:20px;font-weight:700}
+.progress-wrap{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress{flex:1;height:4px;background:#333;border-radius:4px;cursor:pointer;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:var(--accent);border-radius:4px}
+.player-actions{display:flex;gap:8px;margin-top:10px}
+.player-actions button{flex:1;padding:10px;border-radius:12px;background:#222;color:var(--text);font-size:12.5px;font-weight:600;cursor:pointer}
+.player-actions button.primary{background:var(--accent);color:#000}
+.player-actions button:disabled{opacity:.45;cursor:default}
+.toast{position:fixed;left:50%;bottom:calc(110px + var(--safe-bottom));transform:translateX(-50%) translateY(12px);background:#222;border:1px solid #333;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.load-more{display:block;width:100%;margin:12px 0 20px;padding:12px;border-radius:12px;background:#1a1a1a;border:1px solid #2a2a2a;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+.load-more:active{background:#222}
 </style>
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar" id="sidebar" aria-label="Conversaciones">
-    <div class="side-head"><div class="brand">ZYOX</div><button class="side-icon" id="closeSidebar" aria-label="Cerrar menú" title="Cerrar menú">×</button></div>
-    <button class="new-chat" id="newChat"><span aria-hidden="true">＋</span><span>Nuevo chat</span></button>
-    <div class="history-label">Recientes</div>
-    <div class="history" id="history"></div>
-    <div class="side-foot">Tus conversaciones se guardan en este dispositivo.</div>
-  </aside>
-  <div class="overlay" id="overlay"></div>
-  <main class="main">
-    <header class="topbar">
-      <div class="top-left"><button class="top-icon" id="menuBtn" aria-label="Abrir conversaciones" title="Conversaciones">☰</button><div class="mobile-brand">ZYOX</div><div class="model-name">ZYOX AI <span class="model-chevron">⌄</span></div></div>
-      <div class="top-actions"><button id="shareBtn" title="Copiar conversación">Compartir</button></div>
-    </header>
-    <section class="feed" id="feed" aria-live="polite">
-      <div class="thread" id="thread">
-        <div class="welcome" id="welcome">
-          <div class="welcome-mark">✳</div>
-          <h1>¿En qué estás pensando?</h1>
-          <p>Pregunta, explora una idea o empieza algo nuevo.</p>
-          <div class="suggestions">
-            <button class="suggestion" data-prompt="Ayúdame a entender una idea compleja de forma sencilla.">Explícame algo difícil de forma sencilla</button>
-            <button class="suggestion" data-prompt="Ayúdame a escribir y mejorar un texto. Primero pregúntame qué quiero comunicar.">Ayúdame a escribir algo</button>
-            <button class="suggestion" data-prompt="Quiero aprender una habilidad nueva. Propón un plan práctico para empezar.">Crea un plan para aprender algo</button>
-            <button class="suggestion" data-prompt="Ayúdame a resolver este problema paso a paso: ">Resuelve un problema paso a paso</button>
-          </div>
-        </div>
+  <header class="header">
+    <div class="brand">ZYOX <span>Music</span></div>
+    <button class="install-btn" id="installBtn" type="button">AÑADIR A PANTALLA DE INICIO</button>
+  </header>
+  <div class="search-wrap">
+    <div class="search-box">
+      <input id="q" type="search" placeholder="Cualquier canción o artista…" autocomplete="off" enterkeyhint="search">
+      <button class="search-btn" id="searchBtn">Buscar</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="results">Todas</button>
+    <button class="tab" data-tab="liked">Guardadas</button>
+    <button class="tab" data-tab="free">Libres MP3</button>
+  </div>
+  <div class="content" id="content">
+    <div class="empty">Busca cualquier canción.<br>Se muestran <b>todos</b> los resultados posibles (YouTube + libres).</div>
+  </div>
+  <div class="player" id="player">
+    <div class="yt-wrap" id="ytWrap"></div>
+    <div class="player-top">
+      <div class="player-cover" id="pCover">♪</div>
+      <div class="player-meta">
+        <div class="player-title" id="pTitle">—</div>
+        <div class="player-artist" id="pArtist">—</div>
       </div>
-    </section>
-    <footer class="composer-wrap">
-      <div class="composer-area">
-        <div class="composer"><textarea id="prompt" rows="1" placeholder="Pregunta lo que quieras…" aria-label="Escribe tu mensaje"></textarea><button class="send" id="send" aria-label="Enviar" title="Enviar">↑</button></div>
-        <div class="composer-note">Verifica la información importante. La IA puede equivocarse.</div>
-      </div>
-    </footer>
-  </main>
+    </div>
+    <div class="player-controls" id="audioControls">
+      <button class="ctrl" id="btnPrev">⏮</button>
+      <button class="ctrl play" id="btnPlay">▶</button>
+      <button class="ctrl" id="btnNext">⏭</button>
+    </div>
+    <div class="progress-wrap" id="progressWrap">
+      <span id="tCur">0:00</span>
+      <div class="progress" id="progress"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="tDur">0:00</span>
+    </div>
+    <div class="player-actions">
+      <button id="btnLike">♡ Guardar</button>
+      <button class="primary" id="btnDownload">↓ Descargar</button>
+    </div>
+  </div>
 </div>
+<div class="toast" id="toast"></div>
+<div class="install-modal" id="installModal">
+  <div class="install-sheet">
+    <h3>Añadir a pantalla de inicio</h3>
+    <p id="installText">Así se instala como una app normal.</p>
+    <ol id="installSteps"></ol>
+    <button type="button" id="installClose">Entendido</button>
+  </div>
+</div>
+<audio id="audio" preload="metadata"></audio>
 <script>
 (() => {
-  const STORE_KEY = "zyox_chat_conversations_v1";
-  const feed = document.getElementById("feed"), thread = document.getElementById("thread");
-  const input = document.getElementById("prompt"), sendButton = document.getElementById("send");
-  const sidebar = document.getElementById("sidebar"), overlay = document.getElementById("overlay");
-  let chats = loadChats(), activeId = null, busy = false;
+  // PWA manifest inline (un solo HTML)
+  (function(){
+    const manifest = {
+      name: "ZYOX Music",
+      short_name: "ZYOX Music",
+      description: "Busca y reproduce cualquier canción",
+      start_url: ".",
+      display: "standalone",
+      background_color: "#050505",
+      theme_color: "#050505",
+      orientation: "portrait",
+      icons: [
+        { src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAC5UlEQVR42u3dsXGEQBQFwe/gXA7KSskqOsmVfwe7MG2MiwGvMYAq5vV6/UrVxkkQABIAEgASABIAEgASABIAEgASABIAEgASABIAEgASABIAEgASAB/r6+dbNwsAg9fmIMbwVYYwhq8yhDF+lRGM4asMYYxfZQRj/CojGONXGcEYv8oIxvhVRjDGrzICAASA8auKYIxfZQQACADjVxUBAALA+FVFAIAAAEAAACAAjF8tBAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAukACQAJAAeEbHcbyV0QIAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4BoAMAGQAvDusYsoALg5gE+MvowBgJsCOHP4JQgA3AzAqgAAIA3gqRAAACCNAAAA0ggAACCNAAAA0ggAAAAAAACoIgAAAAAAAKCKAAAAAADA+AEAwPABAMDwAQDA+AEAwPgBAMD4AQDA+AEAAABvggEwfgAAAMDXoAAYPwAAuPsDAIDn/gAAYPwAAGD8AABg+AAAYPwAAGD4AHgRZvQAALBoyAYPQBaB3x8BkAVg2ABkERg1AFkEBg1AFoExA5BFYMgAJCEYMABJCIYLQBKDwQIgASABIAEgASA9EwAEusv4ARAAAAgAAAQABGqNHwABcBYACLT7+AEQAGcCgEA7j/8SABBo1/EDIACuAACBdhz/pQAg0G7jvxwABNpp/EsAQKBdxr8MAATaYfxLAUCg1eNfDgAErd7eFgAgMP48ABAMHwAQDB8AIAweAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAOlff2L3kgIyoyLTAAAAAElFTkSuQmCC", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+        { src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAANA0lEQVR42u3YwRGEIBBEUS5cyMGsTNboNAmqHKbf4QWwSNnfHWutFwDIMhwCAAgAAEAAAAACAAAQAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAABAAAIAAAAAEAAAgAABAAAIAAAAAEAAAgAAAAAQAACAAAQAAAAAIAABAAAIAAAAAEAAAgAAAAAQAACAAAQAAAAAIAABAAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAGrueG2A771cBgLEHEAUCAIMPIAgEAEYfQAwIAIw+gPe6AMDoA2IAAYDhB4QAAsDwAwgBBIDhBxACCADDDyAEEACGH0AIIACMP4AIQAAYfgAhgAAw/gAiAAFg+AGEgABwEMYfQAQIAIw/gAgQABh+ACEgADD+ACJAABh/AESAADD+AIgAAWD8ARABAsD4AyACBIDxB0AECADjD4AIEADGHwARIACMPwAiQAAYfwBEgAAQAAAIAAFg/AEQAQLA+AMgAgSA8QcQAQLAIQgAAAEgAIw/ACJAABh/AESAABAAAAgAAWD8ARABAsD4AyACBIAAAEAACADjD4AIEAACAAABIACMPwAiQAAIAAAEgAAw/gCIAAEgAAAQAALA+AMgAgSAAABAAAgA4w+ACBAAACAABAAACADjDwAZESAAAEAACAAAEADGHwARIAAEAAACQAAIAAAEgAAw/gCIAAEgAAAQAAJAAAAgAASAAABAAAgA4w+ACBAAAgAAASAABAAAAkAACAAABIAAEAAACID4AHBJARABAgAABIAAAAABIAAAQAAIAAAQAAIAAASAAABAAAgAAQCAABAAAgAAASAABAAAAkAACAAABIAAEAAACAABIAAAEAACQAAAIAAEgAAAQAAIAAEAgAAQAAIAAAEgAAQAAAJAAACAABAAACAABAAACAABAAACQAAAgAAQAAAgAAQAAAJAAAgAAASAABAAAAgAASAAABAAAkAAACAABIAAAEAACAABAIAAEAACAAABIAAEAAACQAAIAAAEgAAQAAAIAAEAAAJAAACAABAAACAABAAACAABAAACQAAAgAAQAAAIAAEgAAAQAAJAAAAgAASAAABAAAgAAQCAABAAAgAAASAABAC/mnOW5zmBABAAAgABAAgAASAAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACAABgAAQAIAAEAAIAAEACAABgAAQACAABIAAQAAIABAAAkAAIAAEAAgAASAAEAACAASAABAACAABAAJAAAgABIAAAAEgAAQAAkAAgAAQAAIAASAAQAAIAAGAABAAIAAEgABAAAACQAAIAAQAIAAEAAgAQAAIABAAgAAQACAAAAEgAEAAAAJAACAABAAgAAQAAkAAAAJAACAABAAIAAEgABAAAgAEgAAQAAgAAQACQAAIAASAAAABIAAEAAJAAIAAEAACAAEgAEAACAABgAAQACAABIAAQAAIABAAAkAAIAAEAAgAASAAEACAABAAAgABAAgAAeCCIgAAASAAQAAAAkAAgAAABIAAAAEACAABgAAQAIAAEAAIAAEACAABgAAQACAABIAAQAAIABAAAkAAIAAEAAgAASAAEAACAASAABAACAABAAJAAAgABIAAAAEgAAQAAkAAgAAQAAIAASAAQAAIAAGAABAAIAAEgABAAAACQAAIAAQAIAAEgABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIAASAAAAEgABAAAgAQAAIAASAAAAEgABAAAgAEgAAQAAgAAQACQAAIAASAAAABIAAEAAJAAIAAEAACAAEgAEAACAABgAAQACAABIAAQAAIABAAAkAAIAAEAAgAASAAEACAABAAAgABAAgAASAAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACAABgAAQAIAAEAAIAAEACAABgAAQACAABIAAQAAIABAAAkAAIAAEAAgAASAAEAACAASAABAACAABAAJAAAgABIAAAAEgAAQAAkAAgAAQAAIAASAAQAAIAAGAAPCcQAAIAAGAAAAEgAAQAAgAQAAIABAAgAAQACAAAAEgAEAAAAJAAIAAAASAAEAACABAAAgABIAAAASAAEAACAAQAAJAACAABAAIAAEgABAAAgAEgAAQAAgAAQACQAAIAASAAAABIAAEAAJAAIAAEAACAAEgAEAACAABgAAQACAABIAAQAAIABAAAkAAIAAAASAABAACABAAAgAEACAABAAIAEAACAAQABXOx51DAAgAAYAAKDSa/uUAASAAEADNA0D0gAAQAAiAkDE84XcKAgSAABAACIAN43f66IsBBIAAEAAIAMMvBBAAAkAAIABSR18MIAAEgABAABh+IYAAEAAuKFkBYOyFAAJAAAgAggLAuAsBBIAAEACEBYBBFwEIAAEgAAgKAIQAAkAACAAEACIAASAABAACACGAABAAIAAQAQgAAQACABGAABAAIAAQAQgAAQACABGAABAACABEAAgAAYAAQASAABAACABEAAJAAAgABAAiAAEgAAQAAgARgAAQAAIAAYAIQAAIAAGAAEAAIAAEgABAACACEAACQAAgABABCAABIAAQAAgABIAAEAAIAEQAAkAACAAEAAIAASAABAACABGAABAAIAAQAAgAAQACABGAABAAIAAQAAgAAQACAAGAABAACAAQAQgAAYAAAAGAABAACAAQAAJAAAgABACIAAEgAAQAxh8BgAAQAAIAo48AQAAIAAGA4UcAIAAEgADA8CMAEAACQABg+BEACAABIAAw/ggABIAAEAAYfgQAAkAACACMPwIAASAABADGHwGAABAALqjhBwGAABAAGH8QAAgAAYDxBwGAABAAGH8QAAgAAYDxBwGAABAAGH8QAAgAAYDxB+MvAASAAEAAgAAQAAJAAGD8EQAIAAEgADD+GH8EgAAQAAgABAACQAAIAIw/AgABIAAEAMYf448AEAACAAGAAEAACAABYPzB+CMABIAAEAAgABAAAkAACAAw/ggAASAAjD8IAASAAEAAgPFHAAgABAAYfwSAAMD4gwBAAAgABAAYfwSAAEAAgPFHAAgABADGHwSAAEAAYPwRAAJAAGD8Mf4IAAEgABAAGH8EgAAQAAgAjD8CQAAIAAQAxh8BIAAEAAIA448AEAACQACA4UcACAABIADA+CMABIAAEAFg/BEAAkAACAAw/AgAASAABAAYfgSAAEAAgPFHAAgABACGHwSAAEAEYPRBAAgABACGHwSAAEAAYPhBAAgARABGHwSAAEAAYPARAAJAACAAMPgIAAEgABABfYfYyCMABIAAQAD4EgcBIAAEACLA+IMAEAACAAEgAEAACAABgAgw/iAABIAAQAQYfxAAAkAAIAAEAAgAASAAEAHGHwSAABAAiADjDwJAAAgARIDxBwEgAASACMD4gwAQAAJABGD8QQAIAEQAxh8EgABABGD8QQAIAESA8QcEgABABBh/QAAIAISA4QcEgABABBh/QAAIAISA4QcBIAAEAELA8IMAEAACACFg+EEACAABgBAw/CAABIAAQAgYfhAAAkAAIAaMPggAASAAEANGHwSAABAABEWB8wUBIAAEAA0DwfmAABAAAgAAASAABAAAAkAACAAABIAAEAAACAABIAAAEAACQAAAIAAEgAgAwPgLAAAQAAIAAASAAAAAASAAAEAAiAAA6Dn+AgAABIAAAAABIAAAQACIAACMvwAQAAAIAAEgAAAQAAJABABg/AWAAABAAAgAAQCAABAAIgAA4y8ABAAAAkAACAAABIAAEAEAGH8BIAAAEAACQAQAYPwFgAAAQAAIABEAgPEXAAAgAEQAAMZfAAgAAASAABABABh/ASAAABAAAkAEAGD8BYAIAMD4CwABAIAAEAAiAADjLwBEAADGXwAIAAAEgAAQAQAYfwEgAgAw/gJABABg/AWAAABAAAgAEQCA8RcAIgDA+CMARACA8RcAiAAA4y8AEAEAxl8AIAIAjL8AEAEAGH8BIAIAMP4CQAQAYPwFgAgAwPgLACEAgOEXACIAAOMvAEQAAMZfAAgBAAy/ABABAMYfASAEAAw/AkAEABh/BIAQADD8CAAhAGD4EQBCAMDwCwCHIAQADL8AQAgAGH4BgBgAMPoCADEAYPQFAGIAwOgLAAQBYPARAIgCwNgjAAAAAQAACAAAQAAAAAIAABAAAIAAAAAEAAAgAAAAAQAACAAAEAAAgAAAAAQAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAAAAAgAAEAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAABAAAIAAAQAAAAAIAABAAAIAAAAAEAAAgAACA6j562RAlO7spJAAAAABJRU5ErkJggg==", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+    const link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  })();
 
-  function loadChats(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||"[]")}catch(_){return []}}
-  function saveChats(){try{localStorage.setItem(STORE_KEY,JSON.stringify(chats))}catch(_){}}
-  function uid(){return "c_"+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
-  function newChat(){activeId=null;thread.innerHTML="";thread.appendChild(makeWelcome());input.value="";resizeInput();renderHistory();closeMenu();input.focus()}
-  function makeWelcome(){const wrap=document.createElement("div");wrap.className="welcome";wrap.id="welcome";wrap.innerHTML='<div class="welcome-mark">✳</div><h1>¿En qué estás pensando?</h1><p>Pregunta, explora una idea o empieza algo nuevo.</p><div class="suggestions"><button class="suggestion" data-prompt="Ayúdame a entender una idea compleja de forma sencilla.">Explícame algo difícil de forma sencilla</button><button class="suggestion" data-prompt="Ayúdame a escribir y mejorar un texto. Primero pregúntame qué quiero comunicar.">Ayúdame a escribir algo</button><button class="suggestion" data-prompt="Quiero aprender una habilidad nueva. Propón un plan práctico para empezar.">Crea un plan para aprender algo</button><button class="suggestion" data-prompt="Ayúdame a resolver este problema paso a paso: ">Resuelve un problema paso a paso</button></div>';return wrap}
-  function currentChat(){return chats.find(c=>c.id===activeId)}
-  function renderHistory(){const list=document.getElementById("history");if(!chats.length){list.innerHTML='<div class="empty-history">Tus chats aparecerán aquí</div>';return}list.innerHTML="";chats.slice().sort((a,b)=>b.updated-a.updated).forEach(chat=>{const b=document.createElement("button");b.className="history-item"+(chat.id===activeId?" active":"");b.textContent=chat.title||"Nueva conversación";b.title=b.textContent;b.onclick=()=>openChat(chat.id);list.appendChild(b)})}
-  function openChat(id){const chat=chats.find(c=>c.id===id);if(!chat)return;activeId=id;thread.innerHTML="";chat.messages.forEach(m=>addMessage(m.role,m.content,false));renderHistory();closeMenu();scrollBottom()}
-  function addMessage(role,text,persist=true){const node=document.createElement("article");node.className="message "+(role==="user"?"user":"ai");const label=document.createElement("div");label.className="message-label";label.textContent=role==="user"?"Tú":"ZYOX AI";const bubble=document.createElement("div");bubble.className="bubble";bubble.innerHTML=renderText(text);node.append(label,bubble);thread.appendChild(node);if(persist&&activeId){const c=currentChat();if(c){c.messages.push({role:role==="user"?"user":"assistant",content:text});c.updated=Date.now();saveChats();renderHistory()}}scrollBottom();return bubble}
-  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-  function renderText(text){let s=escapeHtml(text);const blocks=[];s=s.replace(/```([^\n`]*)\n?([\s\S]*?)```/g,(_,lang,code)=>{blocks.push('<pre><code>'+code.trim()+'</code></pre>');return "\u0000"+(blocks.length-1)+"\u0000"});s=s.replace(/`([^`]+)`/g,'<code class="inline">$1</code>');s=s.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");s=s.replace(/\*(.+?)\*/g,"<em>$1</em>");const paras=s.split(/\n{2,}/).map(p=>{if(/^\u0000\d+\u0000$/.test(p.trim()))return p.trim();let q=p.replace(/\n/g,"<br>");q=q.replace(/^(?:[-*])\s+(.+)$/gm,"• $1");return "<p>"+q+"</p>"}).join("");return paras.replace(/\u0000(\d+)\u0000/g,(_,n)=>blocks[Number(n)]||"")}
-  function showTyping(){const n=document.createElement("article");n.className="message ai";n.id="typing";n.innerHTML='<div class="message-label">ZYOX AI</div><div class="typing">Pensando <span class="dots"><i></i><i></i><i></i></span></div>';thread.appendChild(n);scrollBottom();return n}
-  function scrollBottom(){requestAnimationFrame(()=>{feed.scrollTop=feed.scrollHeight})}
-  function resizeInput(){input.style.height="auto";input.style.height=Math.min(input.scrollHeight,180)+"px";sendButton.disabled=busy||!input.value.trim()}
-  function closeMenu(){sidebar.classList.remove("open");overlay.classList.remove("show")}
-  function toggleMenu(){sidebar.classList.toggle("open");overlay.classList.toggle("show")}
-  function buildPromptMessages(){const c=currentChat();const history=c?c.messages.slice(-20):[];return [{role:"system",content:"Eres un asistente inteligente, útil, honesto y cuidadoso. Responde en español salvo que el usuario pida otro idioma. Comprende el contexto, razona paso a paso cuando sea útil, y ofrece respuestas claras, completas y naturales. Si no sabes algo o hay incertidumbre, dilo. Usa ejemplos y formato legible cuando ayuden."},...history]}
-  async function askAI(){const text=input.value.trim();if(!text||busy)return;if(!activeId){activeId=uid();chats.unshift({id:activeId,title:text.slice(0,56),messages:[],updated:Date.now()})}const c=currentChat();if(c&&c.messages.length===0)c.title=text.slice(0,56);addMessage("user",text);input.value="";resizeInput();busy=true;resizeInput();const typing=showTyping();let reply="";try{if(typeof puter==="undefined"||!puter.ai)throw new Error("El servicio de IA no está disponible. Revisa tu conexión e inténtalo otra vez.");const messages=buildPromptMessages();try{const stream=await puter.ai.chat(messages,{stream:true});typing.remove();const bubble=addMessage("assistant","",false);for await(const part of stream){const chunk=(part&&(part.text||part))||"";if(typeof chunk==="string"){reply+=chunk;bubble.innerHTML=renderText(reply);scrollBottom()}}if(!reply)reply="No recibí una respuesta. Inténtalo de nuevo.";bubble.innerHTML=renderText(reply)}catch(streamError){if(typing.isConnected)typing.remove();const response=await puter.ai.chat(messages);reply=typeof response==="string"?response:(response?.message?.content||response?.text||"");if(!reply)reply="No recibí una respuesta. Inténtalo de nuevo.";addMessage("assistant",reply,false)}const live=currentChat();if(live){live.messages.push({role:"assistant",content:reply});live.updated=Date.now();saveChats();renderHistory()}}catch(error){if(typing.isConnected)typing.remove();addMessage("assistant","No pude conectar con el servicio de IA. "+(error?.message||"Revisa tu conexión e inténtalo de nuevo."),false)}finally{busy=false;resizeInput();input.focus()}}
-  document.getElementById("newChat").onclick=newChat;document.getElementById("menuBtn").onclick=toggleMenu;document.getElementById("closeSidebar").onclick=closeMenu;overlay.onclick=closeMenu;sendButton.onclick=askAI;input.addEventListener("input",resizeInput);input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askAI()}});
-  document.getElementById("shareBtn").onclick=async()=>{const c=currentChat();if(!c||!c.messages.length)return;const text=c.messages.map(m=>(m.role==="user"?"Tú":"ZYOX AI")+":\n"+m.content).join("\n\n");try{await navigator.clipboard.writeText(text);const b=document.getElementById("shareBtn");const old=b.textContent;b.textContent="Copiado";setTimeout(()=>b.textContent=old,1300)}catch(_){}}
-  thread.addEventListener("click",e=>{const b=e.target.closest("[data-prompt]");if(b){input.value=b.dataset.prompt;resizeInput();input.focus()}});
-  renderHistory();
+  const INVIDIOUS = [
+    "https://inv.nadeko.net",
+    "https://invidious.fdn.fr",
+    "https://yewtu.be",
+    "https://invidious.privacyredirect.com",
+    "https://vid.puffyan.us",
+    "https://invidious.jing.rocks"
+  ];
+  const PIPED = [
+    "https://pipedapi.kavin.rocks",
+    "https://pipedapi.adminforge.de",
+    "https://pipedapi.nosebs.ru"
+  ];
+  const AUDIUS = "https://discoveryprovider.audius.co/v1";
+
+  const content = document.getElementById("content");
+  const audio = document.getElementById("audio");
+  const player = document.getElementById("player");
+  const ytWrap = document.getElementById("ytWrap");
+  const qInput = document.getElementById("q");
+
+  let tracks = [];
+  let liked = loadLiked();
+  let queue = [];
+  let currentIndex = -1;
+  let currentTab = "results";
+  let lastQuery = "";
+
+  function loadLiked(){ try{return JSON.parse(localStorage.getItem("zyox_music_liked_v3")||"[]")}catch{return[]} }
+  function saveLiked(){ localStorage.setItem("zyox_music_liked_v3", JSON.stringify(liked)); }
+  function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2500); }
+  function esc(s){ return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function fmt(s){ if(!isFinite(s)||s<0)return"0:00"; const m=Math.floor(s/60),sec=Math.floor(s%60); return m+":"+String(sec).padStart(2,"0"); }
+
+  async function fetchJSON(url, timeout=9000){
+    const ctrl = new AbortController();
+    const id = setTimeout(()=>ctrl.abort(), timeout);
+    try{
+      const res = await fetch(url, { signal: ctrl.signal });
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      return await res.json();
+    } finally { clearTimeout(id); }
+  }
+
+  function mapInvidious(list){
+    return (list||[]).filter(v => (v.type==="video"||v.videoId||v.videoID) && (v.videoId||v.videoID)).map(v=>{
+      const id = v.videoId || v.videoID;
+      let thumb = null;
+      if(v.videoThumbnails && v.videoThumbnails.length){
+        const mid = v.videoThumbnails.find(t=>t.quality==="medium"||t.quality==="high") || v.videoThumbnails[0];
+        thumb = mid.url;
+      }
+      if(!thumb) thumb = "https://i.ytimg.com/vi/"+id+"/hqdefault.jpg";
+      return { source:"youtube", id, title:v.title, artist:v.author||v.uploaderName||"YouTube", thumb, length:v.lengthSeconds||0, downloadable:false };
+    });
+  }
+
+  function mapPiped(data){
+    const items = data.items || data || [];
+    return items.filter(v => v.type==="stream" || v.url || v.id).map(v=>{
+      const id = v.id || (v.url||"").replace(/^\/watch\?v=/,"").split("&")[0];
+      if(!id) return null;
+      return {
+        source:"youtube", id, title:v.title,
+        artist: v.uploaderName || v.uploader || "YouTube",
+        thumb: v.thumbnail || ("https://i.ytimg.com/vi/"+id+"/hqdefault.jpg"),
+        length: v.duration || 0, downloadable:false
+      };
+    }).filter(Boolean);
+  }
+
+  async function searchYouTubeAll(query){
+    const results = [];
+    const seen = new Set();
+    // Try all Invidious in parallel-ish (first successes)
+    const invPromises = INVIDIOUS.map(async base=>{
+      try{
+        const data = await fetchJSON(base+"/api/v1/search?type=video&q="+encodeURIComponent(query));
+        return mapInvidious(Array.isArray(data)?data:[]);
+      }catch{ return []; }
+    });
+    const pipedPromises = PIPED.map(async base=>{
+      try{
+        const data = await fetchJSON(base+"/search?q="+encodeURIComponent(query)+"&filter=all");
+        return mapPiped(data);
+      }catch{ return []; }
+    });
+
+    const all = await Promise.all([...invPromises, ...pipedPromises]);
+    for(const list of all){
+      for(const t of list){
+        if(!t.id || seen.has(t.id)) continue;
+        seen.add(t.id);
+        results.push(t);
+      }
+    }
+    return results;
+  }
+
+  async function searchAudius(query){
+    try{
+      const data = await fetchJSON(AUDIUS+"/tracks/search?query="+encodeURIComponent(query)+"&app_name=ZYOXMusic");
+      return (data.data||[]).map(t=>({
+        source:"audius", id:String(t.id), title:t.title,
+        artist:(t.user&&t.user.name)||"Artista",
+        thumb:(t.artwork&&(t.artwork["150x150"]||t.artwork["480x480"]))||null,
+        stream:AUDIUS+"/tracks/"+t.id+"/stream", downloadable:true
+      }));
+    }catch{ return []; }
+  }
+
+  async function trendingAudius(){
+    const data = await fetchJSON(AUDIUS+"/tracks/trending?app_name=ZYOXMusic");
+    return (data.data||[]).slice(0,50).map(t=>({
+      source:"audius", id:String(t.id), title:t.title,
+      artist:(t.user&&t.user.name)||"Artista",
+      thumb:(t.artwork&&(t.artwork["150x150"]||t.artwork["480x480"]))||null,
+      stream:AUDIUS+"/tracks/"+t.id+"/stream", downloadable:true
+    }));
+  }
+
+  function renderList(list, emptyMsg){
+    if(!list||!list.length){
+      content.innerHTML = '<div class="empty">'+(emptyMsg||"Sin resultados.")+'</div>';
+      return;
+    }
+    const ytCount = list.filter(t=>t.source==="youtube").length;
+    const freeCount = list.filter(t=>t.downloadable).length;
+    let html = '<div class="count">'+list.length+' canciones'+(ytCount? ' · '+ytCount+' YouTube':'')+(freeCount? ' · '+freeCount+' con MP3':'')+'</div>';
+    html += list.map((t,i)=>{
+      const playing = queue[currentIndex] && String(queue[currentIndex].id)===String(t.id) && queue[currentIndex].source===t.source;
+      const badge = t.source==="youtube" ? '<span class="badge yt">YT</span>' : (t.downloadable?'<span class="badge">MP3</span>':'');
+      return `<div class="track ${playing?'playing':''}" data-i="${i}">
+        <div class="cover">${t.thumb?`<img src="${esc(t.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:'♪'}</div>
+        <div class="meta"><div class="title">${esc(t.title)} ${badge}</div><div class="artist">${esc(t.artist)}</div></div>
+        <div class="actions">${t.downloadable?`<button class="icon-btn" data-dl="${i}" title="MP3">↓</button>`:''}</div>
+      </div>`;
+    }).join("");
+    content.innerHTML = html;
+    content.querySelectorAll(".track").forEach(el=>{
+      el.onclick = e=>{ if(e.target.closest("[data-dl]")) return; playAt(Number(el.dataset.i), list); };
+    });
+    content.querySelectorAll("[data-dl]").forEach(btn=>{
+      btn.onclick = e=>{ e.stopPropagation(); downloadTrack(list[Number(btn.dataset.dl)]); };
+    });
+  }
+
+  async function search(query){
+    const q = (query||"").trim();
+    if(!q) return;
+    lastQuery = q;
+    currentTab = "results";
+    setTabUI();
+    content.innerHTML = '<div class="loading"><div class="spinner"></div>Buscando todas las canciones…</div>';
+    try{
+      const [yt, free] = await Promise.all([searchYouTubeAll(q), searchAudius(q)]);
+      // YouTube first (more complete), then free tracks not already conceptually duplicates
+      const seenTitles = new Set();
+      tracks = [];
+      for(const t of yt){
+        tracks.push(t);
+        seenTitles.add((t.title||"").toLowerCase().slice(0,40));
+      }
+      for(const t of free){
+        const key = (t.title||"").toLowerCase().slice(0,40);
+        if(!seenTitles.has(key)) tracks.push(t);
+      }
+      renderList(tracks, "No encontré canciones para \""+esc(q)+"\".");
+      if(!tracks.length) toast("Sin resultados");
+      else toast(tracks.length+" canciones encontradas");
+    }catch(err){
+      content.innerHTML = '<div class="error">Error al buscar.<br>'+esc(err.message)+'</div>';
+    }
+  }
+
+  async function showFree(){
+    currentTab = "free"; setTabUI();
+    content.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando música libre…</div>';
+    try{
+      tracks = lastQuery ? await searchAudius(lastQuery) : await trendingAudius();
+      renderList(tracks, "No hay pistas libres.");
+    }catch(e){ content.innerHTML = '<div class="error">'+esc(e.message)+'</div>'; }
+  }
+
+  function showLiked(){
+    currentTab = "liked"; setTabUI();
+    tracks = liked.slice();
+    renderList(tracks, "Aún no tienes canciones guardadas.");
+  }
+
+  function setTabUI(){
+    document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===currentTab));
+  }
+
+  function stopAll(){
+    audio.pause(); audio.removeAttribute("src");
+    ytWrap.classList.remove("show"); ytWrap.innerHTML = "";
+  }
+
+  function playAt(index, list){
+    if(!list||!list[index]) return;
+    queue = list.slice(); currentIndex = index;
+    const t = queue[currentIndex];
+    stopAll(); player.classList.add("show"); updatePlayerUI(t);
+
+    if(t.source==="youtube"){
+      document.getElementById("audioControls").style.display = "none";
+      document.getElementById("progressWrap").style.display = "none";
+      ytWrap.classList.add("show");
+      ytWrap.innerHTML = '<iframe src="https://www.youtube.com/embed/'+encodeURIComponent(t.id)+'?autoplay=1&rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+      document.getElementById("btnDownload").disabled = true;
+      document.getElementById("btnDownload").textContent = "MP3 solo en libres";
+    } else {
+      document.getElementById("audioControls").style.display = "flex";
+      document.getElementById("progressWrap").style.display = "flex";
+      document.getElementById("btnDownload").disabled = !t.downloadable;
+      document.getElementById("btnDownload").textContent = t.downloadable ? "↓ Descargar MP3" : "No disponible";
+      audio.src = t.stream;
+      audio.play().catch(()=>toast("No se pudo reproducir"));
+    }
+    if(currentTab==="liked") renderList(liked); else renderList(tracks);
+  }
+
+  function updatePlayerUI(t){
+    document.getElementById("pTitle").textContent = t.title||"—";
+    document.getElementById("pArtist").textContent = t.artist||"—";
+    document.getElementById("pCover").innerHTML = t.thumb ? '<img src="'+esc(t.thumb)+'" alt="" referrerpolicy="no-referrer">' : "♪";
+    const isLiked = liked.some(x=>String(x.id)===String(t.id)&&x.source===t.source);
+    document.getElementById("btnLike").textContent = isLiked ? "♥ Guardada" : "♡ Guardar";
+    document.getElementById("btnPlay").textContent = audio.paused ? "▶" : "❚❚";
+  }
+
+  function togglePlay(){
+    const t = queue[currentIndex];
+    if(!t||t.source==="youtube") return;
+    if(audio.paused) audio.play(); else audio.pause();
+  }
+  function playNext(dir){
+    if(!queue.length) return;
+    currentIndex = (currentIndex+dir+queue.length)%queue.length;
+    playAt(currentIndex, queue);
+  }
+
+  async function downloadTrack(track){
+    if(!track||!track.downloadable||!track.stream){ toast("MP3 solo en canciones libres"); return; }
+    toast("Preparando MP3…");
+    try{
+      const res = await fetch(track.stream);
+      if(!res.ok) throw new Error("No disponible");
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      const href = URL.createObjectURL(blob);
+      a.href = href;
+      a.download = ((track.title||"track").replace(/[^\w\s\-áéíóúñÁÉÍÓÚÑ]/gi,"").trim().slice(0,60)||"track")+".mp3";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(href),2500);
+      toast("Descarga iniciada");
+    }catch{
+      window.open(track.stream,"_blank");
+      toast("Ábrelo y guárdalo como audio");
+    }
+  }
+
+  function toggleLike(){
+    const t = queue[currentIndex]; if(!t) return;
+    const idx = liked.findIndex(x=>String(x.id)===String(t.id)&&x.source===t.source);
+    if(idx>=0){ liked.splice(idx,1); toast("Eliminada"); }
+    else { liked.unshift({...t}); toast("Guardada"); }
+    saveLiked(); updatePlayerUI(t);
+    if(currentTab==="liked") showLiked();
+  }
+
+  document.getElementById("searchBtn").onclick = ()=>search(qInput.value);
+  qInput.addEventListener("keydown", e=>{ if(e.key==="Enter") search(qInput.value); });
+  document.querySelectorAll(".tab").forEach(tab=>{
+    tab.onclick = ()=>{
+      const name = tab.dataset.tab;
+      if(name==="results"){ currentTab="results"; setTabUI(); if(tracks.length) renderList(tracks); else content.innerHTML='<div class="empty">Busca cualquier canción arriba.</div>'; }
+      else if(name==="liked") showLiked();
+      else if(name==="free") showFree();
+    };
+  });
+  document.getElementById("btnPlay").onclick = togglePlay;
+  document.getElementById("btnPrev").onclick = ()=>playNext(-1);
+  document.getElementById("btnNext").onclick = ()=>playNext(1);
+  document.getElementById("btnLike").onclick = toggleLike;
+  document.getElementById("btnDownload").onclick = ()=>{ if(queue[currentIndex]) downloadTrack(queue[currentIndex]); };
+  audio.addEventListener("play", ()=>{ document.getElementById("btnPlay").textContent="❚❚"; });
+  audio.addEventListener("pause", ()=>{ document.getElementById("btnPlay").textContent="▶"; });
+  audio.addEventListener("timeupdate", ()=>{
+    const cur=audio.currentTime||0, dur=audio.duration||0;
+    document.getElementById("tCur").textContent=fmt(cur);
+    document.getElementById("tDur").textContent=fmt(dur);
+    document.getElementById("progressFill").style.width=(dur?(cur/dur)*100:0)+"%";
+  });
+  audio.addEventListener("ended", ()=>playNext(1));
+  document.getElementById("progress").addEventListener("click", e=>{
+    if(!audio.duration) return;
+    const r=e.currentTarget.getBoundingClientRect();
+    audio.currentTime=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width))*audio.duration;
+  });
+
+  // ---- PWA install ----
+  let deferredPrompt = null;
+  const installBtn = document.getElementById("installBtn");
+  const installModal = document.getElementById("installModal");
+  const installText = document.getElementById("installText");
+  const installSteps = document.getElementById("installSteps");
+
+  function isIos() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+  function isStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+  }
+
+  if (isStandalone()) {
+    installBtn.classList.add("hidden");
+  }
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.classList.remove("hidden");
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    installBtn.classList.add("hidden");
+    toast("App añadida a la pantalla de inicio");
+  });
+
+  function showIosGuide() {
+    installText.textContent = "En iPhone/iPad haz esto (Safari):";
+    installSteps.innerHTML = `
+      <li>Toca el botón <b>Compartir</b> (cuadrado con flecha ↑) abajo en Safari.</li>
+      <li>Desplázate y elige <b>Añadir a pantalla de inicio</b>.</li>
+      <li>Toca <b>Añadir</b>.</li>`;
+    installModal.classList.add("show");
+  }
+
+  function showAndroidGuide() {
+    installText.textContent = "En Android (Chrome):";
+    installSteps.innerHTML = `
+      <li>Toca el menú ⋮ de Chrome.</li>
+      <li>Elige <b>Instalar aplicación</b> o <b>Añadir a la pantalla de inicio</b>.</li>
+      <li>Confirma con <b>Instalar</b>.</li>`;
+    installModal.classList.add("show");
+  }
+
+  installBtn.addEventListener("click", async () => {
+    if (isStandalone()) {
+      toast("Ya está instalada");
+      return;
+    }
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice.outcome === "accepted") {
+        installBtn.classList.add("hidden");
+        toast("App añadida");
+      }
+      return;
+    }
+    if (isIos()) showIosGuide();
+    else showAndroidGuide();
+  });
+
+  document.getElementById("installClose").onclick = () => installModal.classList.remove("show");
+  installModal.addEventListener("click", (e) => {
+    if (e.target === installModal) installModal.classList.remove("show");
+  });
+
+
 })();
 </script>
 </body>
