@@ -14,20 +14,29 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#f2f2f2}
-.wrap{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.wrap{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px))}
 img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webkit-user-drag:none}
 .aviso{max-width:320px;text-align:center;font-size:13px;line-height:1.5;color:#b0b0b0;background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:14px 16px}
 .aviso strong{color:#fff}
-.inject-btn{appearance:none;border:1px solid #3a3a3a;background:#111;color:#f2f2f2;font-size:15px;font-weight:700;letter-spacing:.18em;padding:16px 42px;border-radius:14px;cursor:pointer}
-.inject-btn:active{transform:scale(.97);background:#222}
-.status{min-height:18px;font-size:12px;color:#888;text-align:center}
+.btns{display:flex;flex-direction:column;gap:12px;width:min(100%,320px)}
+.btn{appearance:none;border:1px solid #3a3a3a;background:#111;color:#f2f2f2;font-size:14px;font-weight:700;letter-spacing:.12em;padding:15px 20px;border-radius:14px;cursor:pointer;width:100%}
+.btn:active{transform:scale(.98);background:#222}
+.btn.primary{background:#1a1a1a;border-color:#4a4a4a}
+.btn.inject{letter-spacing:.18em;font-size:15px}
+.status{min-height:18px;font-size:12px;color:#888;text-align:center;max-width:320px;line-height:1.4}
 </style>
 </head>
 <body>
 <div class="wrap">
   <img class="logo" src="data:image/jpeg;base64,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" alt="ZX">
-  <div class="aviso"><strong>Aviso:</strong> si tocas <strong>INJECTAR</strong>, se abrirá la aplicación <strong>Free Fire</strong> en tu dispositivo. Asegúrate de tenerla instalada.</div>
-  <button type="button" class="inject-btn" id="injectBtn">INJECTAR</button>
+  <div class="aviso">
+    <strong>Aviso:</strong> <strong>INJECTAR</strong> abrirá Free Fire.
+    <strong>PiP</strong> deja una ventana negra flotante de 65×65 px (si el navegador lo permite) para que puedas seguir viéndola encima de otras apps.
+  </div>
+  <div class="btns">
+    <button type="button" class="btn primary" id="pipBtn">MODO PiP (65×65)</button>
+    <button type="button" class="btn inject" id="injectBtn">INJECTAR</button>
+  </div>
   <div class="status" id="status"></div>
 </div>
 <script>
@@ -43,8 +52,78 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
   document.head.appendChild(link);
 
   const status=document.getElementById("status");
+  let pipWindow=null;
+
   function isAndroid(){return /android/i.test(navigator.userAgent)}
   function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)}
+
+  async function openPip(){
+    // Document Picture-in-Picture (Chrome / Edge reciente)
+    if(window.documentPictureInPicture){
+      try{
+        if(pipWindow && !pipWindow.closed){
+          pipWindow.close();
+          pipWindow=null;
+          status.textContent="PiP cerrado.";
+          return;
+        }
+        pipWindow=await documentPictureInPicture.requestWindow({
+          width:65,
+          height:65
+        });
+        const doc=pipWindow.document;
+        doc.head.innerHTML='<style>*{margin:0;padding:0}html,body{width:100%;height:100%;background:#000;overflow:hidden} .box{width:65px;height:65px;background:#000;border:1px solid #222}</style>';
+        doc.body.innerHTML='<div class="box" title="ZX"></div>';
+        // mantener negro y pequeño
+        pipWindow.addEventListener("pagehide",function(){ pipWindow=null; status.textContent="PiP cerrado."; });
+        status.textContent="PiP activo (65×65). Puedes cambiar a Free Fire.";
+        return true;
+      }catch(e){
+        status.textContent="No se pudo abrir PiP: "+(e.message||e);
+      }
+    }
+
+    // Fallback: Video PiP con canvas negro 65x65
+    try{
+      const canvas=document.createElement("canvas");
+      canvas.width=65; canvas.height=65;
+      const ctx=canvas.getContext("2d");
+      ctx.fillStyle="#000";
+      ctx.fillRect(0,0,65,65);
+      const stream=canvas.captureStream(5);
+      const video=document.createElement("video");
+      video.muted=true;
+      video.playsInline=true;
+      video.srcObject=stream;
+      video.style.position="fixed";
+      video.style.width="1px";
+      video.style.height="1px";
+      video.style.opacity="0";
+      document.body.appendChild(video);
+      await video.play();
+      if(document.pictureInPictureElement){
+        await document.exitPictureInPicture();
+        status.textContent="PiP cerrado.";
+        video.remove();
+        return true;
+      }
+      if(video.requestPictureInPicture){
+        await video.requestPictureInPicture();
+        status.textContent="PiP activo (65×65 negro). Cambia a Free Fire.";
+        video.addEventListener("leavepictureinpicture",function(){
+          video.remove();
+          status.textContent="PiP cerrado.";
+        });
+        return true;
+      }
+    }catch(e){
+      status.textContent="PiP no soportado aquí: "+(e.message||e);
+      return false;
+    }
+
+    status.textContent="Tu navegador no soporta PiP. Prueba Chrome en Android o escritorio.";
+    return false;
+  }
 
   function openFreeFire(){
     status.textContent="Abriendo Free Fire…";
@@ -73,13 +152,18 @@ img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webki
         },i*500);
       });
       setTimeout(function(){ if(!document.hidden){ status.textContent="Si no se abrió, ve a la App Store…"; window.location.href=appStore; } },1800);
-      document.addEventListener("visibilitychange",function(){ if(document.hidden) status.textContent="Free Fire debería estar abierto."; });
       return;
     }
     status.textContent="Abre Free Fire desde la tienda de apps.";
     window.open("https://play.google.com/store/apps/details?id=com.dts.freefireth","_blank");
   }
-  document.getElementById("injectBtn").addEventListener("click",openFreeFire);
+
+  document.getElementById("pipBtn").addEventListener("click",function(){ openPip(); });
+  document.getElementById("injectBtn").addEventListener("click",async function(){
+    // Primero PiP, luego Free Fire
+    await openPip();
+    setTimeout(openFreeFire, 400);
+  });
 })();
 </script>
 </body>
