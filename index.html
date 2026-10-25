@@ -926,6 +926,90 @@
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
 
+  
+  .panel-view { display: none; }
+  .panel-view.active { display: block; }
+  .panel-back {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    cursor: pointer;
+  }
+  .panel-back:hover { border-color: var(--border-3); color: var(--text); }
+  .panel-form label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .panel-form input, .panel-form textarea, .panel-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 14px;
+    outline: none;
+  }
+  .panel-form textarea {
+    min-height: 140px;
+    resize: vertical;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .panel-form input:focus, .panel-form textarea:focus, .panel-form select:focus {
+    border-color: var(--border-3);
+  }
+  .panel-list { display: flex; flex-direction: column; gap: 10px; }
+  .panel-item {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .panel-item .meta { font-size: 12px; color: var(--muted); }
+  .panel-item strong { font-size: 14px; }
+  .panel-item .row-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .panel-item button {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-del { background: #ef4444; color: #fff; }
+  .btn-copy { background: var(--panel-3); color: var(--text); border: 1px solid var(--border) !important; }
+  .panel-empty { color: var(--muted); font-size: 14px; text-align: center; padding: 30px 10px; }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-box {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-box strong { display: block; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .stat-box span { font-size: 12px; color: var(--muted); }
+
   /* ── Panel post-login ── */
   #appPanel {
     display: none;
@@ -1370,33 +1454,87 @@
     <button type="button" class="btn btn-ghost" id="panelLogout">Cerrar sesión</button>
   </div>
   <div class="panel-body">
-    <h1 class="panel-title">Panel ZYOX</h1>
-    <p class="panel-sub">Sesión iniciada con Discord. Elige una opción.</p>
-    <div class="panel-grid">
-      <div class="panel-card" data-act="scripts">
-        <div class="ico">📜</div>
-        <h3>Mis scripts</h3>
-        <p>Sube y gestiona tus archivos .lua</p>
+    <!-- HOME -->
+    <div class="panel-view active" id="view-home">
+      <h1 class="panel-title">Panel ZYOX</h1>
+      <p class="panel-sub">Sesión iniciada con Discord. Elige una opción.</p>
+      <div class="panel-grid">
+        <div class="panel-card" data-act="scripts"><div class="ico">📜</div><h3>Mis scripts</h3><p>Sube y gestiona tus archivos .lua</p></div>
+        <div class="panel-card" data-act="obfuscate"><div class="ico">🔒</div><h3>Ofuscar</h3><p>Protege tu código con ofuscación</p></div>
+        <div class="panel-card" data-act="keys"><div class="ico">🔑</div><h3>Keys / licencias</h3><p>Genera y revoca keys HWID</p></div>
+        <div class="panel-card" data-act="stats"><div class="ico">📊</div><h3>Estadísticas</h3><p>Uso, conexiones e intentos</p></div>
+        <div class="panel-card" data-act="settings"><div class="ico">⚙️</div><h3>Ajustes</h3><p>Cuenta y preferencias</p></div>
       </div>
-      <div class="panel-card" data-act="obfuscate">
-        <div class="ico">🔒</div>
-        <h3>Ofuscar</h3>
-        <p>Protege tu código con ofuscación</p>
+    </div>
+
+    <!-- SCRIPTS -->
+    <div class="panel-view" id="view-scripts">
+      <button type="button" class="panel-back" data-back>← Volver</button>
+      <h1 class="panel-title">Mis scripts</h1>
+      <p class="panel-sub">Sube archivos .lua y gestiona los que tengas guardados.</p>
+      <div class="panel-form">
+        <label>Nombre</label>
+        <input type="text" id="scriptName" placeholder="mi_script">
+        <label>Código / archivo</label>
+        <textarea id="scriptCode" placeholder="-- pega tu código Lua aquí"></textarea>
+        <input type="file" id="scriptFile" accept=".lua,.txt,text/plain" style="margin-bottom:14px">
+        <button type="button" class="btn btn-primary" id="scriptSave">Guardar script</button>
       </div>
-      <div class="panel-card" data-act="keys">
-        <div class="ico">🔑</div>
-        <h3>Keys / licencias</h3>
-        <p>Genera y revoca keys HWID</p>
+      <h3 style="margin:24px 0 12px;font-size:15px">Guardados</h3>
+      <div class="panel-list" id="scriptList"></div>
+    </div>
+
+    <!-- OBFUSCATE -->
+    <div class="panel-view" id="view-obfuscate">
+      <button type="button" class="panel-back" data-back>← Volver</button>
+      <h1 class="panel-title">Ofuscar</h1>
+      <p class="panel-sub">Pega tu Lua y genera una versión ofuscada (local).</p>
+      <div class="panel-form">
+        <label>Código original</label>
+        <textarea id="obfInput" placeholder="print('hola')"></textarea>
+        <button type="button" class="btn btn-primary" id="obfRun">Ofuscar</button>
+        <label style="margin-top:16px">Resultado</label>
+        <textarea id="obfOutput" placeholder="Aquí saldrá el código ofuscado" readonly></textarea>
+        <button type="button" class="btn btn-ghost" id="obfCopy">Copiar resultado</button>
       </div>
-      <div class="panel-card" data-act="stats">
-        <div class="ico">📊</div>
-        <h3>Estadísticas</h3>
-        <p>Uso, conexiones e intentos</p>
+    </div>
+
+    <!-- KEYS -->
+    <div class="panel-view" id="view-keys">
+      <button type="button" class="panel-back" data-back>← Volver</button>
+      <h1 class="panel-title">Keys / licencias</h1>
+      <p class="panel-sub">Genera keys y asígnales duración.</p>
+      <div class="panel-form">
+        <label>Nota (opcional)</label>
+        <input type="text" id="keyNote" placeholder="cliente / prueba">
+        <label>Días de duración</label>
+        <input type="number" id="keyDays" value="30" min="1" max="3650">
+        <button type="button" class="btn btn-primary" id="keyGen">Generar key</button>
       </div>
-      <div class="panel-card" data-act="settings">
-        <div class="ico">⚙️</div>
-        <h3>Ajustes</h3>
-        <p>Cuenta y preferencias</p>
+      <h3 style="margin:24px 0 12px;font-size:15px">Tus keys</h3>
+      <div class="panel-list" id="keyList"></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="panel-view" id="view-stats">
+      <button type="button" class="panel-back" data-back>← Volver</button>
+      <h1 class="panel-title">Estadísticas</h1>
+      <p class="panel-sub">Datos locales de esta sesión / dispositivo.</p>
+      <div class="stat-row" id="statRow"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel-view" id="view-settings">
+      <button type="button" class="panel-back" data-back>← Volver</button>
+      <h1 class="panel-title">Ajustes</h1>
+      <p class="panel-sub">Preferencias de esta cuenta en el dispositivo.</p>
+      <div class="panel-form">
+        <label>Nombre para mostrar</label>
+        <input type="text" id="setDisplayName" placeholder="Tu nombre">
+        <label>Webhook (opcional)</label>
+        <input type="url" id="setWebhook" placeholder="https://discord.com/api/webhooks/...">
+        <button type="button" class="btn btn-primary" id="setSave">Guardar ajustes</button>
+        <button type="button" class="btn btn-ghost" id="setClearData" style="margin-top:10px">Borrar datos locales</button>
       </div>
     </div>
   </div>
@@ -1513,11 +1651,222 @@
     history.replaceState(null, '', window.location.pathname);
   });
 
+  
+  // ── Sub-views ──
+  function showView(name) {
+    document.querySelectorAll('.panel-view').forEach(v => v.classList.remove('active'));
+    const el = document.getElementById('view-' + name);
+    if (el) el.classList.add('active');
+    if (name === 'scripts') renderScripts();
+    if (name === 'keys') renderKeys();
+    if (name === 'stats') renderStats();
+    if (name === 'settings') loadSettingsForm();
+  }
   document.querySelectorAll('.panel-card[data-act]').forEach(card => {
-    card.addEventListener('click', () => {
-      const act = card.dataset.act;
-      alert('Pronto: ' + (card.querySelector('h3')?.textContent || act) + '\n(Aquí irá la función real)');
+    card.addEventListener('click', () => showView(card.dataset.act));
+  });
+  document.querySelectorAll('[data-back]').forEach(btn => {
+    btn.addEventListener('click', () => showView('home'));
+  });
+
+  // storage helpers
+  function loadArr(key) {
+    try { const a = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(a) ? a : []; }
+    catch(e) { return []; }
+  }
+  function saveArr(key, arr) { try { localStorage.setItem(key, JSON.stringify(arr)); } catch(e) {} }
+  function bumpStat(k) {
+    try {
+      const s = JSON.parse(localStorage.getItem('zyoxStats') || '{}');
+      s[k] = (s[k] || 0) + 1;
+      localStorage.setItem('zyoxStats', JSON.stringify(s));
+    } catch(e) {}
+  }
+
+  // SCRIPTS
+  function renderScripts() {
+    const list = document.getElementById('scriptList');
+    const arr = loadArr('zyoxScripts');
+    if (!arr.length) { list.innerHTML = '<div class="panel-empty">No hay scripts guardados.</div>'; return; }
+    list.innerHTML = arr.map(s => `
+      <div class="panel-item" data-id="${s.id}">
+        <div>
+          <strong>${escapeHtmlPanel(s.name)}</strong>
+          <div class="meta">${new Date(s.ts).toLocaleString('es')} · ${(s.code||'').length} chars</div>
+        </div>
+        <div class="row-btns">
+          <button type="button" class="btn-copy" data-load="${s.id}">Abrir</button>
+          <button type="button" class="btn-del" data-del="${s.id}">Borrar</button>
+        </div>
+      </div>`).join('');
+  }
+  function escapeHtmlPanel(s) {
+    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  document.getElementById('scriptFile').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      document.getElementById('scriptCode').value = r.result;
+      if (!document.getElementById('scriptName').value) {
+        document.getElementById('scriptName').value = f.name.replace(/\.lua$/i,'');
+      }
+    };
+    r.readAsText(f);
+  });
+  document.getElementById('scriptSave').addEventListener('click', () => {
+    const name = document.getElementById('scriptName').value.trim() || 'script';
+    const code = document.getElementById('scriptCode').value;
+    if (!code.trim()) { alert('Pega o sube un script.'); return; }
+    const arr = loadArr('zyoxScripts');
+    arr.unshift({ id: Date.now().toString(36), name, code, ts: new Date().toISOString() });
+    saveArr('zyoxScripts', arr);
+    bumpStat('scriptsSaved');
+    document.getElementById('scriptName').value = '';
+    document.getElementById('scriptCode').value = '';
+    document.getElementById('scriptFile').value = '';
+    renderScripts();
+  });
+  document.getElementById('scriptList').addEventListener('click', e => {
+    const del = e.target.closest('[data-del]');
+    const load = e.target.closest('[data-load]');
+    if (del) {
+      saveArr('zyoxScripts', loadArr('zyoxScripts').filter(s => s.id !== del.dataset.del));
+      renderScripts();
+    }
+    if (load) {
+      const s = loadArr('zyoxScripts').find(x => x.id === load.dataset.load);
+      if (s) {
+        document.getElementById('scriptName').value = s.name;
+        document.getElementById('scriptCode').value = s.code;
+      }
+    }
+  });
+
+  // OBFUSCATE (simple client-side)
+  function obfuscateLua(src) {
+    const strings = [];
+    let code = src.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, m => {
+      strings.push(m);
+      return `__S${strings.length-1}__`;
     });
+    const keywords = new Set(['and','break','do','else','elseif','end','false','for','function','goto','if','in','local','nil','not','or','repeat','return','then','true','until','while']);
+    const map = {};
+    let n = 0;
+    code = code.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b/g, (m) => {
+      if (keywords.has(m)) return m;
+      if (/^__S\d+__$/.test(m)) return m;
+      if (!(m in map)) map[m] = '_' + (n++).toString(36);
+      return map[m];
+    });
+    // scramble strings to byte tables lightly
+    code = code.replace(/__S(\d+)__/g, (_, i) => {
+      const raw = strings[+i];
+      const quote = raw[0];
+      const inner = raw.slice(1, -1);
+      try {
+        const bytes = Array.from(inner).map(c => c.charCodeAt(0));
+        return `(function()local t={${bytes.join(',')}}local s=""for i=1,#t do s=s..string.char(t[i])end return s end)()`;
+      } catch(e) { return raw; }
+    });
+    return '-- ZYOX obfuscated\n' + code;
+  }
+  document.getElementById('obfRun').addEventListener('click', () => {
+    const src = document.getElementById('obfInput').value;
+    if (!src.trim()) { alert('Pega código Lua.'); return; }
+    document.getElementById('obfOutput').value = obfuscateLua(src);
+    bumpStat('obfuscations');
+  });
+  document.getElementById('obfCopy').addEventListener('click', async () => {
+    const t = document.getElementById('obfOutput').value;
+    if (!t) return;
+    try { await navigator.clipboard.writeText(t); alert('Copiado.'); }
+    catch(e) { alert('No se pudo copiar.'); }
+  });
+
+  // KEYS
+  function genKeyStr() {
+    const part = () => Math.random().toString(36).slice(2, 6).toUpperCase();
+    return `ZYOX-${part()}-${part()}-${part()}-${part()}`;
+  }
+  function renderKeys() {
+    const list = document.getElementById('keyList');
+    const arr = loadArr('zyoxKeys');
+    if (!arr.length) { list.innerHTML = '<div class="panel-empty">No hay keys.</div>'; return; }
+    list.innerHTML = arr.map(k => `
+      <div class="panel-item">
+        <div>
+          <strong style="font-family:monospace">${escapeHtmlPanel(k.key)}</strong>
+          <div class="meta">${escapeHtmlPanel(k.note||'sin nota')} · ${k.days}d · ${new Date(k.ts).toLocaleDateString('es')}</div>
+        </div>
+        <div class="row-btns">
+          <button type="button" class="btn-copy" data-copy="${escapeHtmlPanel(k.key)}">Copiar</button>
+          <button type="button" class="btn-del" data-del-key="${k.id}">Borrar</button>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('keyGen').addEventListener('click', () => {
+    const note = document.getElementById('keyNote').value.trim();
+    const days = parseInt(document.getElementById('keyDays').value, 10) || 30;
+    const arr = loadArr('zyoxKeys');
+    arr.unshift({ id: Date.now().toString(36), key: genKeyStr(), note, days, ts: new Date().toISOString() });
+    saveArr('zyoxKeys', arr);
+    bumpStat('keysGenerated');
+    document.getElementById('keyNote').value = '';
+    renderKeys();
+  });
+  document.getElementById('keyList').addEventListener('click', e => {
+    const del = e.target.closest('[data-del-key]');
+    const copy = e.target.closest('[data-copy]');
+    if (del) {
+      saveArr('zyoxKeys', loadArr('zyoxKeys').filter(k => k.id !== del.dataset.delKey));
+      renderKeys();
+    }
+    if (copy) {
+      navigator.clipboard.writeText(copy.dataset.copy).then(() => alert('Key copiada.')).catch(() => {});
+    }
+  });
+
+  // STATS
+  function renderStats() {
+    const s = JSON.parse(localStorage.getItem('zyoxStats') || '{}');
+    const scripts = loadArr('zyoxScripts').length;
+    const keys = loadArr('zyoxKeys').length;
+    const row = document.getElementById('statRow');
+    row.innerHTML = [
+      ['Scripts', scripts],
+      ['Keys', keys],
+      ['Ofuscaciones', s.obfuscations || 0],
+      ['Scripts guardados', s.scriptsSaved || 0],
+      ['Keys generadas', s.keysGenerated || 0],
+    ].map(([l,v]) => `<div class="stat-box"><strong>${v}</strong><span>${l}</span></div>`).join('');
+  }
+
+  // SETTINGS
+  function loadSettingsForm() {
+    try {
+      const st = JSON.parse(localStorage.getItem('zyoxSettings') || '{}');
+      document.getElementById('setDisplayName').value = st.displayName || '';
+      document.getElementById('setWebhook').value = st.webhook || '';
+    } catch(e) {}
+  }
+  document.getElementById('setSave').addEventListener('click', () => {
+    const st = {
+      displayName: document.getElementById('setDisplayName').value.trim(),
+      webhook: document.getElementById('setWebhook').value.trim()
+    };
+    localStorage.setItem('zyoxSettings', JSON.stringify(st));
+    if (st.displayName) document.getElementById('panelName').textContent = st.displayName;
+    alert('Ajustes guardados.');
+  });
+  document.getElementById('setClearData').addEventListener('click', () => {
+    if (!confirm('¿Borrar scripts, keys y estadísticas locales?')) return;
+    ['zyoxScripts','zyoxKeys','zyoxStats','zyoxSettings'].forEach(k => localStorage.removeItem(k));
+    alert('Datos borrados.');
+    showView('home');
+  });
+
   });
 
   (async function initAuth() {
