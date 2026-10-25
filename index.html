@@ -1,212 +1,1305 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ZX">
-<meta name="mobile-web-app-capable" content="yes">
-<title>ZX</title>
-<link rel="apple-touch-icon" href="data:image/jpeg;base64,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">
-<link rel="icon" href="data:image/jpeg;base64,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">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vantarmor · Protección premium para tus scripts</title>
+<meta name="description" content="Vantarmor — sistema de licencias, HWID y protección anti-leak para desarrolladores de scripts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#f2f2f2}
-.wrap{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px))}
-img.logo{width:min(70vw,260px);height:auto;display:block;user-select:none;-webkit-user-drag:none}
-.btn{appearance:none;border:1px solid #3a3a3a;background:#111;color:#f2f2f2;font-size:15px;font-weight:700;letter-spacing:.18em;padding:16px 48px;border-radius:14px;cursor:pointer}
-.btn:active{transform:scale(.97);background:#222}
-.modal{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:flex-end;justify-content:center}
-.modal.show{display:flex}
-.sheet{width:100%;max-width:420px;background:#1a1a1a;border-radius:18px 18px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto}
-.sheet h3{font-size:16px;margin-bottom:10px}
-.sheet p,.sheet ol{font-size:13px;color:#bbb;line-height:1.55;margin-bottom:10px}
-.sheet ol{padding-left:20px;color:#ddd}
-.sheet button{width:100%;padding:12px;border-radius:12px;background:#eee;color:#111;font-weight:700;border:0;cursor:pointer;margin-top:8px}
+  :root {
+    --bg: #08080a;
+    --bg-2: #0d0d10;
+    --panel: #121216;
+    --panel-2: #1a1a20;
+    --panel-3: #212128;
+    --border: #26262e;
+    --border-2: #32323c;
+    --border-3: #42424e;
+    --text: #f5f5f8;
+    --text-dim: #a8a8b4;
+    --muted: #6e6e78;
+    --muted-2: #4a4a54;
+    --silver-1: #f5f5f8;
+    --silver-2: #d0d0d8;
+    --silver-3: #a0a0ac;
+    --silver-4: #70707c;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --shadow-md: 0 10px 30px -10px rgba(0,0,0,.6);
+    --shadow-lg: 0 30px 80px -20px rgba(0,0,0,.9);
+    --transition: .25s cubic-bezier(.4,0,.2,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(224,224,232,.08), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(160,160,172,.05), transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(224,224,232,.02), transparent 60%);
+    animation: ambientFloat 30s ease-in-out infinite;
+  }
+
+  @keyframes ambientFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(3%, -3%) scale(1.05); }
+    66%      { transform: translate(-3%, 3%) scale(0.98); }
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, black 20%, transparent 80%);
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { cursor: pointer; font: inherit; }
+
+  /* NAV */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(8,8,10,.65);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    transition: all var(--transition);
+  }
+
+  .nav.scrolled {
+    background: rgba(8,8,10,.9);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,.6);
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -.02em;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .brand-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f5f5f8 0%, #d0d0d8 40%, #a0a0ac 100%);
+    display: grid;
+    place-items: center;
+    color: var(--bg);
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: -.06em;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 14px -4px rgba(224,224,232,.5), inset 0 1px 0 rgba(255,255,255,.6);
+    transition: transform var(--transition);
+    flex-shrink: 0;
+  }
+
+  .brand-logo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%);
+    transform: translateX(-150%);
+    animation: logoShine 4s infinite;
+  }
+
+  @keyframes logoShine {
+    0%, 100% { transform: translateX(-150%); }
+    50%      { transform: translateX(150%); }
+  }
+
+  .nav-brand:hover .brand-logo { transform: scale(1.06) rotate(-3deg); }
+
+  .nav-brand-text {
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-links a {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: color var(--transition);
+    position: relative;
+    padding: 4px 0;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 1px;
+    background: var(--silver-2);
+    transform: scaleX(0);
+    transition: transform var(--transition);
+    transform-origin: left;
+  }
+
+  .nav-links a:hover::after { transform: scaleX(1); }
+
+  .nav-cta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13.5px;
+    transition: all var(--transition);
+    border: 0;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .btn svg { width: 14px; height: 14px; stroke-width: 2.4; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--silver-1) 0%, var(--silver-2) 50%, var(--silver-3) 100%);
+    color: var(--bg);
+    box-shadow: 0 4px 14px -4px rgba(224,224,232,.5), inset 0 1px 0 rgba(255,255,255,.7);
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
+    transform: translateX(-150%);
+    transition: transform .6s;
+  }
+
+  .btn-primary:hover::before { transform: translateX(150%); }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px -6px rgba(224,224,232,.6), inset 0 1px 0 rgba(255,255,255,.7);
+  }
+
+  .btn-ghost {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-ghost:hover {
+    background: var(--panel-2);
+    border-color: var(--border-2);
+    transform: translateY(-1px);
+  }
+
+  .btn-lg {
+    padding: 14px 26px;
+    font-size: 14.5px;
+    border-radius: 12px;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 140px 32px 80px;
+    text-align: center;
+  }
+
+  .hero-inner {
+    max-width: 960px;
+    width: 100%;
+    animation: heroIn .9s cubic-bezier(.16,1,.3,1);
+  }
+
+  @keyframes heroIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 15px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: .04em;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 14px -4px rgba(0,0,0,.5);
+  }
+
+  .hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 10px var(--ok);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .5; transform: scale(.85); }
+  }
+
+  .hero-logo {
+    width: 130px;
+    height: 130px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, #f5f5f8 0%, #d0d0d8 35%, #a0a0ac 70%, #70707c 100%);
+    display: grid;
+    place-items: center;
+    color: var(--bg);
+    font-weight: 900;
+    font-size: 46px;
+    letter-spacing: -.07em;
+    margin: 0 auto 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -10px rgba(0,0,0,.9), 0 0 80px -20px rgba(224,224,232,.35), inset 0 2px 4px rgba(255,255,255,.7), inset 0 -4px 12px rgba(0,0,0,.25);
+    animation: floatLogo 6s ease-in-out infinite;
+  }
+
+  .hero-logo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%);
+    transform: translateX(-150%);
+    animation: logoShine 3.5s infinite;
+  }
+
+  @keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+  }
+
+  .hero-title {
+    font-size: clamp(40px, 6.5vw, 80px);
+    font-weight: 900;
+    line-height: 1.03;
+    letter-spacing: -.035em;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #a0a0ac 50%, #ffffff 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shineText 6s ease-in-out infinite;
+  }
+
+  @keyframes shineText {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+
+  .hero-sub {
+    font-size: clamp(15px, 1.8vw, 18.5px);
+    color: var(--text-dim);
+    max-width: 660px;
+    margin: 0 auto 44px;
+    line-height: 1.7;
+  }
+
+  .hero-sub strong {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 72px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 48px;
+    border-top: 1px solid var(--border);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .hero-stat { text-align: center; }
+
+  .hero-stat strong {
+    display: block;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -.025em;
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .hero-stat span {
+    font-size: 11.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-weight: 700;
+  }
+
+  /* TRUST */
+  .trust {
+    position: relative;
+    z-index: 1;
+    padding: 40px 32px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .trust-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    flex-wrap: wrap;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .02em;
+    opacity: .7;
+    transition: all var(--transition);
+  }
+
+  .trust-item:hover { opacity: 1; color: var(--text-dim); }
+
+  .trust-item svg { width: 20px; height: 20px; stroke-width: 2; }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 110px 32px;
+  }
+
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+
+  .section-head {
+    text-align: center;
+    margin-bottom: 72px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: clamp(30px, 4.2vw, 48px);
+    font-weight: 900;
+    letter-spacing: -.03em;
+    line-height: 1.12;
+    margin-bottom: 16px;
+  }
+
+  .section-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .section-desc {
+    color: var(--text-dim);
+    font-size: 16.5px;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* FEATURES */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .feature {
+    padding: 32px 28px;
+    background: linear-gradient(180deg, var(--panel), rgba(18,18,22,.5));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--silver-3), transparent);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .feature::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(224,224,232,.05), transparent 40%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+  }
+
+  .feature:hover {
+    border-color: var(--border-3);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .feature:hover::before { opacity: .8; }
+  .feature:hover::after { opacity: 1; }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--panel-3), var(--panel));
+    border: 1px solid var(--border-2);
+    display: grid;
+    place-items: center;
+    color: var(--silver-1);
+    margin-bottom: 20px;
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature:hover .feature-icon {
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-3));
+    color: var(--bg);
+    transform: scale(1.08) rotate(-4deg);
+    box-shadow: 0 10px 30px -8px rgba(224,224,232,.5);
+  }
+
+  .feature-icon svg { width: 22px; height: 22px; stroke-width: 2.2; }
+
+  .feature h3 {
+    font-size: 17.5px;
+    font-weight: 800;
+    letter-spacing: -.015em;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* STEPS */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+
+  .step {
+    padding: 34px 26px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition);
+    position: relative;
+  }
+
+  .step:hover {
+    border-color: var(--border-2);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .step-num {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -.05em;
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-4));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    opacity: .7;
+  }
+
+  .step h4 {
+    font-size: 16.5px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -.01em;
+  }
+
+  .step p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  /* PRICING */
+  .pricing {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 22px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .plan {
+    padding: 36px 30px;
+    background: linear-gradient(180deg, var(--panel), rgba(18,18,22,.5));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .plan:hover {
+    border-color: var(--border-3);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .plan.featured {
+    border-color: var(--silver-3);
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    box-shadow: 0 20px 80px -20px rgba(224,224,232,.2);
+    transform: scale(1.02);
+  }
+
+  .plan.featured:hover {
+    transform: scale(1.02) translateY(-6px);
+  }
+
+  .plan.featured::before {
+    content: 'MÁS POPULAR';
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 14px;
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-3));
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px -4px rgba(224,224,232,.6);
+  }
+
+  .plan-name {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .plan-price strong {
+    font-size: 50px;
+    font-weight: 900;
+    letter-spacing: -.035em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .plan-price span {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .plan-desc {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-bottom: 32px;
+    flex: 1;
+  }
+
+  .plan-features li {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+
+  .plan-features li svg {
+    width: 14px;
+    height: 14px;
+    color: var(--silver-1);
+    stroke-width: 3;
+    flex-shrink: 0;
+    padding: 2px;
+    background: rgba(224,224,232,.08);
+    border-radius: 4px;
+    box-sizing: content-box;
+  }
+
+  .plan .btn { width: 100%; }
+
+  /* CTA FINAL */
+  .cta-final {
+    text-align: center;
+    padding: 90px 40px;
+    background: linear-gradient(180deg, var(--panel), var(--bg));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    max-width: 920px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-final::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--silver-1), transparent);
+  }
+
+  .cta-final::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(224,224,232,.06), transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-final h2 {
+    font-size: clamp(28px, 3.8vw, 42px);
+    font-weight: 900;
+    letter-spacing: -.03em;
+    margin-bottom: 16px;
+    line-height: 1.15;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-final p {
+    color: var(--text-dim);
+    margin-bottom: 36px;
+    font-size: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-final .hero-cta {
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 56px 32px 36px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  .footer-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f5f5f8, #a0a0ac);
+    display: grid;
+    place-items: center;
+    color: var(--bg);
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: -.06em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    transition: color var(--transition);
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy {
+    width: 100%;
+    text-align: center;
+    color: var(--muted-2);
+    font-size: 12px;
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    letter-spacing: .02em;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .nav { padding: 12px 20px; }
+    .nav-links { display: none; }
+    .nav-cta .btn-ghost { display: none; }
+    section { padding: 80px 20px; }
+    .hero { padding: 120px 20px 60px; }
+    .hero-stats { gap: 28px; padding-top: 36px; }
+    .hero-stat strong { font-size: 24px; }
+    .cta-final { padding: 60px 26px; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    .trust { padding: 32px 20px; }
+    .trust-inner { gap: 32px; }
+  }
+
+  @media (max-width: 500px) {
+    .hero-cta { flex-direction: column; width: 100%; }
+    .hero-cta .btn { width: 100%; }
+    .hero-logo { width: 100px; height: 100px; font-size: 38px; }
+    .plan.featured { transform: none; }
+    .plan.featured:hover { transform: translateY(-6px); }
+  }
+
+  ::selection {
+    background: rgba(224,224,232,.25);
+    color: var(--text);
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <img class="logo" src="data:image/jpeg;base64,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" alt="ZX">
-  <button type="button" class="btn" id="installBtn">INSTALAR</button>
-</div>
-<div class="modal" id="modal">
-  <div class="sheet">
-    <h3 id="modalTitle">Perfil ZX</h3>
-    <div id="modalBody"></div>
-    <button type="button" id="modalClose">Entendido</button>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="/index.html" class="nav-brand">
+    <span class="brand-logo"><img src="https://files.catbox.moe/qxl7dn.png" alt="Vantarmor" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+    <span class="nav-brand-text">Vantarmor</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="#features">Características</a>
+    <a href="#how">Cómo funciona</a>
+    <a href="#pricing">Precios</a>
+  </div>
+
+  <div class="nav-cta">
+    <!-- BOTÓN CORREGIDO A /login.html -->
+    <a href="/login.html" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Acceder
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Sistema activo · 99.9% uptime
+    </div>
+
+    <div class="hero-logo"><img src="https://files.catbox.moe/qxl7dn.png" alt="Vantarmor" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+
+    <h1 class="hero-title">
+      Protege tus scripts<br>
+      con nivel profesional
+    </h1>
+
+    <p class="hero-sub">
+      Vantarmor es la plataforma de <strong>licencias, HWID y anti-leak</strong> más avanzada para desarrolladores de scripts. Rápido, seguro, indetectable.
+    </p>
+
+    <div class="hero-cta">
+      <!-- BOTÓN CORREGIDO A /login.html -->
+      <a href="/login.html" class="btn btn-primary btn-lg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        Comenzar ahora
+      </a>
+      <a href="#features" class="btn btn-ghost btn-lg">
+        Ver características
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <strong>50K+</strong>
+        <span>Keys activas</span>
+      </div>
+      <div class="hero-stat">
+        <strong>1.2K+</strong>
+        <span>Desarrolladores</span>
+      </div>
+      <div class="hero-stat">
+        <strong>99.9%</strong>
+        <span>Uptime</span>
+      </div>
+      <div class="hero-stat">
+        <strong>&lt;50ms</strong>
+        <span>Latencia</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- TRUST BAR -->
+<div class="trust">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Protección DDoS
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      99.9% Uptime
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Cifrado AES-256
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Sin logs
+    </div>
   </div>
 </div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">Características</div>
+      <h2 class="section-title">Todo lo que necesitas<br>para <em>proteger tu script</em></h2>
+      <p class="section-desc">Herramientas profesionales diseñadas para detener leaks, reventas y abusos.</p>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3>Sistema de licencias</h3>
+        <p>Genera, revoca y gestiona keys con duración personalizable, HWID binding y control total desde el panel o Discord.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>HWID Binding</h3>
+        <p>Cada key se vincula al hardware único del usuario. Imposible compartir o revender sin que se bloquee automáticamente.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </div>
+        <h3>Anti-leak avanzado</h3>
+        <p>Ofuscación, anti-debug, detección de dumpers y bloqueo automático de cuentas que intenten robar tu script.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h3>Bot de Discord</h3>
+        <p>Gestiona todo desde tu servidor con comandos slash: genera keys, resetea HWID, consulta estadísticas en tiempo real.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <path d="m19 9-5 5-4-4-3 3"/>
+          </svg>
+        </div>
+        <h3>Estadísticas en vivo</h3>
+        <p>Dashboard con analíticas completas: keys activas, usuarios conectados, intentos fallidos, y logs detallados.</p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M9 9h6v6H9z"/>
+            <path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/>
+          </svg>
+        </div>
+        <h3>Ofuscación avanzada</h3>
+        <p>Protege tu código con múltiples capas de ofuscación. Tu script queda ilegible incluso si alguien intenta dumpearlo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background: var(--bg-2);">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">Cómo funciona</div>
+      <h2 class="section-title">De 0 a protegido<br>en menos de <em>2 minutos</em></h2>
+      <p class="section-desc">Sin configuración complicada. Solo sube tu script, genera keys y empieza a proteger.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h4>Sube tu script</h4>
+        <p>Arrastra tu archivo .lua al panel o conéctalo vía API. Vantarmor lo ofusca automáticamente.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <h4>Genera keys</h4>
+        <p>Crea tantas keys como necesites con duración personalizable. Desde el panel o con <code>/genkey</code> en Discord.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <h4>Distribuye</h4>
+        <p>Comparte las keys con tus usuarios. Ellos las meten en el loader y se vinculan a su HWID al instante.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">04</div>
+        <h4>Monitorea</h4>
+        <p>Observa en tiempo real quién usa tu script, detecta abusos y revoca acceso con un click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">Precios</div>
+      <h2 class="section-title">Planes para <em>cada escala</em></h2>
+      <p class="section-desc">Empieza gratis, escala cuando lo necesites. Sin comisiones ocultas.</p>
+    </div>
+
+    <div class="pricing">
+      <!-- FREE -->
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">
+          <strong>$0</strong>
+          <span>/ mes</span>
+        </div>
+        <div class="plan-desc">Perfecto para empezar y proyectos pequeños.</div>
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 2 scripts hosteados</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 5 ofuscaciones</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 100 keys (todos los scripts)</li>
+        </ul>
+        <!-- BOTÓN CORREGIDO A /login.html -->
+        <a href="/login.html" class="btn btn-ghost">Empezar gratis</a>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="plan featured">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">
+          <strong>$3</strong>
+          <span>/ mes</span>
+        </div>
+        <div class="plan-desc">Para desarrolladores serios que quieren crecer.</div>
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 10 scripts hosteados</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 30 ofuscaciones</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Keys ilimitadas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Anti-leak avanzado</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Soporte prioritario</li>
+        </ul>
+        <!-- BOTÓN CORREGIDO A /login.html -->
+        <a href="/login.html" class="btn btn-primary">Elegir Premium</a>
+      </div>
+
+      <!-- PREMIUM PLUS -->
+      <div class="plan">
+        <div class="plan-name">Premium Plus</div>
+        <div class="plan-price">
+          <strong>$5</strong>
+          <span>/ mes</span>
+        </div>
+        <div class="plan-desc">Todo ilimitado con seguridad de nivel empresarial.</div>
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Scripts ilimitados</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ofuscaciones ilimitadas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Keys ilimitadas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Seguridad extra</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Anti-debug reforzado</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Soporte 24/7</li>
+        </ul>
+        <!-- BOTÓN CORREGIDO A /login.html -->
+        <a href="/login.html" class="btn btn-ghost">Elegir Premium Plus</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section>
+  <div class="cta-final">
+    <h2>¿Listo para proteger tu script?</h2>
+    <p>Únete a más de 1.200 desarrolladores que ya confían en Vantarmor.</p>
+    <div class="hero-cta">
+      <!-- BOTÓN CORREGIDO A /login.html -->
+      <a href="/login.html" class="btn btn-primary btn-lg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        Comenzar ahora
+      </a>
+      <a href="https://discord.gg/ex9rNMqc" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">
+        Unirse al Discord
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo"><img src="https://files.catbox.moe/qxl7dn.png" alt="Vantarmor" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+      <span>Vantarmor</span>
+    </div>
+
+    <div class="footer-links">
+      <!-- ENLACES CORREGIDOS -->
+      <a href="/login.html">Dashboard</a>
+      <a href="/login.html">Login</a>
+      <a href="#features">Características</a>
+      <a href="#pricing">Precios</a>
+      <a href="https://discord.gg/ex9rNMqc" target="_blank" rel="noopener">Discord</a>
+    </div>
+  </div>
+
+  <div class="footer-copy">
+    © 2026 Vantarmor. Todos los derechos reservados.
+  </div>
+</footer>
+
 <script>
-(function(){
-  const data192="data:image/jpeg;base64,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";
-  const manifest={name:"ZX",short_name:"ZX",start_url:".",display:"standalone",background_color:"#000000",theme_color:"#000000",icons:[
-    {src:data192,sizes:"192x192",type:"image/jpeg",purpose:"any maskable"},
-    {src:data192,sizes:"512x512",type:"image/jpeg",purpose:"any maskable"}
-  ]};
-  const blob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
-  const mlink=document.createElement("link");
-  mlink.rel="manifest";
-  mlink.href=URL.createObjectURL(blob);
-  document.head.appendChild(mlink);
-
-  const modal=document.getElementById("modal");
-  const modalBody=document.getElementById("modalBody");
-  const modalTitle=document.getElementById("modalTitle");
-
-  function isIos(){
-    return /iphone|ipad|ipod/i.test(navigator.userAgent)||
-      (navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-  }
-
-  function uuid(){
-    if(crypto&&crypto.randomUUID) return crypto.randomUUID().toUpperCase();
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){
-      const r=Math.random()*16|0,v=c==="x"?r:(r&0x3|0x8);
-      return v.toString(16).toUpperCase();
-    });
-  }
-
-  /* Perfil estilo "anti-revoke" / sideload (como herramientas tipo David iOS):
-     bloquea dominios de Apple usados para comprobar/revocar certificados de apps instaladas fuera del App Store.
-     NO instala una web como app; ayuda con apps IPA sideload. */
-  function buildMobileconfig(){
-    const profileUUID=uuid();
-    const filterUUID=uuid();
-    const dnsUUID=uuid();
-    const deny=[
-      "ppq.apple.com",
-      "ocsp.apple.com",
-      "ocsp2.apple.com",
-      "crl.apple.com",
-      "certs.apple.com",
-      "valid.apple.com",
-      "appattest.apple.com",
-      "vpp.itunes.apple.com",
-      "mesu.apple.com"
-    ].map(d=>"      <string>"+d+"</string>").join("\n");
-
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>PayloadContent</key>
-  <array>
-    <dict>
-      <key>PayloadType</key>
-      <string>com.apple.webcontent-filter</string>
-      <key>PayloadVersion</key>
-      <integer>1</integer>
-      <key>PayloadIdentifier</key>
-      <string>com.zx.filter.blockapple</string>
-      <key>PayloadUUID</key>
-      <string>${filterUUID}</string>
-      <key>PayloadDisplayName</key>
-      <string>ZX Filter</string>
-      <key>PayloadDescription</key>
-      <string>Bloquea comprobaciones de revocación de Apple</string>
-      <key>PayloadOrganization</key>
-      <string>ZX</string>
-      <key>FilterType</key>
-      <string>BuiltIn</string>
-      <key>AutoFilterEnabled</key>
-      <false/>
-      <key>DenyList</key>
-      <array>
-${deny}
-      </array>
-    </dict>
-    <dict>
-      <key>DNSSettings</key>
-      <dict>
-        <key>DNSProtocol</key>
-        <string>HTTPS</string>
-        <key>ServerURL</key>
-        <string>https://cloudflare-dns.com/dns-query</string>
-        <key>ServerAddresses</key>
-        <array>
-          <string>1.1.1.1</string>
-          <string>1.0.0.1</string>
-        </array>
-      </dict>
-      <key>PayloadDescription</key>
-      <string>DNS cifrado Cloudflare</string>
-      <key>PayloadDisplayName</key>
-      <string>ZX DNS</string>
-      <key>PayloadIdentifier</key>
-      <string>com.zx.dns.settings</string>
-      <key>PayloadType</key>
-      <string>com.apple.dnsSettings.managed</string>
-      <key>PayloadUUID</key>
-      <string>${dnsUUID}</string>
-      <key>PayloadVersion</key>
-      <integer>1</integer>
-      <key>Name</key>
-      <string>ZX DNS</string>
-      <key>PayloadOrganization</key>
-      <string>ZX</string>
-    </dict>
-  </array>
-  <key>PayloadDescription</key>
-  <string>Perfil ZX: filtro anti-revocación + DNS (estilo sideload iOS).</string>
-  <key>PayloadDisplayName</key>
-  <string>ZX Profile</string>
-  <key>PayloadIdentifier</key>
-  <string>com.zx.profile</string>
-  <key>PayloadOrganization</key>
-  <string>ZX</string>
-  <key>PayloadRemovalDisallowed</key>
-  <false/>
-  <key>PayloadType</key>
-  <string>Configuration</string>
-  <key>PayloadUUID</key>
-  <string>${profileUUID}</string>
-  <key>PayloadVersion</key>
-  <integer>1</integer>
-</dict>
-</plist>`;
-  }
-
-  function downloadProfile(){
-    const xml=buildMobileconfig();
-    const file=new Blob([xml],{type:"application/x-apple-aspen-config"});
-    const url=URL.createObjectURL(file);
-    const a=document.createElement("a");
-    a.href=url;
-    a.download="ZX-Profile.mobileconfig";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 2500);
-  }
-
-  document.getElementById("installBtn").addEventListener("click", function(){
-    downloadProfile();
-    modalTitle.textContent="Instalar perfil ZX";
-    if(isIos()){
-      modalBody.innerHTML=
-        "<p>Se descargó <b>ZX-Profile.mobileconfig</b> (filtro + DNS, estilo sideload / anti-revoke).</p>"+
-        "<ol>"+
-        "<li>Abre <b>Ajustes</b>.</li>"+
-        "<li>Toca <b>Perfil descargado</b> (arriba).</li>"+
-        "<li><b>Instalar</b> → código → confirmar.</li>"+
-        "<li>Opcional: <b>Ajustes → General → VPN y gestión de dispositivos</b>.</li>"+
-        "</ol>"+
-        "<p style=\"color:#888;font-size:12px\">Esto <b>no</b> convierte una web en app. Sirve para apps IPA instaladas fuera del App Store (bloqueo de comprobaciones de Apple). Úsalo bajo tu responsabilidad.</p>";
-    }else{
-      modalBody.innerHTML=
-        "<p>Se descargó el perfil para <b>iPhone/iPad</b>.</p>"+
-        "<p>Ábrelo en un iPhone con <b>Safari</b> e instálalo en Ajustes.</p>"+
-        "<p style=\"color:#888;font-size:12px\">En Android este método de perfil no aplica igual.</p>";
-    }
-    modal.classList.add("show");
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
   });
 
-  document.getElementById("modalClose").onclick=function(){ modal.classList.remove("show"); };
-  modal.addEventListener("click",function(e){ if(e.target===modal) modal.classList.remove("show"); });
-})();
+  document.querySelectorAll('.feature').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--mx', x + '%');
+      card.style.setProperty('--my', y + '%');
+    });
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const offset = 80;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature, .step, .plan').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity .6s ease, transform .6s ease';
+    observer.observe(el);
+  });
 </script>
 </body>
 </html>
