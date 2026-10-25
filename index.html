@@ -1529,7 +1529,7 @@
     <div class="panel-view" id="view-obfuscate">
       <button type="button" class="panel-back" data-back>← Volver</button>
       <h1 class="panel-title">Ofuscar</h1>
-      <p class="panel-sub">Pega tu código Lua o carga un archivo .lua/.txt. El resultado conserva los identificadores y cadenas para evitar romper APIs del entorno.</p>
+      <p class="panel-sub">Pega tu Lua o carga un archivo. Se genera un wrapper VM con el código empaquetado; para ejecutarlo, el entorno debe permitir loadstring o load.</p>
       <div class="panel-form">
         <label for="obfFile">Código original · pegar o cargar archivo</label>
         <div class="obf-file-row">
@@ -1797,74 +1797,78 @@
     }
   });
 
-  // OBFUSCATE: eliminar comentarios sin renombrar identificadores ni tocar cadenas.
-  // Es intencionalmente conservador para no romper globals, APIs, claves de tablas o LuaU.
-  function stripLuaComments(source) {
-    let out = '';
-    let i = 0;
-    const longBracketAt = (text, pos) => {
-      const match = text.slice(pos).match(/^\[(=*)\[/);
-      return match ? { openLength: match[0].length, close: ']' + match[1] + ']' } : null;
+  // VM obfuscator: empaqueta el fuente en bytes con clave por ejecución y genera
+  // un pequeño dispatcher bytecode (decodificar -> compilar -> ejecutar).
+  // El runtime nativo de Lua/Luau compila el fuente recuperado para conservar su semántica.
+  function obfuscateLuaWithVM(source) {
+    const randomBytes = new Uint32Array(16);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(randomBytes);
+    } else {
+      for (let i = 0; i < randomBytes.length; i++) randomBytes[i] = Math.floor(Math.random() * 0x100000000);
+    }
+    let randomIndex = 0;
+    const randomInt = max => {
+      const value = randomIndex < randomBytes.length ? randomBytes[randomIndex++] : Math.floor(Math.random() * 0x100000000);
+      return value % max;
     };
-    const keepLineBreaks = text => text.replace(/[^\r\n]/g, ' ');
+    let nameSerial = 0;
+    const identifier = () => '_v' + randomInt(0xFFFFFF).toString(36) + (nameSerial++).toString(36);
+    const names = Array.from({length: 12}, identifier);
+    const [payload, program, pc, instruction, stack, sourceVar, fn, env, loader, err, buffer, index] = names;
 
-    // Lua acepta una línea shebang al inicio de un archivo ejecutado como script.
-    if (source.startsWith('#!')) {
-      const newline = source.indexOf('\n');
-      const end = newline === -1 ? source.length : newline;
-      out += keepLineBreaks(source.slice(0, end));
-      i = end;
+    let bytes;
+    if (window.TextEncoder) {
+      bytes = Array.from(new TextEncoder().encode(source));
+    } else {
+      const utf8 = unescape(encodeURIComponent(source));
+      bytes = Array.from(utf8, ch => ch.charCodeAt(0));
     }
-
-    while (i < source.length) {
-      const ch = source[i];
-
-      // Cadenas cortas: conservar literalmente, incluidos escapes y comentarios internos.
-      if (ch === '"' || ch === "'") {
-        const quote = ch;
-        const begin = i++;
-        while (i < source.length) {
-          if (source[i] === '\\') { i += 2; continue; }
-          if (source[i] === quote) { i++; break; }
-          i++;
-        }
-        out += source.slice(begin, i);
-        continue;
-      }
-
-      // Cadenas largas [=[ ... ]=], con cualquier número de signos '='.
-      const longString = ch === '[' ? longBracketAt(source, i) : null;
-      if (longString) {
-        const begin = i;
-        const contentStart = i + longString.openLength;
-        const closeAt = source.indexOf(longString.close, contentStart);
-        i = closeAt === -1 ? source.length : closeAt + longString.close.length;
-        out += source.slice(begin, i);
-        continue;
-      }
-
-      // Comentarios de Lua: -- línea o --[=[ bloque ]=].
-      if (source.startsWith('--', i)) {
-        const longComment = longBracketAt(source, i + 2);
-        if (longComment) {
-          const contentStart = i + 2 + longComment.openLength;
-          const closeAt = source.indexOf(longComment.close, contentStart);
-          const end = closeAt === -1 ? source.length : closeAt + longComment.close.length;
-          out += keepLineBreaks(source.slice(i, end));
-          i = end;
-        } else {
-          const begin = i;
-          while (i < source.length && source[i] !== '\n' && source[i] !== '\r') i++;
-          // El espacio evita unir tokens que estaban separados por el comentario.
-          out += ' ' + keepLineBreaks(source.slice(begin, i));
-        }
-        continue;
-      }
-
-      out += ch;
-      i++;
+    const key = 1 + randomInt(254);
+    const multiplier = 1 + randomInt(249);
+    const encoded = bytes.map((byte, i) => (byte + key + (((i + 1) * multiplier) % 251)) % 256);
+    const opcodes = [];
+    while (opcodes.length < 3) {
+      const candidate = 40 + randomInt(200);
+      if (!opcodes.includes(candidate)) opcodes.push(candidate);
     }
-    return out;
+    const [decodeOp, compileOp, executeOp] = opcodes;
+    const vmName = identifier();
+
+    return `-- ZYOX VM wrapper | payload empaquetado\nreturn (function(...)\n` +
+`local ${payload}={${encoded.join(',')}}\n` +
+`local ${program}={{${decodeOp}},{${compileOp}},{${executeOp}}}\n` +
+`local ${stack}={}\nlocal ${pc}=1\n` +
+`while ${pc}<=#${program} do\n` +
+`  local ${instruction}=${program}[${pc}][1]\n` +
+`  if ${instruction}==${decodeOp} then\n` +
+`    local ${buffer}={}\n` +
+`    for ${index}=1,#${payload} do\n` +
+`      ${buffer}[${index}]=string.char((${payload}[${index}]-${key}-(((${index}*${multiplier})%251)))%256)\n` +
+`    end\n` +
+`    ${stack}[#${stack}+1]=table.concat(${buffer})\n` +
+`  elseif ${instruction}==${compileOp} then\n` +
+`    local ${sourceVar}=${stack}[#${stack}]\n    ${stack}[#${stack}]=nil\n` +
+`    local ${env}=(getfenv and getfenv(1)) or _ENV or _G\n` +
+`    local ${fn},${err}\n` +
+`    if loadstring then\n` +
+`      ${fn},${err}=loadstring(${sourceVar},"@${vmName}")\n` +
+`    elseif load then\n` +
+`      ${fn},${err}=load(${sourceVar},"@${vmName}","t",${env})\n` +
+`    else\n` +
+`      error("ZYOX VM: este entorno no permite loadstring/load",0)\n` +
+`    end\n` +
+`    if not ${fn} then error(${err},0) end\n` +
+`    if setfenv then setfenv(${fn},${env}) end\n` +
+`    ${stack}[#${stack}+1]=${fn}\n` +
+`  elseif ${instruction}==${executeOp} then\n` +
+`    local ${fn}=${stack}[#${stack}]\n    ${stack}[#${stack}]=nil\n` +
+`    return ${fn}(...)\n` +
+`  else\n` +
+`    error("ZYOX VM: opcode inválido",0)\n` +
+`  end\n` +
+`  ${pc}=${pc}+1\n` +
+`end\n)(...)`;
   }
 
   let obfSourceFilename = '';
@@ -1905,8 +1909,8 @@
       return;
     }
     try {
-      obfOutput.value = stripLuaComments(src);
-      obfStatus.textContent = 'Listo. Se conservaron los nombres y cadenas para mantener compatibilidad. Copia o descarga el .lua para ejecutarlo en tu entorno Lua.';
+      obfOutput.value = obfuscateLuaWithVM(src);
+      obfStatus.textContent = 'VM generada. El fuente está empaquetado como bytes; ejecuta el .lua en un entorno que permita loadstring o load.';
       bumpStat('obfuscations');
     } catch (err) {
       obfStatus.textContent = 'No se pudo procesar el código. Revisa que el archivo sea texto Lua válido.';
