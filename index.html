@@ -1105,7 +1105,8 @@
 
   /* ── Bloqueo: sin zoom, sin movimiento, sin cambios de tamaño ── */
   html, body { max-width: 100%; overflow-x: hidden; overscroll-behavior: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-  html, body, * { touch-action: pan-y; }
+  html, body { touch-action: pan-y; }
+  * { touch-action: pan-y; }
   input, textarea, select { font-size: 16px; touch-action: manipulation; }
   body::before, body::after { display: none !important; animation: none !important; }
   *, *::before, *::after { animation: none !important; }
@@ -1897,12 +1898,28 @@
   })();
 
 
-  // bloquear zoom por gestos
-  ['gesturestart','gesturechange','gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
-  document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
-  let _lt = 0;
-  document.addEventListener('touchend', e => { const n = Date.now(); if (n - _lt < 300) e.preventDefault(); _lt = n; }, { passive: false });
-  document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  // bloquear zoom por gestos (también mientras se hace scroll)
+  (function(){
+    const opt = { passive: false, capture: true };
+    const stop = e => { e.preventDefault(); e.stopPropagation(); };
+    [window, document].forEach(t => ['gesturestart','gesturechange','gestureend'].forEach(ev => t.addEventListener(ev, stop, opt)));
+    ['touchstart','touchmove'].forEach(ev => window.addEventListener(ev, e => {
+      if (e.touches && e.touches.length > 1 && e.cancelable) e.preventDefault();
+    }, opt));
+    let lt = 0;
+    window.addEventListener('touchend', e => { const n = Date.now(); if (n - lt < 350 && e.cancelable) e.preventDefault(); lt = n; }, opt);
+    window.addEventListener('wheel', e => { if (e.ctrlKey && e.cancelable) e.preventDefault(); }, opt);
+    // si aun así hay zoom, volver a escala 1 al instante
+    const meta = document.querySelector('meta[name="viewport"]');
+    const content = meta.getAttribute('content');
+    function reset() {
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1.0001');
+      requestAnimationFrame(() => meta.setAttribute('content', content));
+    }
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => { if (window.visualViewport.scale > 1.001) reset(); });
+    }
+  })();
 </script>
 </body>
 </html>
