@@ -143,6 +143,21 @@
     letter-spacing: 1px;
     cursor: pointer;
   }
+  #panel-script { display: none; min-height: 100vh; padding: 24px; }
+  .script-titulo { font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
+  .script-caja {
+    min-height: 140px;
+    background: #1a1a22;
+    border: 1px solid #2c2c38;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #9a9aa8;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
   .gift-panel select {
     width: 100%;
     margin-bottom: 10px;
@@ -234,6 +249,14 @@
     <button type="button" class="panel-btn" data-panel="BLOCK SPIN">BLOCK SPIN</button>
     <div id="panel-msg"></div>
     <button type="button" class="volver" id="volver">VOLVER</button>
+  </div>
+</main>
+
+<main id="panel-script">
+  <div class="panel-wrap">
+    <div class="script-titulo">SCRIPT:</div>
+    <div class="script-caja" id="script-caja"></div>
+    <button type="button" class="volver" id="volver2">VOLVER</button>
   </div>
 </main>
 
@@ -340,6 +363,11 @@
       pmsg.className = "ok";
       pmsg.textContent = "Elegiste: " + btn.dataset.panel;
 
+      setTimeout(function () {
+        document.getElementById("panel-acceso").style.display = "none";
+        document.getElementById("panel-script").style.display = "block";
+      }, 700);
+
       fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -358,6 +386,11 @@
 
   document.getElementById("volver").addEventListener("click", function () {
     document.getElementById("panel-acceso").style.display = "none";
+    document.getElementById("contenido").style.display = "block";
+  });
+
+  document.getElementById("volver2").addEventListener("click", function () {
+    document.getElementById("panel-script").style.display = "none";
     document.getElementById("contenido").style.display = "block";
   });
 
