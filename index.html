@@ -337,7 +337,7 @@
   // URL de tu Worker
   const API = "https://zyox-api.zyoxkeys.workers.dev";
   let reqId = null, pollTimer = null;
-  let accessTimer = null, accessRenewTimer = null, currentAccess = null;
+  let accessTimer = null, accessRenewTimer = null, currentAccess = null, scriptParaCopiar = "";
   try { reqId = localStorage.getItem("zyox_req"); } catch (e) {}
 
   function mostrarPanelAcceso() {
@@ -436,6 +436,7 @@
     const status = document.getElementById("key-status");
     const caja = document.getElementById("script-caja");
     const script = construirScript(panel, access);
+    scriptParaCopiar = script.replace(/[\r\n]+/g, "");
     if (script) {
       caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 1 día y se renueva automáticamente.\n\n" + script;
     }
@@ -472,6 +473,7 @@
     document.getElementById("panel-script").style.display = "block";
 
     const script = construirScript(panel, access);
+    scriptParaCopiar = script.replace(/[\r\n]+/g, "");
     const caja = document.getElementById("script-caja");
     const btnCopiar = document.getElementById("copiar-script");
     const msg = document.getElementById("copiar-msg");
@@ -490,7 +492,7 @@
 
   const botonCopiar = document.getElementById("copiar-script");
   if (botonCopiar) botonCopiar.addEventListener("click", async function () {
-    const texto = document.getElementById("script-caja").textContent;
+    const texto = scriptParaCopiar || document.getElementById("script-caja").textContent.replace(/[\r\n]+/g, "");
     const msg = document.getElementById("copiar-msg");
     try {
       if (navigator.clipboard && window.isSecureContext) {
