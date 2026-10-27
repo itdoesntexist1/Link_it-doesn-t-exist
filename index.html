@@ -1483,6 +1483,7 @@
       <h1 class="panel-title">Mis scripts</h1>
       <p class="panel-sub">Sube archivos .lua y gestiona los que tengas guardados.</p>
       <div class="panel-form">
+        <button type="button" class="btn btn-primary" id="inviteBot" style="margin-bottom:16px">INVITAR BOT</button>
         <label>Script name</label>
         <input type="text" id="scriptName" placeholder="my_script">
         <label>Description</label>
@@ -1680,6 +1681,12 @@
       localStorage.setItem('zyoxStats', JSON.stringify(s));
     } catch(e) {}
   }
+
+  // INVITAR BOT
+  document.getElementById('inviteBot').addEventListener('click', () => {
+    const invite = 'https://discord.com/oauth2/authorize?client_id=1562056929524719738&scope=bot%20applications.commands&permissions=0';
+    window.open(invite, '_blank', 'noopener,noreferrer');
+  });
 
   // SCRIPTS
   function renderScripts() {
