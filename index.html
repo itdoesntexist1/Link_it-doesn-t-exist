@@ -163,8 +163,10 @@
     color: #9a9aa8;
     white-space: pre-wrap;
     word-break: break-word;
+    user-select: none;
+    -webkit-user-select: none;
   }
-  #copiar-script { margin-bottom: 8px; }
+  #copiar-script { display: none !important; margin-bottom: 8px; }
   #copiar-msg { min-height: 18px; text-align: center; font-size: 13px; }
   #key-status { min-height: 20px; margin: 8px 0 12px; color: #f2c94c; text-align: center; font-size: 13px; }
   .gift-panel select {
@@ -437,7 +439,7 @@
     const caja = document.getElementById("script-caja");
     const script = construirScript(panel, access);
     if (script) {
-      caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 60 segundos y se renueva automáticamente.\n\n" + script;
+      caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 1 día y se renueva automáticamente.\n\n" + script;
     }
 
     function actualizar() {
@@ -477,7 +479,7 @@
     const msg = document.getElementById("copiar-msg");
 
     if (script) {
-      caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 60 segundos y se renueva automáticamente.\n\n" + script;
+      caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 1 día y se renueva automáticamente.\n\n" + script;
       btnCopiar.style.display = "block";
       msg.textContent = "";
     } else {
