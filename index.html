@@ -341,17 +341,16 @@
   try { reqId = localStorage.getItem("zyox_req"); } catch (e) {}
 
   function mostrarPanelAcceso() {
+    clearInterval(pollTimer);
+    panelElegido = false;
     document.getElementById("contenido").style.display = "none";
     document.getElementById("panel-acceso").style.display = "block";
   }
 
   function esperarAprobacion() {
     const msg = document.getElementById("gift-msg");
-    document.getElementById("gift-enviar").disabled = true;
-    document.getElementById("gift-codigo").disabled = true;
-    document.getElementById("gift-tipo").disabled = true;
     msg.className = "";
-    msg.textContent = "Solicitud enviada. Esperando aprobación...";
+    msg.textContent = "Comprobando estado...";
     clearInterval(pollTimer);
     function revisar() {
       fetch(API + "/status?id=" + encodeURIComponent(reqId))
@@ -367,6 +366,12 @@
             } else {
               mostrarPanelAcceso();
             }
+          } else if (d.status === "pending") {
+            document.getElementById("gift-enviar").disabled = true;
+            document.getElementById("gift-codigo").disabled = true;
+            document.getElementById("gift-tipo").disabled = true;
+            msg.className = "";
+            msg.textContent = "Solicitud enviada. Esperando aprobación...";
           } else if (d.status === "unknown") {
             // Fue revocado o expiró
             clearInterval(pollTimer);
