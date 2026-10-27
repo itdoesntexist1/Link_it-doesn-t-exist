@@ -254,7 +254,7 @@
     <button type="button" class="panel-btn" data-panel="STEAL A BRAINROT">STEAL A BRAINROT</button>
     <button type="button" class="panel-btn" data-panel="BLOCK SPIN">BLOCK SPIN</button>
     <div id="panel-msg"></div>
-    <button type="button" class="volver" id="volver">VOLVER</button>
+    
   </div>
 </main>
 
@@ -262,11 +262,30 @@
   <div class="panel-wrap">
     <div class="script-titulo">SCRIPT:</div>
     <div class="script-caja" id="script-caja"></div>
-    <button type="button" class="volver" id="volver2">VOLVER</button>
+    
   </div>
 </main>
 
 <script>
+  // Bloqueo fuerte de zoom
+  document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener("gesturechange", function (e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener("gestureend", function (e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener("touchmove", function (e) {
+    if (e.scale !== undefined && e.scale !== 1) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener("wheel", function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && ["+", "-", "=", "0"].indexOf(e.key) !== -1) e.preventDefault();
+  });
+  // Evitar doble-tap zoom en iOS
+  var lastTouch = 0;
+  document.addEventListener("touchend", function (e) {
+    var now = Date.now();
+    if (now - lastTouch <= 300) e.preventDefault();
+    lastTouch = now;
+  }, { passive: false });
+
   const PASSWORD = "ZYOX";
 
   function mostrarContenido() {
@@ -332,6 +351,8 @@
   function esperarAprobacion() {
     const msg = document.getElementById("gift-msg");
     document.getElementById("gift-enviar").disabled = true;
+    document.getElementById("gift-codigo").disabled = true;
+    document.getElementById("gift-tipo").disabled = true;
     msg.className = "";
     msg.textContent = "Solicitud enviada. Esperando aprobación...";
     clearInterval(pollTimer);
@@ -341,19 +362,39 @@
         .then(function (d) {
           if (d.status === "approved") {
             clearInterval(pollTimer);
-            mostrarPanelAcceso();
+            if (d.panel) {
+              // Ya eligió panel → ir directo al script y bloquear
+              mostrarScriptBloqueado(d.panel);
+            } else {
+              mostrarPanelAcceso();
+            }
           } else if (d.status === "unknown") {
+            // Fue revocado o expiró
             clearInterval(pollTimer);
             try { localStorage.removeItem("zyox_req"); } catch (e) {}
             reqId = null;
             document.getElementById("gift-enviar").disabled = false;
+            document.getElementById("gift-codigo").disabled = false;
+            document.getElementById("gift-tipo").disabled = false;
             msg.textContent = "";
+            // Volver a pantalla principal
+            document.getElementById("panel-script").style.display = "none";
+            document.getElementById("panel-acceso").style.display = "none";
+            document.getElementById("contenido").style.display = "block";
           }
         })
         .catch(function () {});
     }
     pollTimer = setInterval(revisar, 4000);
     revisar();
+  }
+
+  function mostrarScriptBloqueado(panel) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("contenido").style.display = "none";
+    document.getElementById("panel-acceso").style.display = "none";
+    document.getElementById("panel-script").style.display = "block";
+    document.getElementById("script-caja").textContent = "Panel: " + panel + "\n\nEsperando script...";
   }
 
   document.getElementById("gift-enviar").addEventListener("click", function () {
@@ -401,38 +442,18 @@
       btn.classList.add("sel");
       const pmsg = document.getElementById("panel-msg");
       pmsg.className = "ok";
-      pmsg.textContent = "Elegiste: " + btn.dataset.panel;
-
-      setTimeout(function () {
-        document.getElementById("panel-acceso").style.display = "none";
-        document.getElementById("panel-script").style.display = "block";
-      }, 700);
+      pmsg.textContent = "Elegiste: " + btn.dataset.panel + " (no se puede cambiar)";
 
       fetch(API + "/panel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: reqId, panel: btn.dataset.panel })
       }).catch(function () {});
+
+      setTimeout(function () {
+        mostrarScriptBloqueado(btn.dataset.panel);
+      }, 700);
     });
-  });
-
-  document.getElementById("volver").addEventListener("click", function () {
-    document.getElementById("panel-acceso").style.display = "none";
-    document.getElementById("contenido").style.display = "block";
-  });
-
-  document.getElementById("volver2").addEventListener("click", function () {
-    document.getElementById("panel-script").style.display = "none";
-    document.getElementById("contenido").style.display = "block";
-  });
-
-  // Bloquear zoom / cambio de tamaño
-  ["gesturestart", "gesturechange", "gestureend"].forEach(function (ev) {
-    document.addEventListener(ev, function (e) { e.preventDefault(); });
-  });
-  document.addEventListener("wheel", function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
-  document.addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && ["+", "-", "=", "0"].indexOf(e.key) !== -1) e.preventDefault();
   });
 
   document.getElementById("form").addEventListener("submit", function (e) {
