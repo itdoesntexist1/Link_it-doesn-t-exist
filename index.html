@@ -1470,8 +1470,7 @@
       <h1 class="panel-title">Panel ZYOX</h1>
       <p class="panel-sub">Sesión iniciada con Discord. Elige una opción.</p>
       <div class="panel-grid">
-        <div class="panel-card" data-act="scripts"><div class="ico">📜</div><h3>Mis scripts</h3><p>Sube y gestiona tus archivos .lua</p></div>
-        <div class="panel-card" data-act="obfuscate"><div class="ico">🔒</div><h3>Ofuscar</h3><p>Protege tu código con ofuscación</p></div>
+        <div class="panel-card" data-act="scripts"><div class="ico">📜</div><h3>Mis scripts</h3><p>Sube y gestiona tus archivos .lua</p></div><h3>Ofuscar</h3><p>Protege tu código con ofuscación</p></div>
         <div class="panel-card" data-act="keys"><div class="ico">🔑</div><h3>Keys / licencias</h3><p>Genera y revoca keys HWID</p></div>
         <div class="panel-card" data-act="stats"><div class="ico">📊</div><h3>Estadísticas</h3><p>Uso, conexiones e intentos</p></div>
         <div class="panel-card" data-act="settings"><div class="ico">⚙️</div><h3>Ajustes</h3><p>Cuenta y preferencias</p></div>
@@ -1493,21 +1492,6 @@
       </div>
       <h3 style="margin:24px 0 12px;font-size:15px">Guardados</h3>
       <div class="panel-list" id="scriptList"></div>
-    </div>
-
-    <!-- OBFUSCATE -->
-    <div class="panel-view" id="view-obfuscate">
-      <button type="button" class="panel-back" data-back>← Volver</button>
-      <h1 class="panel-title">Ofuscar</h1>
-      <p class="panel-sub">Pega tu Lua y genera una versión ofuscada (local).</p>
-      <div class="panel-form">
-        <label>Código original</label>
-        <textarea id="obfInput" placeholder="print('hola')"></textarea>
-        <button type="button" class="btn btn-primary" id="obfRun">Ofuscar</button>
-        <label style="margin-top:16px">Resultado</label>
-        <textarea id="obfOutput" placeholder="Aquí saldrá el código ofuscado" readonly></textarea>
-        <button type="button" class="btn btn-ghost" id="obfCopy">Copiar resultado</button>
-      </div>
     </div>
 
     <!-- KEYS -->
@@ -1598,7 +1582,7 @@
 
   // ── Discord session + panel ──
   const DISCORD_CLIENT_ID = '1562056929524719738';
-  const DISCORD_REDIRECT_URI = 'https://itdoesntexist1.github.io/Link_it-doesn-t-exist/';
+  const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
   const SESSION_KEY = 'zyoxDiscordSession';
 
   function parseTokenFromHash() {
@@ -1755,47 +1739,6 @@
     }
   });
 
-  // OBFUSCATE (simple client-side)
-  function obfuscateLua(src) {
-    const strings = [];
-    let code = src.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, m => {
-      strings.push(m);
-      return `__S${strings.length-1}__`;
-    });
-    const keywords = new Set(['and','break','do','else','elseif','end','false','for','function','goto','if','in','local','nil','not','or','repeat','return','then','true','until','while']);
-    const map = {};
-    let n = 0;
-    code = code.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b/g, (m) => {
-      if (keywords.has(m)) return m;
-      if (/^__S\d+__$/.test(m)) return m;
-      if (!(m in map)) map[m] = '_' + (n++).toString(36);
-      return map[m];
-    });
-    // scramble strings to byte tables lightly
-    code = code.replace(/__S(\d+)__/g, (_, i) => {
-      const raw = strings[+i];
-      const quote = raw[0];
-      const inner = raw.slice(1, -1);
-      try {
-        const bytes = Array.from(inner).map(c => c.charCodeAt(0));
-        return `(function()local t={${bytes.join(',')}}local s=""for i=1,#t do s=s..string.char(t[i])end return s end)()`;
-      } catch(e) { return raw; }
-    });
-    return '-- ZYOX obfuscated\n' + code;
-  }
-  document.getElementById('obfRun').addEventListener('click', () => {
-    const src = document.getElementById('obfInput').value;
-    if (!src.trim()) { alert('Pega código Lua.'); return; }
-    document.getElementById('obfOutput').value = obfuscateLua(src);
-    bumpStat('obfuscations');
-  });
-  document.getElementById('obfCopy').addEventListener('click', async () => {
-    const t = document.getElementById('obfOutput').value;
-    if (!t) return;
-    try { await navigator.clipboard.writeText(t); alert('Copiado.'); }
-    catch(e) { alert('No se pudo copiar.'); }
-  });
-
   // KEYS
   function genKeyStr() {
     const part = () => Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -1848,7 +1791,6 @@
     row.innerHTML = [
       ['Scripts', scripts],
       ['Keys', keys],
-      ['Ofuscaciones', s.obfuscations || 0],
       ['Scripts guardados', s.scriptsSaved || 0],
       ['Keys generadas', s.keysGenerated || 0],
     ].map(([l,v]) => `<div class="stat-box"><strong>${v}</strong><span>${l}</span></div>`).join('');
