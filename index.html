@@ -970,6 +970,11 @@
     border-color: var(--border-3);
   }
   .panel-list { display: flex; flex-direction: column; gap: 10px; }
+  .script-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 2px 0 16px; }
+  .script-actions .btn { flex: 1 1 240px; min-height: 44px; white-space: normal; }
+  .script-status { min-height: 20px; margin: 4px 0 12px; color: var(--text-dim); font-size: 12px; }
+  .script-status.ok { color: var(--ok); }
+  .script-status.error { color: var(--danger); }
   .panel-item {
     background: var(--panel-2);
     border: 1px solid var(--border);
@@ -1492,7 +1497,16 @@
         <textarea id="scriptCode" placeholder="-- paste your Lua code here"></textarea>
         <label>Upload file</label>
         <input type="file" id="scriptFile" accept=".lua,.txt,text/plain" style="margin-bottom:14px">
-        <button type="button" class="btn btn-primary" id="scriptSave">SAVE</button>
+        <label>Worker URL para el loadstring</label>
+        <input type="url" id="scriptWorkerUrl" placeholder="https://tu-worker.workers.dev">
+        <div class="script-actions">
+          <button type="button" class="btn btn-primary" id="scriptSave">SAVE</button>
+          <button type="button" class="btn btn-ghost" id="scriptObfuscate">OBFUSCATE AND LOADSTRING</button>
+          <button type="button" class="btn btn-ghost" id="scriptConfigSave">GUARDAR CONFIGURACIÓN PARA SUBIR EL PANEL</button>
+        </div>
+        <div id="scriptStatus" class="script-status" role="status"></div>
+        <label>Loadstring generado</label>
+        <textarea id="scriptLoadstring" readonly placeholder="Aquí aparecerá el loadstring después de ofuscar el script."></textarea>
       </div>
       <h3 style="margin:24px 0 12px;font-size:15px">Guardados</h3>
       <div class="panel-list" id="scriptList"></div>
@@ -1539,6 +1553,7 @@
   </div>
 </div>
 
+<script src="./zyox-prometheus.js"></script>
 <script>
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
@@ -1709,6 +1724,17 @@
   function escapeHtmlPanel(s) {
     return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
+  let lastObfuscatedScript = '';
+  let lastGeneratedLoadstring = '';
+  function setScriptStatus(message, type) {
+    const el = document.getElementById('scriptStatus');
+    el.textContent = message || '';
+    el.className = 'script-status' + (type ? ' ' + type : '');
+  }
+  function makeLoadstring(workerUrl) {
+    const base = (workerUrl || window.location.origin).trim().replace(/\/+$/, '');
+    return 'script_key="TU_KEY"; script_base_url="' + base + '";\nloadstring(game:HttpGet("' + base + '/payload?key="..script_key))()';
+  }
   document.getElementById('scriptFile').addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
@@ -1720,6 +1746,54 @@
       }
     };
     r.readAsText(f);
+  });
+  document.getElementById('scriptObfuscate').addEventListener('click', async () => {
+    const code = document.getElementById('scriptCode').value;
+    const file = document.getElementById('scriptFile').files[0];
+    if (!code.trim()) { setScriptStatus('Primero pega o sube un script LuaU.', 'error'); return; }
+    if (typeof window.ZyoxPrometheusObfuscate !== 'function') {
+      setScriptStatus('No se cargó el bundle de Prometheus. Sube zyox-prometheus.js junto al HTML.', 'error');
+      return;
+    }
+    const button = document.getElementById('scriptObfuscate');
+    button.disabled = true;
+    setScriptStatus('Ofuscando con Prometheus LuaU…');
+    try {
+      const result = await window.ZyoxPrometheusObfuscate({
+        source: code,
+        filename: file?.name || (document.getElementById('scriptName').value.trim() || 'script') + '.lua',
+        preset: 'Medium'
+      });
+      if (!result.ok) throw new Error(result.error || 'Prometheus no pudo ofuscar el script.');
+      lastObfuscatedScript = result.output || '';
+      lastGeneratedLoadstring = makeLoadstring(document.getElementById('scriptWorkerUrl').value);
+      document.getElementById('scriptCode').value = lastObfuscatedScript;
+      document.getElementById('scriptLoadstring').value = lastGeneratedLoadstring;
+      setScriptStatus('Ofuscación terminada. Ya puedes guardar la configuración para el panel.', 'ok');
+    } catch (error) {
+      setScriptStatus('Error de Prometheus: ' + (error?.message || error), 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
+  document.getElementById('scriptConfigSave').addEventListener('click', () => {
+    const payload = lastObfuscatedScript || document.getElementById('scriptCode').value;
+    if (!payload.trim()) { setScriptStatus('Ofusca o sube un script antes de guardar la configuración.', 'error'); return; }
+    const config = {
+      name: document.getElementById('scriptName').value.trim() || 'script',
+      description: document.getElementById('scriptDescription').value.trim(),
+      workerUrl: document.getElementById('scriptWorkerUrl').value.trim() || window.location.origin,
+      payload,
+      loadstring: lastGeneratedLoadstring || makeLoadstring(document.getElementById('scriptWorkerUrl').value),
+      ts: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem('zyoxPanelConfig', JSON.stringify(config));
+      document.getElementById('scriptLoadstring').value = config.loadstring;
+      setScriptStatus('Configuración guardada para subir el panel.', 'ok');
+    } catch (error) {
+      setScriptStatus('No se pudo guardar la configuración local: ' + (error?.message || error), 'error');
+    }
   });
   document.getElementById('scriptSave').addEventListener('click', () => {
     const name = document.getElementById('scriptName').value.trim() || 'script';
