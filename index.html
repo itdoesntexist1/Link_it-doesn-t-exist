@@ -164,6 +164,8 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  #copiar-script { margin-bottom: 8px; }
+  #copiar-msg { min-height: 18px; text-align: center; font-size: 13px; }
   .gift-panel select {
     width: 100%;
     margin-bottom: 10px;
@@ -262,6 +264,8 @@
   <div class="panel-wrap">
     <div class="script-titulo">SCRIPT:</div>
     <div class="script-caja" id="script-caja"></div>
+    <button type="button" class="panel-btn" id="copiar-script">COPIAR SCRIPT</button>
+    <div id="copiar-msg"></div>
     
   </div>
 </main>
@@ -407,7 +411,8 @@
     }
   }
 
-  document.getElementById("copiar-script").addEventListener("click", function () {
+  const botonCopiar = document.getElementById("copiar-script");
+  if (botonCopiar) botonCopiar.addEventListener("click", function () {
     const texto = document.getElementById("script-caja").textContent;
     const msg = document.getElementById("copiar-msg");
     if (navigator.clipboard && navigator.clipboard.writeText) {
