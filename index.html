@@ -1106,6 +1106,15 @@
   body.panel-mode footer {
     display: none !important;
   }
+  body:not(.panel-mode) .nav,
+  body:not(.panel-mode) .hero,
+  body:not(.panel-mode) section,
+  body:not(.panel-mode) footer {
+    display: none !important;
+  }
+  body:not(.panel-mode) #appPanel { display: block; position: relative; min-height: 100vh; }
+  #appPanel .panel-user img, #appPanel #panelLogout { display: none; }
+  #appPanel .panel-user span { font-size: 16px; }
 
 
   /* ── Bloqueo: sin zoom, sin movimiento, sin cambios de tamaño ── */
@@ -1473,7 +1482,7 @@
     <!-- HOME -->
     <div class="panel-view active" id="view-home">
       <h1 class="panel-title">Panel ZYOX</h1>
-      <p class="panel-sub">Sesión iniciada con Discord. Elige una opción.</p>
+      <p class="panel-sub">Administra tus scripts, keys, estadísticas y configuración.</p>
       <div class="panel-grid">
         <div class="panel-card" data-act="scripts"><div class="ico">📜</div><h3>Mis scripts</h3><p>Sube y gestiona tus archivos .lua</p></div>
         <div class="panel-card" data-act="keys"><div class="ico">🔑</div><h3>Keys / licencias</h3><p>Genera y revoca keys HWID</p></div>
@@ -1907,24 +1916,8 @@
     showView('home');
   });
 
-  (async function initAuth() {
-    const token = parseTokenFromHash();
-    if (token) {
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-      try {
-        const user = await fetchDiscordUser(token);
-        saveSession(user, token);
-        showPanel(user);
-        return;
-      } catch (e) {
-        clearSession();
-      }
-    }
-    const session = loadSession();
-    if (session && session.user) {
-      showPanel(session.user);
-    }
-  })();
+  // El dashboard se abre directamente; no requiere inicio de sesión con Discord.
+  showPanel({ username: 'Panel ZYOX' });
 
 
   // bloquear zoom por gestos (también mientras se hace scroll)
