@@ -163,10 +163,8 @@
     color: #9a9aa8;
     white-space: pre-wrap;
     word-break: break-word;
-    user-select: none;
-    -webkit-user-select: none;
   }
-  #copiar-script { display: none !important; margin-bottom: 8px; }
+  #copiar-script { margin-bottom: 8px; }
   #copiar-msg { min-height: 18px; text-align: center; font-size: 13px; }
   #key-status { min-height: 20px; margin: 8px 0 12px; color: #f2c94c; text-align: center; font-size: 13px; }
   .gift-panel select {
@@ -491,32 +489,30 @@
   }
 
   const botonCopiar = document.getElementById("copiar-script");
-  if (botonCopiar) botonCopiar.addEventListener("click", function () {
+  if (botonCopiar) botonCopiar.addEventListener("click", async function () {
     const texto = document.getElementById("script-caja").textContent;
     const msg = document.getElementById("copiar-msg");
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(texto).then(function () {
-        msg.style.color = "#43b581";
-        msg.textContent = "¡Copiado!";
-      }).catch(function () {
-        msg.style.color = "#ff6b6b";
-        msg.textContent = "No se pudo copiar";
-      });
-    } else {
-      // Fallback
-      var ta = document.createElement("textarea");
-      ta.value = texto;
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand("copy");
-        msg.style.color = "#43b581";
-        msg.textContent = "¡Copiado!";
-      } catch (e) {
-        msg.style.color = "#ff6b6b";
-        msg.textContent = "No se pudo copiar";
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = texto;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        if (!ok) throw new Error("copy failed");
       }
-      document.body.removeChild(ta);
+      msg.style.color = "#43b581";
+      msg.textContent = "¡Copiado!";
+    } catch (e) {
+      msg.style.color = "#ff6b6b";
+      msg.textContent = "No se pudo copiar. Mantén pulsado el texto para copiarlo.";
     }
   });
 
