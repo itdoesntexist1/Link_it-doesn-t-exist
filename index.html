@@ -166,6 +166,7 @@
   }
   #copiar-script { margin-bottom: 8px; }
   #copiar-msg { min-height: 18px; text-align: center; font-size: 13px; }
+  #key-status { min-height: 20px; margin: 8px 0 12px; color: #f2c94c; text-align: center; font-size: 13px; }
   .gift-panel select {
     width: 100%;
     margin-bottom: 10px;
@@ -266,6 +267,7 @@
     <div class="script-caja" id="script-caja"></div>
     <button type="button" class="panel-btn" id="copiar-script">COPIAR SCRIPT</button>
     <div id="copiar-msg"></div>
+    <div id="key-status"></div>
     
   </div>
 </main>
@@ -335,6 +337,7 @@
   // URL de tu Worker
   const API = "https://zyox-api.macielmancinas4.workers.dev";
   let reqId = null, pollTimer = null;
+  let accessTimer = null, accessRenewTimer = null, currentAccess = null;
   try { reqId = localStorage.getItem("zyox_req"); } catch (e) {}
 
   function mostrarPanelAcceso() {
@@ -356,9 +359,11 @@
         .then(function (d) {
           if (d.status === "approved") {
             clearInterval(pollTimer);
-            if (d.panel) {
+            if (d.panel && d.key) {
               // Ya eligió panel → ir directo al script y bloquear
-              mostrarScriptBloqueado(d.panel);
+              mostrarScriptBloqueado(d.panel, { key: d.key, expiresAt: d.expiresAt });
+            } else if (d.panel && d.keyExpired) {
+              cerrarSesionTemporal("La key expiró. Vuelve a iniciar el acceso.");
             } else {
               mostrarPanelAcceso();
             }
@@ -389,7 +394,57 @@
     "BLOCK SPIN": ""
   };
 
-  function mostrarScriptBloqueado(panel) {
+  function cerrarSesionTemporal(mensaje) {
+    clearInterval(accessTimer);
+    clearTimeout(accessRenewTimer);
+    const access = currentAccess;
+    currentAccess = null;
+    document.getElementById("panel-script").style.display = "none";
+    document.getElementById("panel-acceso").style.display = "none";
+    document.getElementById("contenido").style.display = "block";
+    document.getElementById("key-status").textContent = mensaje || "Sesión finalizada.";
+    if (access && reqId) {
+      fetch(API + "/expire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: reqId, key: access.key }),
+        keepalive: true
+      }).catch(function () {});
+    }
+  }
+
+  function iniciarTemporizador(panel, access) {
+    clearInterval(accessTimer);
+    clearTimeout(accessRenewTimer);
+    currentAccess = access;
+    const status = document.getElementById("key-status");
+
+    function actualizar() {
+      if (!currentAccess) return;
+      const restante = Math.max(0, currentAccess.expiresAt - Date.now());
+      status.textContent = "Key temporal: " + Math.ceil(restante / 1000) + " s restantes";
+      if (restante <= 0) cerrarSesionTemporal("La key expiró. El acceso fue cerrado.");
+    }
+
+    actualizar();
+    accessTimer = setInterval(actualizar, 1000);
+    accessRenewTimer = setTimeout(function renovar() {
+      if (!currentAccess || !reqId) return;
+      fetch(API + "/renew", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: reqId, key: currentAccess.key })
+      })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (d) {
+          if (!d.ok || !d.key || !d.expiresAt) throw new Error();
+          iniciarTemporizador(panel, { key: d.key, expiresAt: d.expiresAt });
+        })
+        .catch(function () { cerrarSesionTemporal("La key ya no es válida. El acceso fue cerrado."); });
+    }, Math.max(1000, access.expiresAt - Date.now() - 5000));
+  }
+
+  function mostrarScriptBloqueado(panel, access) {
     document.getElementById("login").style.display = "none";
     document.getElementById("contenido").style.display = "none";
     document.getElementById("panel-acceso").style.display = "none";
@@ -401,7 +456,7 @@
     const msg = document.getElementById("copiar-msg");
 
     if (script) {
-      caja.textContent = script;
+      caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 60 segundos y se renueva automáticamente.\n\n" + script;
       btnCopiar.style.display = "block";
       msg.textContent = "";
     } else {
@@ -409,6 +464,7 @@
       btnCopiar.style.display = "none";
       msg.textContent = "";
     }
+    iniciarTemporizador(panel, access);
   }
 
   const botonCopiar = document.getElementById("copiar-script");
@@ -478,11 +534,11 @@
   });
 
   let panelElegido = false;
-  document.querySelectorAll(".panel-btn").forEach(function (btn) {
+  document.querySelectorAll(".panel-btn[data-panel]").forEach(function (btn) {
     btn.addEventListener("click", function () {
       if (panelElegido) return;
       panelElegido = true;
-      document.querySelectorAll(".panel-btn").forEach(function (b) { b.classList.remove("sel"); b.disabled = true; });
+      document.querySelectorAll(".panel-btn[data-panel]").forEach(function (b) { b.classList.remove("sel"); b.disabled = true; });
       btn.classList.add("sel");
       const pmsg = document.getElementById("panel-msg");
       pmsg.className = "ok";
@@ -492,11 +548,20 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: reqId, panel: btn.dataset.panel })
-      }).catch(function () {});
-
-      setTimeout(function () {
-        mostrarScriptBloqueado(btn.dataset.panel);
-      }, 700);
+      })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (d) {
+          if (!d.ok || !d.key || !d.expiresAt) throw new Error();
+          setTimeout(function () {
+            mostrarScriptBloqueado(btn.dataset.panel, { key: d.key, expiresAt: d.expiresAt });
+          }, 700);
+        })
+        .catch(function () {
+          panelElegido = false;
+          document.querySelectorAll(".panel-btn[data-panel]").forEach(function (b) { b.disabled = false; });
+          pmsg.className = "err";
+          pmsg.textContent = "No se pudo crear la key temporal. Intenta de nuevo.";
+        });
     });
   });
 
