@@ -335,7 +335,7 @@
   });
 
   // URL de tu Worker
-  const API = "https://zyox-api.macielmancinas4.workers.dev";
+  const API = "https://zyox-api.zyoxkeys.workers.dev";
   let reqId = null, pollTimer = null;
   let accessTimer = null, accessRenewTimer = null, currentAccess = null;
   try { reqId = localStorage.getItem("zyox_req"); } catch (e) {}
@@ -389,10 +389,21 @@
   }
 
   const SCRIPTS = {
-    "STEAL A BRAINROT": 'loadstring(game:HttpGet("https://raw.githubusercontent.com/itdoesntexist1/Payloadv2./refs/heads/main/Payloadv2."))()',
+    "STEAL A BRAINROT": "",
     "ROBA UN HUEVO": "",
     "BLOCK SPIN": ""
   };
+
+  function construirScript(panel, access) {
+    if (panel === "STEAL A BRAINROT") {
+      // División simple de la URL: dificulta la lectura casual, pero no es cifrado.
+      const a = "https://zyox-api.";
+      const b = "zyoxkeys.workers.dev/";
+      const endpoint = a + b + "payload?key=" + encodeURIComponent(access.key);
+      return 'loadstring(game:HttpGet("' + endpoint + '"))()';
+    }
+    return SCRIPTS[panel] || "";
+  }
 
   function cerrarSesionTemporal(mensaje) {
     clearInterval(accessTimer);
@@ -418,6 +429,11 @@
     clearTimeout(accessRenewTimer);
     currentAccess = access;
     const status = document.getElementById("key-status");
+    const caja = document.getElementById("script-caja");
+    const script = construirScript(panel, access);
+    if (script) {
+      caja.textContent = "-- Key temporal: " + access.key + "\n-- Expira en 60 segundos y se renueva automáticamente.\n\n" + script;
+    }
 
     function actualizar() {
       if (!currentAccess) return;
@@ -450,7 +466,7 @@
     document.getElementById("panel-acceso").style.display = "none";
     document.getElementById("panel-script").style.display = "block";
 
-    const script = SCRIPTS[panel] || "";
+    const script = construirScript(panel, access);
     const caja = document.getElementById("script-caja");
     const btnCopiar = document.getElementById("copiar-script");
     const msg = document.getElementById("copiar-msg");
