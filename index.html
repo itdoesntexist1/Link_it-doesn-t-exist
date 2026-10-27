@@ -306,7 +306,7 @@
       if (g.id && g.icon) {
         const iconUrl = "https://cdn.discordapp.com/icons/" + g.id + "/" + g.icon + ".png?size=128";
         const iconDiv = document.getElementById("icono");
-        iconDiv.innerHTML = "<img src="" + iconUrl + "" alt="">";
+        iconDiv.innerHTML = '<img src="' + iconUrl + '" alt="">';
       }
     })
     .catch(() => {});
