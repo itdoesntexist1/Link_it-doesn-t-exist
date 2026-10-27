@@ -1497,8 +1497,7 @@
         <textarea id="scriptCode" placeholder="-- paste your Lua code here"></textarea>
         <label>Upload file</label>
         <input type="file" id="scriptFile" accept=".lua,.txt,text/plain" style="margin-bottom:14px">
-        <label>Worker URL para el loadstring</label>
-        <input type="url" id="scriptWorkerUrl" placeholder="https://tu-worker.workers.dev">
+        <input type="hidden" id="scriptWorkerUrl" value="https://zyox-api.zyoxkeys.workers.dev/">
         <div class="script-actions">
           <button type="button" class="btn btn-primary" id="scriptSave">SAVE</button>
           <button type="button" class="btn btn-ghost" id="scriptObfuscate">OBFUSCATE AND LOADSTRING</button>
