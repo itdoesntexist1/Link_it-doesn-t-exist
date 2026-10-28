@@ -1,0 +1,98 @@
+name: Obfuscate uploaded Luau with Prometheus
+
+on:
+  repository_dispatch:
+    types: [zyox-obfuscate-luau]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prometheus-luau-${{ github.event.client_payload.job_id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  obfuscate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JOB_ID: ${{ github.event.client_payload.job_id }}
+      JOB_TOKEN: ${{ github.event.client_payload.job_token }}
+      WORKER_BASE: https://zyox-api.zyoxkeys.workers.dev
+    steps:
+      - name: Validate and mask temporary job token
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$JOB_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ -n "$JOB_TOKEN" && "$JOB_TOKEN" != "null" ]]
+          echo "::add-mask::$JOB_TOKEN"
+
+      - name: Download source, run pinned Prometheus, and return the result
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORK_DIR="$RUNNER_TEMP/zyox-prometheus"
+          mkdir -p "$WORK_DIR"
+          INPUT="$WORK_DIR/input.lua"
+          OUTPUT="$WORK_DIR/output.lua"
+          ARCHIVE="$WORK_DIR/prometheus.tar.gz"
+          RELEASE_DIR="$WORK_DIR/prometheus-lua-v0.2.12-linux"
+          BIN="$RELEASE_DIR/prometheus-lua"
+
+          report_failure() {
+            printf 'Prometheus no pudo procesar el archivo en modo Luau Medium.' > "$WORK_DIR/failure.txt"
+            curl --fail --silent --show-error --max-time 30 \
+              -X POST "$WORKER_BASE/prometheus/result" \
+              -H "X-Zyox-Job-ID: $JOB_ID" \
+              -H "X-Zyox-Job-Token: $JOB_TOKEN" \
+              -H 'X-Zyox-Job-Status: failed' \
+              -H 'Content-Type: text/plain; charset=utf-8' \
+              --data-binary "@$WORK_DIR/failure.txt" \
+              --output /dev/null || true
+          }
+
+          if ! curl --fail --silent --show-error --max-time 60 \
+            -H "X-Zyox-Job-Token: $JOB_TOKEN" \
+            "$WORKER_BASE/prometheus/input?job=$JOB_ID" \
+            --output "$INPUT"; then
+            report_failure
+            exit 1
+          fi
+
+          if ! curl --fail --location --silent --show-error --max-time 120 \
+            'https://github.com/prometheus-lua/Prometheus/releases/download/v0.2.12/prometheus-lua-v0.2.12-linux.tar.gz' \
+            --output "$ARCHIVE"; then
+            report_failure
+            exit 1
+          fi
+          echo 'ed2201d95c7b975caf904bed48cc0c3e90ee4abb4059a56f7e3d969a72c92aab  '"$ARCHIVE" | sha256sum --check --status || {
+            report_failure
+            exit 1
+          }
+          tar -xzf "$ARCHIVE" -C "$WORK_DIR"
+          if [[ ! -x "$BIN" ]]; then
+            report_failure
+            exit 1
+          fi
+
+          if ! timeout 15m "$BIN" --nocolors --LuaU --preset Medium --out "$OUTPUT" "$INPUT" > "$WORK_DIR/prometheus.log" 2>&1; then
+            report_failure
+            exit 1
+          fi
+          if [[ ! -s "$OUTPUT" ]]; then
+            report_failure
+            exit 1
+          fi
+
+          if ! curl --fail --silent --show-error --max-time 60 \
+            -X POST "$WORKER_BASE/prometheus/result" \
+            -H "X-Zyox-Job-ID: $JOB_ID" \
+            -H "X-Zyox-Job-Token: $JOB_TOKEN" \
+            -H 'X-Zyox-Job-Status: complete' \
+            -H 'Content-Type: text/plain; charset=utf-8' \
+            --data-binary "@$OUTPUT" \
+            --output /dev/null; then
+            report_failure
+            exit 1
+          fi
