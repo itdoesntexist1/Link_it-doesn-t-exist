@@ -15,20 +15,21 @@
     h1 { margin: 8px 0 10px; font-size: clamp(1.6rem, 5vw, 2.15rem); }
     .intro { margin: 0 0 24px; color: #c0c3d0; line-height: 1.55; }
     label { display: block; margin: 18px 0 7px; font-size: .94rem; font-weight: 650; }
-    input, textarea { display: block; width: 100%; border: 1px solid #3e4354; border-radius: 11px; padding: 12px 14px; color: #fff; background: #10121a; font: inherit; outline: none; }
-    input:focus, textarea:focus { border-color: #818cff; box-shadow: 0 0 0 3px #6975ff26; }
+    input, textarea, select { display: block; width: 100%; border: 1px solid #3e4354; border-radius: 11px; padding: 12px 14px; color: #fff; background: #10121a; font: inherit; outline: none; }
+    input:focus, textarea:focus, select:focus { border-color: #818cff; box-shadow: 0 0 0 3px #6975ff26; }
     textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
     .hint { display: block; margin-top: 7px; color: #a7aaba; font-size: .82rem; line-height: 1.4; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-    button { min-height: 46px; border: 0; border-radius: 11px; padding: 0 18px; color: #fff; background: #5865f2; font: inherit; font-weight: 750; cursor: pointer; }
+    button, .link-button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; border: 0; border-radius: 11px; padding: 0 18px; color: #fff; background: #5865f2; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; }
     button.secondary { border: 1px solid #424758; background: #252936; }
     button:disabled { cursor: not-allowed; opacity: .45; }
     #status { min-height: 24px; margin: 16px 0 0; color: #bdc4ff; line-height: 1.45; }
-    .preview { margin-top: 24px; padding: 17px; border: 1px solid #383d4d; border-radius: 13px; background: #10121a; }
-    .preview h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .preview { margin-top: 24px; padding: 20px 18px; border: 1px solid #383d4d; border-left: 5px solid #5865f2; border-radius: 13px; background: #23242b; }
+    .preview h2 { margin: 0 0 12px; font-size: 1.25rem; font-weight: 650; }
     .preview p { margin: 0; color: #c0c3d0; white-space: pre-wrap; overflow-wrap: anywhere; }
     footer { margin: 16px 4px 0; color: #999daf; font-size: .8rem; line-height: 1.5; }
-    @media (max-width: 480px) { .actions button { flex: 1 1 100%; } }
+    [hidden] { display: none !important; }
+    @media (max-width: 480px) { .actions button, .actions .link-button { flex: 1 1 100%; } }
   </style>
 </head>
 <body>
@@ -36,39 +37,41 @@
     <section class="card" aria-labelledby="heading">
       <div class="eyebrow">ZYOX · configuración</div>
       <h1 id="heading">Editor del panel de Discord</h1>
-      <p class="intro">Conecta tu cuenta de Discord y escribe el ID del servidor. Solo las cuentas con permiso de <strong>Gestionar servidor</strong> o <strong>Administrador</strong> podrán cambiar el panel.</p>
+      <p class="intro">Conecta tu cuenta de Discord. La página mostrará los servidores donde tienes permiso de <strong>Gestionar servidor</strong> o <strong>Administrador</strong>. Elige uno para editar su panel.</p>
 
-      <div class="actions">
-        <button id="connectButton" type="button">Conectar Discord</button>
-      </div>
-      <label for="guildId">ID del servidor</label>
-      <input id="guildId" inputmode="numeric" autocomplete="off" placeholder="Ejemplo: 123456789012345678" required>
-      <span class="hint">Activa el Modo de desarrollador en Discord y elige “Copiar ID del servidor”.</span>
+      <div class="actions"><button id="connectButton" type="button">Conectar Discord</button></div>
+      <label for="serverSelect">Elegir servidor</label>
+      <select id="serverSelect" disabled>
+        <option value="">Conecta Discord para cargar tus servidores</option>
+      </select>
+      <span class="hint">Si el bot no está en el servidor elegido, se abrirá su invitación preseleccionando ese servidor. Esa instalación respeta el permiso único de invitación.</span>
+      <a id="inviteFallback" class="link-button" href="#" target="_blank" rel="noopener" hidden>Abrir invitación del bot</a>
 
       <label for="panelTitle">Título <span class="hint">Máximo 100 caracteres.</span></label>
-      <input id="panelTitle" maxlength="100" placeholder="ZYOXPROTECT">
-
+      <input id="panelTitle" maxlength="100" placeholder="ZYOXPROTECT" disabled>
       <label for="panelDescription">Descripción <span class="hint">Máximo 1500 caracteres.</span></label>
-      <textarea id="panelDescription" maxlength="1500" placeholder="Escribe aquí la descripción del panel"></textarea>
+      <textarea id="panelDescription" maxlength="1500" placeholder="Escribe aquí la descripción del panel" disabled></textarea>
 
       <div class="actions">
         <button class="secondary" id="loadButton" type="button" disabled>Cargar actual</button>
         <button id="saveButton" type="button" disabled>Guardar cambios</button>
       </div>
-      <p id="status" role="status" aria-live="polite">Conecta Discord para habilitar la edición.</p>
+      <p id="status" role="status" aria-live="polite">Conecta Discord para empezar.</p>
 
-      <div class="preview" aria-label="Vista previa del panel">
+      <div class="preview" aria-label="Vista previa del embed del panel">
         <h2 id="previewTitle">ZYOXPROTECT</h2>
         <p id="previewDescription">Pulsa el botón para solicitar el script. Solo podrán usarlo los usuarios con el rol autorizado.</p>
       </div>
     </section>
-    <footer>La autorización se verifica con Discord. El token temporal de sesión solo se mantiene en memoria en esta pestaña. Después de guardar, ejecuta /panel para publicar el nuevo texto; los mensajes existentes no se editan automáticamente.</footer>
+    <footer>La sesión temporal se guarda solo en memoria en esta pestaña. Después de guardar, ejecuta /panel para publicar el embed actualizado; los mensajes existentes no se editan automáticamente.</footer>
   </main>
 
   <script>
     const API_BASE = "https://zyox-api.zyoxkeys.workers.dev";
     const el = (id) => document.getElementById(id);
     let sessionToken = "";
+    let selectedGuildId = "";
+    let selectionRun = 0;
 
     function updatePreview() {
       el("previewTitle").textContent = el("panelTitle").value.trim() || "ZYOXPROTECT";
@@ -76,23 +79,36 @@
     }
     el("panelTitle").addEventListener("input", updatePreview);
     el("panelDescription").addEventListener("input", updatePreview);
-
+    function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
     function randomHex(bytesLength) {
       const bytes = new Uint8Array(bytesLength);
       crypto.getRandomValues(bytes);
       return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
     }
-    function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
     function authError(code) {
       const messages = {
         handoff_invalido: "No se pudo validar la conexión de Discord.",
         oauth_no_configurado: "El Worker todavía no tiene OAuth2 configurado.",
-        autorizacion_cancelada: "Cancelaste la autorización de Discord.",
-        sin_acceso_al_servidor: "Tu cuenta no tiene acceso a ese servidor.",
+        sesion_expirada: "La sesión venció. Conecta Discord otra vez.",
+        sin_acceso_al_servidor: "No tienes permisos de administración en ese servidor.",
         requiere_gestionar_servidor: "Necesitas Administrador o Gestionar servidor en ese servidor.",
-        sesion_expirada: "La sesión venció. Conecta Discord otra vez."
+        requiere_permiso_invitacion: "El bot no está en ese servidor. Primero un administrador debe concederte /permise bot invite @tuUsuario.",
+        permiso_invite_ya_usado: "Ya utilizaste tu permiso único para invitar el bot.",
+        servidor_ya_autorizado: "Ese servidor ya utilizó su permiso único de instalación.",
+        bot_token_no_configurado: "Falta registrar el bot desde /discord/setup.",
+        no_se_pudo_verificar_bot: "Discord no permitió comprobar si el bot está en ese servidor. Inténtalo otra vez más tarde."
       };
-      return messages[code] || code || "No se pudo conectar con Discord.";
+      return messages[code] || code || "No se pudo completar la operación.";
+    }
+    async function api(path, body) {
+      const response = await fetch(API_BASE + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      return { response, data };
     }
 
     async function connectDiscord() {
@@ -106,35 +122,27 @@
       el("status").textContent = "Abriendo la autorización segura de Discord…";
       try {
         const handoffSecret = randomHex(32);
-        const startResponse = await fetch(API_BASE + "/panel-auth/start", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          cache: "no-store",
-          body: JSON.stringify({ handoffSecret })
-        });
-        const startData = await startResponse.json();
-        if (!startResponse.ok) throw new Error(authError(startData.error));
-        popup.location.href = startData.authorizeUrl;
-        el("status").textContent = "Autoriza el acceso en la ventana emergente. Consultando el resultado…";
+        const { response, data } = await api("/panel-auth/start", { handoffSecret });
+        if (!response.ok) throw new Error(authError(data.error));
+        popup.location.href = data.authorizeUrl;
+        el("status").textContent = "Autoriza la conexión en la ventana de Discord…";
         for (let attempt = 0; attempt < 90; attempt++) {
           await wait(1500);
-          const pollResponse = await fetch(API_BASE + "/panel-auth/poll", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            cache: "no-store",
-            body: JSON.stringify({ state: startData.state, handoffSecret })
-          });
-          const pollData = await pollResponse.json();
-          if (pollResponse.status === 202 && pollData.pending) continue;
-          if (!pollResponse.ok) throw new Error(authError(pollData.error));
-          sessionToken = pollData.sessionToken;
-          el("loadButton").disabled = false;
-          el("saveButton").disabled = false;
-          el("status").textContent = "Discord conectado. Escribe el ID de un servidor donde tengas permiso de administrar.";
+          const polled = await api("/panel-auth/poll", { state: data.state, handoffSecret });
+          if (polled.response.status === 202 && polled.data.pending) continue;
+          if (!polled.response.ok) throw new Error(authError(polled.data.error));
+          sessionToken = polled.data.sessionToken;
+          const select = el("serverSelect");
+          select.replaceChildren(new Option("Elige un servidor…", ""));
+          for (const guild of polled.data.guilds || []) select.add(new Option(guild.name, guild.id));
+          select.disabled = false;
+          el("status").textContent = (polled.data.guilds || []).length
+            ? "Discord conectado. Elige el servidor que quieres configurar."
+            : "Discord conectado, pero tu cuenta no tiene Gestionar servidor o Administrador en ningún servidor.";
           try { popup.close(); } catch (_) {}
           return;
         }
-        throw new Error("La autorización tardó demasiado. Inténtalo de nuevo.");
+        throw new Error("La autorización tardó demasiado. Inténtalo otra vez.");
       } catch (error) {
         try { popup.close(); } catch (_) {}
         el("status").textContent = error instanceof TypeError
@@ -145,51 +153,104 @@
       }
     }
 
+    function setEditorEnabled(enabled) {
+      el("panelTitle").disabled = !enabled;
+      el("panelDescription").disabled = !enabled;
+      el("loadButton").disabled = !enabled;
+      el("saveButton").disabled = !enabled;
+    }
+
+    async function chooseServer() {
+      const guildId = el("serverSelect").value;
+      if (!sessionToken || !guildId) return;
+      const run = ++selectionRun;
+      selectedGuildId = "";
+      setEditorEnabled(false);
+      el("inviteFallback").hidden = true;
+      const popup = window.open("about:blank", "zyox-bot-install", "popup,width=520,height=760");
+      el("status").textContent = "Comprobando si el bot ya está en ese servidor…";
+      try {
+        const selected = await api("/panel-config", { action: "select", sessionToken, guildId });
+        if (run !== selectionRun) { try { popup?.close(); } catch (_) {} return; }
+        if (!selected.response.ok) throw new Error(authError(selected.data.error));
+        if (selected.data.botInstalled) {
+          try { popup?.close(); } catch (_) {}
+          selectedGuildId = guildId;
+          setEditorEnabled(true);
+          el("status").textContent = "El bot ya está en el servidor. Cargando el panel…";
+          await send("load");
+          return;
+        }
+        if (!selected.data.inviteUrl) throw new Error("Discord no devolvió el enlace de invitación.");
+        if (popup) {
+          popup.location.href = selected.data.inviteUrl;
+        } else {
+          el("inviteFallback").href = selected.data.inviteUrl;
+          el("inviteFallback").hidden = false;
+        }
+        el("status").textContent = "Se abrió la invitación de Discord para ese servidor. Al terminar de agregar el bot, esta página habilitará el editor.";
+        for (let attempt = 0; attempt < 90; attempt++) {
+          await wait(2000);
+          if (run !== selectionRun) return;
+          const check = await api("/panel-config", { action: "check", sessionToken, guildId });
+          if (!check.response.ok) throw new Error(authError(check.data.error));
+          if (check.data.botInstalled) {
+            try { popup?.close(); } catch (_) {}
+            el("inviteFallback").hidden = true;
+            selectedGuildId = guildId;
+            setEditorEnabled(true);
+            el("status").textContent = "Bot agregado. Cargando la configuración del panel…";
+            await send("load");
+            return;
+          }
+        }
+        el("status").textContent = "Aún no detecto el bot en ese servidor. Termina la autorización de Discord o vuelve a elegir el servidor.";
+      } catch (error) {
+        try { popup?.close(); } catch (_) {}
+        if (run !== selectionRun) return;
+        el("status").textContent = error instanceof TypeError
+          ? "No pude conectar con el Worker. Revisa la red y que la API esté desplegada."
+          : error.message;
+      }
+    }
+
     async function send(action) {
-      if (!sessionToken) {
-        el("status").textContent = "Primero conecta Discord.";
+      if (!sessionToken || !selectedGuildId) {
+        el("status").textContent = "Conecta Discord y elige un servidor donde esté el bot.";
         return;
       }
-      const status = el("status");
       const buttons = [el("loadButton"), el("saveButton")];
       buttons.forEach((button) => { button.disabled = true; });
-      status.textContent = "Guardando…";
+      el("status").textContent = action === "load" ? "Cargando…" : "Guardando…";
       try {
-        const response = await fetch(API_BASE + "/panel-config", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          cache: "no-store",
-          body: JSON.stringify({
-            action,
-            sessionToken,
-            guildId: el("guildId").value.trim(),
-            title: el("panelTitle").value,
-            description: el("panelDescription").value
-          })
+        const { response, data } = await api("/panel-config", {
+          action, sessionToken, guildId: selectedGuildId,
+          title: el("panelTitle").value,
+          description: el("panelDescription").value
         });
-        const data = await response.json();
         if (!response.ok) {
           if (data.error === "sesion_expirada") sessionToken = "";
-          throw new Error(authError(data.error) || "No se pudo completar la operación.");
+          throw new Error(authError(data.error));
         }
         if (action === "load") {
           el("panelTitle").value = data.title;
           el("panelDescription").value = data.description;
           updatePreview();
-          status.textContent = "Configuración cargada.";
+          el("status").textContent = "Configuración cargada.";
         } else {
-          status.textContent = "Cambios guardados. Ejecuta /panel en Discord para publicarlos.";
+          el("status").textContent = "Cambios guardados. Ejecuta /panel para publicar el embed actualizado.";
         }
       } catch (error) {
-        status.textContent = error instanceof TypeError
+        el("status").textContent = error instanceof TypeError
           ? "No pude conectar con el Worker. Revisa la red y que la API esté desplegada."
           : error.message;
       } finally {
-        buttons.forEach((button) => { button.disabled = !sessionToken; });
+        buttons.forEach((button) => { button.disabled = !selectedGuildId || !sessionToken; });
       }
     }
 
     el("connectButton").addEventListener("click", connectDiscord);
+    el("serverSelect").addEventListener("change", chooseServer);
     el("loadButton").addEventListener("click", () => send("load"));
     el("saveButton").addEventListener("click", () => send("save"));
   </script>
