@@ -224,8 +224,29 @@
     });
     document.querySelectorAll(".modal .options button").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        chosen.textContent = "Elegiste: " + btn.dataset.option;
-        document.getElementById("address").hidden = btn.dataset.option !== "Pedir a domicilio";
+        var opcion = btn.dataset.option;
+        document.getElementById("address").hidden = opcion !== "Pedir a domicilio";
+        if (opcion !== "Comer aquí") {
+          chosen.textContent = "Elegiste: " + opcion;
+          return;
+        }
+        var producto = document.getElementById("modalTitle").textContent;
+        var mensaje = "🍽️ **Nuevo pedido para comer aquí**\n" +
+          "**Producto:** " + producto;
+        btn.disabled = true;
+        chosen.textContent = "Enviando pedido...";
+        fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: mensaje })
+        }).then(function (r) {
+          if (!r.ok) throw new Error("error");
+          chosen.textContent = "¡Pedido enviado! Te esperamos.";
+        }).catch(function () {
+          chosen.textContent = "No se pudo enviar el pedido. Intenta de nuevo.";
+        }).then(function () {
+          btn.disabled = false;
+        });
       });
     });
     document.getElementById("closeModal").addEventListener("click", function () {
