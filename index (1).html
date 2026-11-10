@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AD-BLOCKER</title>
+<style>
+  :root { --fondo:#f4f6fb; --tarjeta:#ffffff; --texto:#14181f; --suave:#5b6573; --azul:#0a84ff; --borde:#e3e7ee; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo:#0b0d12; --tarjeta:#161a22; --texto:#f2f4f8; --suave:#9aa4b2; --borde:#262c38; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         padding:24px; background:var(--fondo); color:var(--texto);
+         font-family:-apple-system, system-ui, "Segoe UI", Roboto, sans-serif; }
+  .tarjeta { width:100%; max-width:420px; background:var(--tarjeta); border:1px solid var(--borde);
+             border-radius:24px; padding:32px 24px; text-align:center; }
+  .icono { width:72px; height:72px; margin:0 auto 16px; border-radius:18px; background:var(--azul);
+           display:flex; align-items:center; justify-content:center; font-size:36px; }
+  h1 { margin:0 0 8px; font-size:26px; }
+  p { margin:0 0 20px; color:var(--suave); line-height:1.5; }
+  .boton { display:block; width:100%; padding:16px; border:0; border-radius:14px; background:var(--azul);
+           color:#fff; font-size:19px; font-weight:600; text-decoration:none; }
+  .boton:active { opacity:.8; }
+  .pasos { text-align:left; margin:24px 0 0; padding:0; list-style:none; counter-reset:p; color:var(--suave); font-size:15px; }
+  .pasos li { counter-increment:p; position:relative; padding:8px 0 8px 34px; line-height:1.4; }
+  .pasos li::before { content:counter(p); position:absolute; left:0; top:8px; width:24px; height:24px; border-radius:50%;
+                      background:var(--borde); color:var(--texto); font-size:13px; font-weight:600;
+                      display:flex; align-items:center; justify-content:center; }
+  .aviso { display:none; margin-top:16px; padding:12px; border-radius:12px; background:#ff9f0a22; color:#c77700; font-size:14px; }
+  @media (prefers-color-scheme: dark) { .aviso { color:#ffb340; } }
+</style>
+</head>
+<body>
+  <main class="tarjeta">
+    <div class="icono">&#x1F6E1;&#xFE0F;</div>
+    <h1>AD-BLOCKER</h1>
+    <p>DNS propio que bloquea anuncios y sitios que tú elijas. Funciona en Wi-Fi y en datos m&oacute;viles.</p>
+    <a class="boton" id="instalar" href="https://minds.mancinasjoshua1.workers.dev/perfil.mobileconfig">Instalar</a>
+    <div class="aviso" id="aviso"></div>
+    <ol class="pasos">
+      <li>Toca <b>Instalar</b> y luego <b>Permitir</b>.</li>
+      <li>Abre <b>Ajustes</b> y toca <b>Perfil descargado</b>.</li>
+      <li>Toca <b>Instalar</b> arriba a la derecha.</li>
+      <li>Ve a Ajustes &gt; General &gt; VPN y administraci&oacute;n de dispositivos &gt; <b>DNS</b> y elige <b>AD-BLOCKER</b>.</li>
+    </ol>
+  </main>
+<script>
+  var ua = navigator.userAgent || "";
+  var esiOS = /iPhone|iPad|iPod/.test(ua);
+  var enApp = /FBAN|FBAV|Instagram|Discord|Line|TikTok|Snapchat|; wv\)/i.test(ua);
+  var aviso = document.getElementById("aviso");
+  if (!esiOS) {
+    aviso.style.display = "block";
+    aviso.textContent = "Esta p\u00e1gina es para iPhone o iPad. \u00c1brela desde Safari en tu iPhone.";
+  } else if (enApp) {
+    aviso.style.display = "block";
+    aviso.textContent = "Est\u00e1s en un navegador dentro de otra app. Copia el enlace y \u00e1brelo en Safari para poder instalar.";
+  }
+</script>
+</body>
+</html>
